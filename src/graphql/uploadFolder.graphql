@@ -1,0 +1,3 @@
+mutation uploadFolder($input: UploadFolderInput!) {
+  uploadFolder(input: $input)
+}
