@@ -1,50 +1,48 @@
 import "./App.css";
-import { useState } from "react";
-import { useLoginMutation } from "./generated/schemas";
+import { Route, Routes } from "react-router-dom";
+import { ProtectedRoute } from "./routes/ProtectedRoute";
+import { PrivateRoute } from "./routes/PrivateRoute";
+import Login from "./pages/Login/Login";
 import "antd/dist/reset.css";
+import "./index.css";
+import { AlertProvider } from "./context/AlertContext";
 
 function App() {
-  const [state, setState] = useState({
-    email: "",
-    password: "",
-  });
-
-  const [login] = useLoginMutation();
   return (
-    <div className="App">
-      <div>
-        <input
-          placeholder="Email"
-          onChange={(e) => {
-            setState({
-              ...state,
-              email: e.target.value,
-            });
-          }}
+    <AlertProvider
+      value={{
+        message: "",
+        visible: false,
+        type: "success",
+      }}
+    >
+      <Routes>
+        <Route
+          path="/*"
+          element={
+            <ProtectedRoute isProtected>
+              <PrivateRoute />
+            </ProtectedRoute>
+          }
         />
-
-        <input
-          placeholder="Password"
-          onChange={(e) => {
-            setState({
-              ...state,
-              password: e.target.value,
-            });
-          }}
+        <Route
+          path="/login"
+          element={
+            <ProtectedRoute>
+              <Login />
+            </ProtectedRoute>
+          }
         />
-
-        <button
-          onClick={async () => {
-            const { data } = await login({
-              variables: state,
-            });
-            localStorage.setItem("token", String(data?.login));
-          }}
-        >
-          login
-        </button>
-      </div>
-    </div>
+        {/* <Route
+            path="/signup"
+            element={
+              <ProtectedRoute>
+                <Register />
+              </ProtectedRoute>
+            }
+          /> */}
+      </Routes>
+    </AlertProvider>
   );
 }
 
