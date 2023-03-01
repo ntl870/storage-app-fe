@@ -1,0 +1,10 @@
+query getMe {
+  getMe {
+    ID
+    name
+    email
+    rootFolder {
+      ID
+    }
+  }
+}

@@ -1,10 +1,12 @@
 import { ProtectedLayout } from "../components/ProtectedLayout";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { DashboardOutlined } from "@ant-design/icons";
+import { MyStorage } from "../pages/MyStorage/MyStorage";
+import { FolderPage } from "../pages/FolderPage/FolderPage";
 
 export interface Route {
   path: string;
-  label: string;
+  label?: string;
   element: React.ReactNode;
   icon?: React.ReactNode;
   hidden?: boolean;
@@ -16,8 +18,13 @@ const routes: Route[] = [
     path: "/",
     key: "/",
     label: "Dashboard",
-    element: <div>Hello</div>,
+    element: <MyStorage />,
     icon: <DashboardOutlined />,
+  },
+  {
+    path: "/folder/:folderID",
+    key: "/folder/:folderID",
+    element: <FolderPage />,
   },
 ];
 

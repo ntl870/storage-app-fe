@@ -11,6 +11,7 @@ import {
 import { createUploadLink } from "apollo-upload-client";
 import { setContext } from "@apollo/client/link/context";
 import { BrowserRouter } from "react-router-dom";
+import { useLocalStorage } from "./utils/tools";
 
 const uploadLink = createUploadLink({ uri: import.meta.env.VITE_API_ENDPOINT });
 
@@ -19,7 +20,8 @@ const httpLink = createHttpLink({
 });
 
 const authLink = setContext((_, { headers }) => {
-  const token = localStorage.getItem("token");
+  const { getLocalStorage } = useLocalStorage();
+  const token = getLocalStorage("token");
   return {
     headers: {
       ...headers,
