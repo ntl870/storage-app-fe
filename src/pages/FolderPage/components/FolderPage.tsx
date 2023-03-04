@@ -1,17 +1,15 @@
-import useRouter from "../../hooks/useRouter";
+import useRouter from "@hooks/useRouter";
 import {
   useGetUserFoldersQuery,
   Folder,
   useGetFilesByFolderQuery,
   File,
-} from "../../generated/schemas";
-import { FolderFilled } from "@ant-design/icons";
-import { Row, Col, Typography } from "antd";
-import ItemCard from "../../components/ItemCard";
-import ItemCardContent from "../../components/ItemCardContent";
+} from "@generated/schemas";
+import { Typography } from "antd";
 import { useState } from "react";
 import { FileSection } from "./FileSection";
-import useCurrentUser from "../../hooks/useCurrentUser";
+import useCurrentUser from "@hooks/useCurrentUser";
+import { FolderSection } from "../FolderSection";
 
 export const FolderPage = () => {
   const { params, navigate } = useRouter();
@@ -58,27 +56,11 @@ export const FolderPage = () => {
       <Typography.Text className="inline-block p-4 font-semibold">
         Folders
       </Typography.Text>
-      <Row className="ml-7">
-        {data?.getUserFolders.map((item) => (
-          <Col className="m-4" key={item.ID}>
-            <ItemCard
-              cover={<FolderFilled className="text-7xl mt-6" />}
-              className="w-60"
-              onClick={() => handleClickFolder(item as Folder)}
-            >
-              <ItemCardContent
-                className={`${
-                  selectedItem?.ID === item.ID ? "bg-blue-100" : ""
-                }`}
-              >
-                <Typography.Text className="w-full font-semibold pointer-events-none">
-                  {item.name}
-                </Typography.Text>
-              </ItemCardContent>
-            </ItemCard>
-          </Col>
-        ))}
-      </Row>
+      <FolderSection
+        folders={(data?.getUserFolders as Folder[]) || []}
+        handleClickFolder={handleClickFolder}
+        selectedItem={selectedItem as Folder}
+      />
       <Typography.Text className="inline-block p-4 font-semibold">
         Files
       </Typography.Text>

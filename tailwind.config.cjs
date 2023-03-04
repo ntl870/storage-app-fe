@@ -6,6 +6,14 @@ module.exports = {
     extend: {
       minWidth: {
         "350px": "350px",
+        56: "14rem",
+      },
+      maxWidth: {
+        72: "18rem",
+        56: "14rem",
+      },
+      borderColor: {
+        "primary-grey": "rgb(60,64,67)",
       },
     },
   },

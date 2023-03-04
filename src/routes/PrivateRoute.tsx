@@ -2,7 +2,7 @@ import { ProtectedLayout } from "../components/ProtectedLayout";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { DashboardOutlined } from "@ant-design/icons";
 import { MyStorage } from "../pages/MyStorage/MyStorage";
-import { FolderPage } from "../pages/FolderPage/FolderPage";
+import { FolderPage } from "../pages/FolderPage/components/FolderPage";
 
 export interface Route {
   path: string;
@@ -25,6 +25,7 @@ const routes: Route[] = [
     path: "/folder/:folderID",
     key: "/folder/:folderID",
     element: <FolderPage />,
+    hidden: true,
   },
 ];
 

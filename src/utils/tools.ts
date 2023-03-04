@@ -15,3 +15,11 @@ export const useLocalStorage = () => {
     },
   };
 };
+
+export const downloadURI = (fileID: string, type: "files" | "folders") => {
+  const link = document.createElement("a");
+  link.href = `${import.meta.env.VITE_BASE_API}/${type}/${fileID}`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
