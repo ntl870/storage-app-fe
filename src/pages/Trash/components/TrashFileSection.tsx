@@ -1,14 +1,13 @@
+import { DeleteOutlined, FileFilled, RedoOutlined } from "@ant-design/icons";
 import {
-  CloudDownloadOutlined,
-  DeleteOutlined,
-  FileFilled,
-} from "@ant-design/icons";
-import { Col, Dropdown, MenuProps, Row, Typography } from "antd";
+  Folder,
+  File,
+  useRestoreFileFromTrashMutation,
+  useDeleteFileMutation,
+} from "@generated/schemas";
+import { Row, Dropdown, Col, Typography, MenuProps } from "antd";
 import ItemCard from "@components/FileCard";
 import ItemCardContent from "@components/FileCardContent";
-import { File, Folder, useMoveFileToTrashMutation } from "@generated/schemas";
-import { downloadURI } from "@utils/tools";
-import { useMemo } from "react";
 import { useAlert } from "@hooks/useAlert";
 
 interface Props {
@@ -19,37 +18,48 @@ interface Props {
   refetch: () => void;
 }
 
-export const FileSection = ({
+export const TrashFileSection = ({
   files,
   handleClickItem,
   selectedItem,
   refetch,
 }: Props) => {
   const { showSuccessAlert, showErrorAlert } = useAlert();
-  const [moveFileToTrash] = useMoveFileToTrashMutation();
+  const [restoreFileFromTrash] = useRestoreFileFromTrashMutation();
+  const [deleteFile] = useDeleteFileMutation();
 
   const getItems = (item: File): MenuProps["items"] => [
     {
-      label: "Download",
+      label: "Restore",
       key: "1",
-      icon: <CloudDownloadOutlined />,
-      onClick: () => {
-        downloadURI(String(item.ID), "files");
-      },
-    },
-    {
-      label: "Move to trash",
-      key: "2",
-      icon: <DeleteOutlined />,
+      icon: <RedoOutlined />,
       onClick: async () => {
         try {
-          await moveFileToTrash({
+          await restoreFileFromTrash({
             variables: {
               fileID: item.ID,
             },
           });
           refetch();
-          showSuccessAlert("File moved to trash");
+          showSuccessAlert("File restored");
+        } catch (err) {
+          showErrorAlert((err as Error).message);
+        }
+      },
+    },
+    {
+      label: "Delete Forever",
+      key: "2",
+      icon: <DeleteOutlined />,
+      onClick: async () => {
+        try {
+          const { data } = await deleteFile({
+            variables: {
+              fileID: item.ID,
+            },
+          });
+          refetch();
+          showSuccessAlert(data?.deleteFile || "");
         } catch (err) {
           showErrorAlert((err as Error).message);
         }
@@ -57,14 +67,9 @@ export const FileSection = ({
     },
   ];
 
-  const filteredFiles = useMemo(
-    () => files.filter((file) => !file.isTrash),
-    [files]
-  );
-
   return (
     <Row className="ml-7">
-      {filteredFiles.map((file) => (
+      {files.map((file) => (
         <Dropdown
           menu={{ items: getItems(file) }}
           key={file.ID}

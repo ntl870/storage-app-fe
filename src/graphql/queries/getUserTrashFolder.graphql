@@ -1,0 +1,19 @@
+query getUserTrashFolder {
+  getUserTrashFolder {
+    ID
+    name
+    files {
+      ID
+      name
+      url
+      fileType
+    }
+    subFolders {
+      ID
+      name
+      path
+    }
+    path
+    isTrash
+  }
+}

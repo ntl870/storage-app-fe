@@ -1,0 +1,3 @@
+mutation deleteFolder($folderID: String!) {
+  deleteFolder(folderID: $folderID)
+}

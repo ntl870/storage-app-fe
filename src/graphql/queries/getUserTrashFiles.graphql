@@ -1,0 +1,9 @@
+query getUserTrashFiles {
+  getUserTrashFiles {
+    ID
+    name
+    url
+    fileType
+    isTrash
+  }
+}

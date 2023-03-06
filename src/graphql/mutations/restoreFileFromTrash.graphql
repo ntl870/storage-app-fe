@@ -1,0 +1,6 @@
+mutation restoreFileFromTrash($fileID: String!) {
+  restoreFileFromTrash(fileID: $fileID) {
+    ID
+    name
+  }
+}

@@ -1,8 +1,16 @@
-import { FolderFilled } from "@ant-design/icons";
+import {
+  CloudDownloadOutlined,
+  DeleteOutlined,
+  FolderFilled,
+} from "@ant-design/icons";
 import { Row, Col, Typography, Dropdown, MenuProps } from "antd";
-import { Folder } from "../../generated/schemas";
+import {
+  Folder,
+  useMoveFolderToTrashMutation,
+} from "../../../generated/schemas";
 import styled from "styled-components";
 import { downloadURI } from "@utils/tools";
+import { useMemo } from "react";
 
 const StyledItem = styled.div`
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -15,26 +23,53 @@ interface Props {
   folders: Folder[];
   handleClickFolder?: (item: Folder) => void;
   selectedItem: Folder | null;
+  refetch: () => void;
 }
-
-const getItems = (item: Folder): MenuProps["items"] => [
-  {
-    label: "Download",
-    key: "1",
-    onClick: () => {
-      downloadURI(String(item.ID), "folders");
-    },
-  },
-];
 
 export const FolderSection = ({
   folders,
   selectedItem,
   handleClickFolder,
+  refetch,
 }: Props) => {
+  const [moveFolderToTrash] = useMoveFolderToTrashMutation();
+
+  const getItems = (item: Folder): MenuProps["items"] => [
+    {
+      label: "Download",
+      key: "1",
+      icon: <CloudDownloadOutlined />,
+      onClick: () => {
+        downloadURI(String(item.ID), "folders");
+      },
+    },
+    {
+      label: "Move to trash",
+      key: "2",
+      icon: <DeleteOutlined />,
+      onClick: async () => {
+        try {
+          await moveFolderToTrash({
+            variables: {
+              folderID: item.ID,
+            },
+          });
+          refetch();
+        } catch (err) {
+          console.log(err);
+        }
+      },
+    },
+  ];
+
+  const filteredFolders = useMemo(
+    () => folders.filter((folder) => !folder.isTrash),
+    [folders]
+  );
+
   return (
     <Row className="ml-7">
-      {folders?.map((folder) => (
+      {filteredFolders?.map((folder) => (
         <Dropdown
           menu={{ items: getItems(folder) }}
           key={folder.ID}

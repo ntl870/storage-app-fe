@@ -4,5 +4,6 @@ query getFilesByFolder($folderID: String!) {
     name
     url
     fileType
+    isTrash
   }
 }

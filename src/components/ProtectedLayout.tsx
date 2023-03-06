@@ -1,7 +1,7 @@
+import { Route } from "@routes/routes";
 import { Layout, Menu } from "antd";
 import Sider from "antd/es/layout/Sider";
 import React from "react";
-import { Route } from "../routes/PrivateRoute";
 import useRouter from "../hooks/useRouter";
 
 interface ProtectedLayoutProps {
@@ -10,8 +10,7 @@ interface ProtectedLayoutProps {
 }
 
 export const ProtectedLayout = ({ children, routes }: ProtectedLayoutProps) => {
-  const { navigate } = useRouter();
-
+  const { navigate, pathname } = useRouter();
   const onSelectItem = (key: string) => {
     navigate(key, {
       replace: true,
@@ -24,7 +23,7 @@ export const ProtectedLayout = ({ children, routes }: ProtectedLayoutProps) => {
         <Menu
           theme="light"
           mode="inline"
-          defaultSelectedKeys={["/"]}
+          defaultSelectedKeys={[pathname]}
           items={routes}
           onSelect={({ key }) => onSelectItem(key)}
         />

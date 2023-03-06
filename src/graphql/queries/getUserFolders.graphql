@@ -14,5 +14,6 @@ query getUserFolders($folderID: String!) {
       path
     }
     path
+    isTrash
   }
 }

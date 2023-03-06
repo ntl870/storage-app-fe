@@ -1,0 +1,6 @@
+mutation moveFileToTrash($fileID: String!) {
+  moveFileToTrash(fileID: $fileID) {
+    ID
+    name
+  }
+}

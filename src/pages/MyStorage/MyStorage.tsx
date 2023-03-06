@@ -1,4 +1,4 @@
-import { FolderPage } from "../FolderPage/components/FolderPage";
+import { FolderPage } from "../FolderPage/FolderPage";
 
 export const MyStorage = () => {
   return (

@@ -1,0 +1,3 @@
+mutation moveFolderToTrash($folderID: String!) {
+  moveFolderToTrash(folderID: $folderID)
+}

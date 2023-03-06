@@ -7,29 +7,31 @@ import {
 } from "@generated/schemas";
 import { Typography } from "antd";
 import { useState } from "react";
-import { FileSection } from "./FileSection";
+import { FileSection } from "./components/FileSection";
 import useCurrentUser from "@hooks/useCurrentUser";
-import { FolderSection } from "../FolderSection";
+import { FolderSection } from "./components/FolderSection";
 
 export const FolderPage = () => {
   const { params, navigate } = useRouter();
   const { rootFolderID } = useCurrentUser();
   const [selectedItem, setSelectedItem] = useState<Folder | File | null>(null);
 
-  const { data } = useGetUserFoldersQuery({
-    variables: {
-      folderID: params.folderID || rootFolderID || "",
-    },
-    skip: !params.folderID && !rootFolderID,
-    fetchPolicy: "cache-and-network",
-  });
+  const { data: foldersData, refetch: refetchFolders } = useGetUserFoldersQuery(
+    {
+      variables: {
+        folderID: params.folderID || rootFolderID || "",
+      },
+      skip: !params.folderID && !rootFolderID,
+      fetchPolicy: "network-only",
+    }
+  );
 
-  const { data: filesData } = useGetFilesByFolderQuery({
+  const { data: filesData, refetch: refetchFiles } = useGetFilesByFolderQuery({
     variables: {
       folderID: params.folderID || rootFolderID || "",
     },
     skip: !params.folderID && !rootFolderID,
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "network-only",
   });
 
   const navigateToFolder = (folderID: string) => {
@@ -57,9 +59,10 @@ export const FolderPage = () => {
         Folders
       </Typography.Text>
       <FolderSection
-        folders={(data?.getUserFolders as Folder[]) || []}
+        folders={(foldersData?.getUserFolders as Folder[]) || []}
         handleClickFolder={handleClickFolder}
         selectedItem={selectedItem as Folder}
+        refetch={refetchFolders}
       />
       <Typography.Text className="inline-block p-4 font-semibold">
         Files
@@ -68,6 +71,8 @@ export const FolderPage = () => {
         files={(filesData?.getFilesByFolder as File[]) || []}
         handleClickItem={handleClickFile}
         selectedItem={selectedItem}
+        isFilterTrash={false}
+        refetch={refetchFiles}
       />
     </>
   );
