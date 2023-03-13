@@ -7,7 +7,7 @@ import useRouter from "../../hooks/useRouter";
 const Login = () => {
   const [login, { loading }] = useLoginMutation();
   const { setLocalStorage } = useLocalStorage();
-  const { showSuccessAlert, showErrorAlert } = useAlert();
+  const { showSuccessNotification, showErrorNotification } = useAlert();
   const { navigate } = useRouter();
 
   const onFinish = async ({ email, password }: MutationLoginArgs) => {
@@ -19,10 +19,10 @@ const Login = () => {
         },
       });
       setLocalStorage("token", data?.login || "");
-      showSuccessAlert("Login successfully");
+      showSuccessNotification("Login successfully");
       navigate("/");
     } catch (err) {
-      showErrorAlert((err as Error).message);
+      showErrorNotification((err as Error).message);
     }
   };
 

@@ -9,13 +9,7 @@ import { AlertProvider } from "./context/AlertContext";
 
 function App() {
   return (
-    <AlertProvider
-      value={{
-        message: "",
-        visible: false,
-        type: "success",
-      }}
-    >
+    <AlertProvider>
       <Routes>
         <Route
           path="/*"

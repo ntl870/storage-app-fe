@@ -24,7 +24,7 @@ export const TrashFileSection = ({
   selectedItem,
   refetch,
 }: Props) => {
-  const { showSuccessAlert, showErrorAlert } = useAlert();
+  const { showSuccessNotification, showErrorNotification } = useAlert();
   const [restoreFileFromTrash] = useRestoreFileFromTrashMutation();
   const [deleteFile] = useDeleteFileMutation();
 
@@ -41,9 +41,9 @@ export const TrashFileSection = ({
             },
           });
           refetch();
-          showSuccessAlert("File restored");
+          showSuccessNotification("File restored");
         } catch (err) {
-          showErrorAlert((err as Error).message);
+          showErrorNotification((err as Error).message);
         }
       },
     },
@@ -59,9 +59,9 @@ export const TrashFileSection = ({
             },
           });
           refetch();
-          showSuccessAlert(data?.deleteFile || "");
+          showSuccessNotification(data?.deleteFile || "");
         } catch (err) {
-          showErrorAlert((err as Error).message);
+          showErrorNotification((err as Error).message);
         }
       },
     },

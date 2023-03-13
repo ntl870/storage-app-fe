@@ -22,7 +22,7 @@ const { Text } = Typography;
 interface Props {
   folders: Folder[];
   handleClickFolder?: (item: Folder) => void;
-  selectedItem: Folder | null;
+  selectedItem: (Folder & { type: "folder" | "file" }) | null;
   refetch: () => void;
 }
 
@@ -78,7 +78,7 @@ export const FolderSection = ({
           <Col className="m-4">
             <StyledItem
               className={`p-3 flex flex-row items-center min-w-56 max-w-56 ${
-                selectedItem?.ID === folder.ID
+                selectedItem?.ID === folder.ID && selectedItem.type === "folder"
                   ? "bg-blue-100"
                   : "bg-white hover:bg-neutral-100"
               }`}

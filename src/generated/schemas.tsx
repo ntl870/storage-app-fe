@@ -173,6 +173,40 @@ export type User = {
 };
 
 
+export const CreateFolderDocument = gql`
+    mutation createFolder($input: NewFolderInput!) {
+  createFolder(input: $input) {
+    ID
+    name
+  }
+}
+    `;
+export type CreateFolderMutationFn = Apollo.MutationFunction<CreateFolderMutation, CreateFolderMutationVariables>;
+
+/**
+ * __useCreateFolderMutation__
+ *
+ * To run a mutation, you first call `useCreateFolderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateFolderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createFolderMutation, { data, loading, error }] = useCreateFolderMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateFolderMutation(baseOptions?: Apollo.MutationHookOptions<CreateFolderMutation, CreateFolderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateFolderMutation, CreateFolderMutationVariables>(CreateFolderDocument, options);
+      }
+export type CreateFolderMutationHookResult = ReturnType<typeof useCreateFolderMutation>;
+export type CreateFolderMutationResult = Apollo.MutationResult<CreateFolderMutation>;
+export type CreateFolderMutationOptions = Apollo.BaseMutationOptions<CreateFolderMutation, CreateFolderMutationVariables>;
 export const DeleteFileDocument = gql`
     mutation deleteFile($fileID: String!) {
   deleteFile(fileID: $fileID)
@@ -397,6 +431,47 @@ export function useRestoreFileFromTrashMutation(baseOptions?: Apollo.MutationHoo
 export type RestoreFileFromTrashMutationHookResult = ReturnType<typeof useRestoreFileFromTrashMutation>;
 export type RestoreFileFromTrashMutationResult = Apollo.MutationResult<RestoreFileFromTrashMutation>;
 export type RestoreFileFromTrashMutationOptions = Apollo.BaseMutationOptions<RestoreFileFromTrashMutation, RestoreFileFromTrashMutationVariables>;
+export const UploadFileDocument = gql`
+    mutation uploadFile($file: Upload!, $folderID: String!) {
+  uploadFile(file: $file, folderID: $folderID) {
+    ID
+    name
+    folder {
+      ID
+      name
+    }
+    url
+    ownerID
+  }
+}
+    `;
+export type UploadFileMutationFn = Apollo.MutationFunction<UploadFileMutation, UploadFileMutationVariables>;
+
+/**
+ * __useUploadFileMutation__
+ *
+ * To run a mutation, you first call `useUploadFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUploadFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [uploadFileMutation, { data, loading, error }] = useUploadFileMutation({
+ *   variables: {
+ *      file: // value for 'file'
+ *      folderID: // value for 'folderID'
+ *   },
+ * });
+ */
+export function useUploadFileMutation(baseOptions?: Apollo.MutationHookOptions<UploadFileMutation, UploadFileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UploadFileMutation, UploadFileMutationVariables>(UploadFileDocument, options);
+      }
+export type UploadFileMutationHookResult = ReturnType<typeof useUploadFileMutation>;
+export type UploadFileMutationResult = Apollo.MutationResult<UploadFileMutation>;
+export type UploadFileMutationOptions = Apollo.BaseMutationOptions<UploadFileMutation, UploadFileMutationVariables>;
 export const UploadFolderDocument = gql`
     mutation uploadFolder($input: UploadFolderInput!) {
   uploadFolder(input: $input)
@@ -656,6 +731,13 @@ export type GetUserTrashFolderQueryResult = Apollo.QueryResult<GetUserTrashFolde
 export function refetchGetUserTrashFolderQuery(variables?: GetUserTrashFolderQueryVariables) {
       return { query: GetUserTrashFolderDocument, variables: variables }
     }
+export type CreateFolderMutationVariables = Exact<{
+  input: NewFolderInput;
+}>;
+
+
+export type CreateFolderMutation = { createFolder: { ID: string, name: string } };
+
 export type DeleteFileMutationVariables = Exact<{
   fileID: Scalars['String'];
 }>;
@@ -705,6 +787,14 @@ export type RestoreFileFromTrashMutationVariables = Exact<{
 
 
 export type RestoreFileFromTrashMutation = { restoreFileFromTrash: { ID: string, name: string } };
+
+export type UploadFileMutationVariables = Exact<{
+  file: Scalars['Upload'];
+  folderID: Scalars['String'];
+}>;
+
+
+export type UploadFileMutation = { uploadFile: { ID: string, name: string, url: string, ownerID: string, folder?: { ID: string, name: string } | null } };
 
 export type UploadFolderMutationVariables = Exact<{
   input: UploadFolderInput;

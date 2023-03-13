@@ -28,7 +28,7 @@ export const TrashFolderSection = ({
   handleClickFolder,
   refetch,
 }: Props) => {
-  const { showSuccessAlert, showErrorAlert } = useAlert();
+  const { showSuccessNotification, showErrorNotification } = useAlert();
   const [moveFolderOutOfTrash] = useMoveFolderOutOfTrashMutation();
   const [deleteFolder] = useDeleteFolderMutation();
 
@@ -45,9 +45,9 @@ export const TrashFolderSection = ({
             },
           });
           refetch();
-          showSuccessAlert(data?.moveFolderOutOfTrash || "");
+          showSuccessNotification(data?.moveFolderOutOfTrash || "");
         } catch (err) {
-          showErrorAlert((err as Error).message);
+          showErrorNotification((err as Error).message);
         }
       },
     },
@@ -63,9 +63,9 @@ export const TrashFolderSection = ({
             },
           });
           refetch();
-          showSuccessAlert(data?.deleteFolder || "");
+          showSuccessNotification(data?.deleteFolder || "");
         } catch (err) {
-          showErrorAlert((err as Error).message);
+          showErrorNotification((err as Error).message);
         }
       },
     },

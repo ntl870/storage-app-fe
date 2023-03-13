@@ -6,14 +6,14 @@ import {
 import { Col, Dropdown, MenuProps, Row, Typography } from "antd";
 import ItemCard from "@components/FileCard";
 import ItemCardContent from "@components/FileCardContent";
-import { File, Folder, useMoveFileToTrashMutation } from "@generated/schemas";
+import { File, useMoveFileToTrashMutation } from "@generated/schemas";
 import { downloadURI } from "@utils/tools";
 import { useMemo } from "react";
 import { useAlert } from "@hooks/useAlert";
 
 interface Props {
   files: File[];
-  selectedItem: Folder | File | null;
+  selectedItem: (File & { type: "file" | "folder" }) | null;
   handleClickItem: (file: File | null) => void;
   isFilterTrash?: boolean;
   refetch: () => void;
@@ -25,7 +25,7 @@ export const FileSection = ({
   selectedItem,
   refetch,
 }: Props) => {
-  const { showSuccessAlert, showErrorAlert } = useAlert();
+  const { showSuccessNotification, showErrorNotification } = useAlert();
   const [moveFileToTrash] = useMoveFileToTrashMutation();
 
   const getItems = (item: File): MenuProps["items"] => [
@@ -49,9 +49,9 @@ export const FileSection = ({
             },
           });
           refetch();
-          showSuccessAlert("File moved to trash");
+          showSuccessNotification("File moved to trash");
         } catch (err) {
-          showErrorAlert((err as Error).message);
+          showErrorNotification((err as Error).message);
         }
       },
     },
@@ -78,7 +78,9 @@ export const FileSection = ({
             >
               <ItemCardContent
                 className={`${
-                  selectedItem?.ID === file.ID ? "bg-blue-100" : ""
+                  selectedItem?.ID === file.ID && selectedItem.type === "file"
+                    ? "bg-blue-100"
+                    : ""
                 }`}
               >
                 <Typography.Text className="w-full font-semibold pointer-events-none truncate inline-block select-none">

@@ -4,6 +4,7 @@
     "useDefineForClassFields": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,
+    "isolatedModules": true,
     "skipLibCheck": true,
     "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
@@ -23,5 +24,6 @@
       "@utils/*": ["src/utils/*"]
     },
     "baseUrl": "./"
-  }
+  },
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

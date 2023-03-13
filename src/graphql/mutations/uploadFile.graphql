@@ -1,0 +1,12 @@
+mutation uploadFile($file: Upload!, $folderID: String!) {
+  uploadFile(file: $file, folderID: $folderID) {
+    ID
+    name
+    folder {
+      ID
+      name
+    }
+    url
+    ownerID
+  }
+}
