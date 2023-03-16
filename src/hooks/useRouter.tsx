@@ -9,8 +9,11 @@ const useRouter = () => {
   const navigate = useNavigate();
   const { pathname, state: locationState } = useLocation();
   const params = useParams();
+
   const [searchParams] = useSearchParams();
   const searchParamsObject = Object.fromEntries(searchParams.entries());
+
+  const splittedPathname = pathname.split("/").slice(1);
 
   return {
     params,
@@ -18,6 +21,7 @@ const useRouter = () => {
     locationState,
     searchParamsObject,
     navigate,
+    splittedPathname,
   };
 };
 

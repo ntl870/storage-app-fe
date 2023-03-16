@@ -1,3 +1,14 @@
+import {
+  FilePdfOutlined,
+  FileImageOutlined,
+  FileZipOutlined,
+  FileTextOutlined,
+  FileOutlined,
+  AudioOutlined,
+} from "@ant-design/icons";
+import { File as FileSchema } from "@generated/schemas";
+import { Image } from "antd";
+
 export const useLocalStorage = () => {
   return {
     setLocalStorage: (key: string, value: any) => {
@@ -67,4 +78,33 @@ export const groupFilesByFolder = (files: File[]) => {
   }
 
   return folders;
+};
+
+export const getFileURL = (fileID?: string) =>
+  `${import.meta.env.VITE_BASE_API}/files/${fileID}`;
+
+export const renderIconByFileType = (file: FileSchema) => {
+  switch (file.fileType) {
+    case "pdf":
+      return <FilePdfOutlined className="text-7xl mt-6" />;
+    case "png":
+    case "jpg":
+      return (
+        <Image
+          src={getFileURL(file.ID)}
+          preview={false}
+          height={104}
+          className="object-cover"
+        />
+      );
+    case "mp4":
+    case "mp3":
+      return <AudioOutlined className="text-7xl mt-6" />;
+    case "zip":
+      return <FileZipOutlined className="text-7xl mt-6" />;
+    case "txt":
+      return <FileTextOutlined className="text-7xl mt-6" />;
+    default:
+      return <FileOutlined className="text-7xl mt-6" />;
+  }
 };

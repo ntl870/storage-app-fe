@@ -1,0 +1,6 @@
+query getArrayOfRootFoldersName($folderID: String!) {
+  getArrayOfRootFoldersName(folderID: $folderID) {
+    ID
+    name
+  }
+}

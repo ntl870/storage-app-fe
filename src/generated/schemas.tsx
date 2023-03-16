@@ -123,6 +123,7 @@ export type NewUserReturn = {
 
 export type Query = {
   getAllUsers: Array<User>;
+  getArrayOfRootFoldersName: Array<Folder>;
   getFileByID: File;
   getFilesByFolder: Array<File>;
   getMe: User;
@@ -131,6 +132,11 @@ export type Query = {
   getUserFolders: Array<Folder>;
   getUserTrashFiles: Array<File>;
   getUserTrashFolder: Array<Folder>;
+};
+
+
+export type QueryGetArrayOfRootFoldersNameArgs = {
+  folderID: Scalars['String'];
 };
 
 
@@ -503,6 +509,45 @@ export function useUploadFolderMutation(baseOptions?: Apollo.MutationHookOptions
 export type UploadFolderMutationHookResult = ReturnType<typeof useUploadFolderMutation>;
 export type UploadFolderMutationResult = Apollo.MutationResult<UploadFolderMutation>;
 export type UploadFolderMutationOptions = Apollo.BaseMutationOptions<UploadFolderMutation, UploadFolderMutationVariables>;
+export const GetArrayOfRootFoldersNameDocument = gql`
+    query getArrayOfRootFoldersName($folderID: String!) {
+  getArrayOfRootFoldersName(folderID: $folderID) {
+    ID
+    name
+  }
+}
+    `;
+
+/**
+ * __useGetArrayOfRootFoldersNameQuery__
+ *
+ * To run a query within a React component, call `useGetArrayOfRootFoldersNameQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetArrayOfRootFoldersNameQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetArrayOfRootFoldersNameQuery({
+ *   variables: {
+ *      folderID: // value for 'folderID'
+ *   },
+ * });
+ */
+export function useGetArrayOfRootFoldersNameQuery(baseOptions: Apollo.QueryHookOptions<GetArrayOfRootFoldersNameQuery, GetArrayOfRootFoldersNameQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetArrayOfRootFoldersNameQuery, GetArrayOfRootFoldersNameQueryVariables>(GetArrayOfRootFoldersNameDocument, options);
+      }
+export function useGetArrayOfRootFoldersNameLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetArrayOfRootFoldersNameQuery, GetArrayOfRootFoldersNameQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetArrayOfRootFoldersNameQuery, GetArrayOfRootFoldersNameQueryVariables>(GetArrayOfRootFoldersNameDocument, options);
+        }
+export type GetArrayOfRootFoldersNameQueryHookResult = ReturnType<typeof useGetArrayOfRootFoldersNameQuery>;
+export type GetArrayOfRootFoldersNameLazyQueryHookResult = ReturnType<typeof useGetArrayOfRootFoldersNameLazyQuery>;
+export type GetArrayOfRootFoldersNameQueryResult = Apollo.QueryResult<GetArrayOfRootFoldersNameQuery, GetArrayOfRootFoldersNameQueryVariables>;
+export function refetchGetArrayOfRootFoldersNameQuery(variables: GetArrayOfRootFoldersNameQueryVariables) {
+      return { query: GetArrayOfRootFoldersNameDocument, variables: variables }
+    }
 export const GetFilesByFolderDocument = gql`
     query getFilesByFolder($folderID: String!) {
   getFilesByFolder(folderID: $folderID) {
@@ -802,6 +847,13 @@ export type UploadFolderMutationVariables = Exact<{
 
 
 export type UploadFolderMutation = { uploadFolder: string };
+
+export type GetArrayOfRootFoldersNameQueryVariables = Exact<{
+  folderID: Scalars['String'];
+}>;
+
+
+export type GetArrayOfRootFoldersNameQuery = { getArrayOfRootFoldersName: Array<{ ID: string, name: string }> };
 
 export type GetFilesByFolderQueryVariables = Exact<{
   folderID: Scalars['String'];

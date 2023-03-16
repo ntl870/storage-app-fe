@@ -28,6 +28,7 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import { groupFilesByFolder } from "@utils/tools";
+import NavigateBreadCrumb from "@components/NavigateBreadCrumb";
 
 type SelectedItemType =
   | ((Folder | FileSchema) & { type: "file" | "folder" })
@@ -87,11 +88,21 @@ export const FolderPage = () => {
       navigateToFolder(String(selectedItem.ID));
       return;
     }
+
+    if (!item) {
+      setSelectedItem(null);
+      return;
+    }
     setSelectedItem({ ...item, type: "folder" });
   };
 
   const handleClickFile = (item: FileSchema | null) => {
     if (selectedItem && selectedItem.ID === item?.ID) {
+      return;
+    }
+
+    if (!item) {
+      setSelectedItem(null);
       return;
     }
     setSelectedItem({ ...item, type: "file" } as SelectedItemType);
@@ -191,42 +202,46 @@ export const FolderPage = () => {
   }, [folderInputRef]);
 
   return (
-    <div className="flex flex-col pt-5">
-      <div className="ml-4">
-        <Dropdown menu={{ items: addMenuItems }} trigger={["click"]}>
-          <Button className="" size="large">
-            <PlusOutlined />
-            Add
-          </Button>
-        </Dropdown>
+    <>
+      <div className="flex flex-col pt-5">
+        <div className="ml-4">
+          <Dropdown menu={{ items: addMenuItems }} trigger={["click"]}>
+            <Button className="" size="large">
+              <PlusOutlined />
+              Add
+            </Button>
+          </Dropdown>
+        </div>
+        <NavigateBreadCrumb />
+        {!!foldersData?.getUserFolders.length && (
+          <Typography.Text className="inline-block p-4 font-semibold">
+            Folders
+          </Typography.Text>
+        )}
+
+        <FolderSection
+          folders={(foldersData?.getUserFolders as Folder[]) || []}
+          handleClickFolder={handleClickFolder}
+          selectedItem={selectedItem as Folder & { type: "file" | "folder" }}
+          refetch={refetchFolders}
+        />
+
+        {!!filesData?.getFilesByFolder.length && (
+          <Typography.Text className="inline-block p-4 font-semibold">
+            Files
+          </Typography.Text>
+        )}
+
+        <FileSection
+          files={(filesData?.getFilesByFolder as FileSchema[]) || []}
+          handleClickItem={handleClickFile}
+          selectedItem={
+            selectedItem as FileSchema & { type: "file" | "folder" }
+          }
+          isFilterTrash={false}
+          refetch={refetchFiles}
+        />
       </div>
-
-      {!!foldersData?.getUserFolders.length && (
-        <Typography.Text className="inline-block p-4 font-semibold">
-          Folders
-        </Typography.Text>
-      )}
-
-      <FolderSection
-        folders={(foldersData?.getUserFolders as Folder[]) || []}
-        handleClickFolder={handleClickFolder}
-        selectedItem={selectedItem as Folder & { type: "file" | "folder" }}
-        refetch={refetchFolders}
-      />
-
-      {!!filesData?.getFilesByFolder.length && (
-        <Typography.Text className="inline-block p-4 font-semibold">
-          Files
-        </Typography.Text>
-      )}
-
-      <FileSection
-        files={(filesData?.getFilesByFolder as FileSchema[]) || []}
-        handleClickItem={handleClickFile}
-        selectedItem={selectedItem as FileSchema & { type: "file" | "folder" }}
-        isFilterTrash={false}
-        refetch={refetchFiles}
-      />
       {isShownNewFolderDialog && (
         <Modal
           title="Create Folder"
@@ -256,6 +271,6 @@ export const FolderPage = () => {
         multiple
         onChange={handleUploadFolder}
       />
-    </div>
+    </>
   );
 };
