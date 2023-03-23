@@ -27,12 +27,29 @@ export const useLocalStorage = () => {
   };
 };
 
-export const downloadURI = (fileID: string, type: "files" | "folders") => {
+export const downloadURI = (
+  fileID: string,
+  type: "files" | "folders",
+  name: string
+) => {
+  const storage = useLocalStorage();
   const link = document.createElement("a");
-  link.href = `${import.meta.env.VITE_BASE_API}/${type}/${fileID}`;
   document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  const headers = new Headers();
+  const token = storage.getLocalStorage("token");
+  headers.append("Authorization", `Bearer ${token}`);
+
+  fetch(`${import.meta.env.VITE_BASE_API}/${type}/${fileID}`, { headers })
+    .then((response) => response.blob())
+    .then((blobby) => {
+      const objectUrl = window.URL.createObjectURL(blobby);
+
+      link.href = objectUrl;
+      link.download = name;
+      link.click();
+
+      window.URL.revokeObjectURL(objectUrl);
+    });
 };
 
 export const groupFilesByFolder = (files: File[]) => {

@@ -40,7 +40,7 @@ export const FolderSection = ({
       key: "1",
       icon: <CloudDownloadOutlined />,
       onClick: () => {
-        downloadURI(String(item.ID), "folders");
+        downloadURI(String(item.ID), "folders", item.name);
       },
     },
     {

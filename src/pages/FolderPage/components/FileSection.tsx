@@ -1,8 +1,4 @@
-import {
-  CloudDownloadOutlined,
-  DeleteOutlined,
-  FileFilled,
-} from "@ant-design/icons";
+import { CloudDownloadOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Col, Dropdown, MenuProps, Row, Typography, Image, Modal } from "antd";
 import ItemCard from "@components/FileCard";
 import ItemCardContent from "@components/FileCardContent";
@@ -61,7 +57,7 @@ export const FileSection = ({
       key: "1",
       icon: <CloudDownloadOutlined />,
       onClick: () => {
-        downloadURI(String(item.ID), "files");
+        downloadURI(String(item.ID), "files", item.name);
       },
     },
     {

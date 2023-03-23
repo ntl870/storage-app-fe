@@ -120,7 +120,7 @@ export const FolderPage = () => {
       refetchFolders();
       refetchFiles();
     } catch (err) {
-      console.log(err);
+      throw new Error(err as string);
     }
   };
 
@@ -137,8 +137,9 @@ export const FolderPage = () => {
           },
         },
       });
+      refetchFolders();
     } catch (err) {
-      console.log(err);
+      throw new Error(err as string);
     }
   };
 
