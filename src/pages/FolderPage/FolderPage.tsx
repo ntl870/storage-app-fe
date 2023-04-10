@@ -15,6 +15,7 @@ import {
   InputRef,
   MenuProps,
   Modal,
+  Spin,
   Typography,
 } from "antd";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -29,6 +30,7 @@ import {
 } from "@ant-design/icons";
 import { groupFilesByFolder } from "@utils/tools";
 import NavigateBreadCrumb from "@components/NavigateBreadCrumb";
+import { useAlert } from "@hooks/useAlert";
 
 type SelectedItemType =
   | ((Folder | FileSchema) & { type: "file" | "folder" })
@@ -37,8 +39,10 @@ type SelectedItemType =
 export const FolderPage = () => {
   const { params, navigate } = useRouter();
   const { rootFolderID } = useCurrentUser();
+  const { showErrorNotification, showSuccessNotification } = useAlert();
   const [isShownNewFolderDialog, setIsShownNewFolderDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SelectedItemType>(null);
+  const [isShowAccessDeniedModal, setIsShowAccessDeniedModal] = useState(false);
   const createFolderInputRef = useRef<InputRef>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -61,23 +65,48 @@ export const FolderPage = () => {
     [params.folderID, rootFolderID]
   );
 
-  const { data: foldersData, refetch: refetchFolders } = useGetUserFoldersQuery(
-    {
-      variables: {
-        folderID: currentFolderID,
-      },
-      skip: !currentFolderID,
-      fetchPolicy: "network-only",
-    }
-  );
-
-  const { data: filesData, refetch: refetchFiles } = useGetFilesByFolderQuery({
+  const {
+    data: foldersData,
+    loading: getFolderLoading,
+    refetch: refetchFolders,
+    error: getFolderError,
+  } = useGetUserFoldersQuery({
     variables: {
       folderID: currentFolderID,
     },
     skip: !currentFolderID,
     fetchPolicy: "network-only",
   });
+
+  const {
+    data: filesData,
+    loading: getFilesLoading,
+    refetch: refetchFiles,
+    error: getFilesError,
+  } = useGetFilesByFolderQuery({
+    variables: {
+      folderID: currentFolderID,
+    },
+    skip: !currentFolderID,
+    fetchPolicy: "network-only",
+  });
+
+  useEffect(() => {
+    if (
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      (getFolderError?.graphQLErrors[0]?.extensions?.exception?.status ===
+        403 ||
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        getFilesError?.graphQLErrors[0]?.extensions?.exception?.status ===
+          403) &&
+      !getFilesLoading &&
+      !getFolderLoading
+    ) {
+      setIsShowAccessDeniedModal(true);
+    }
+  }, [getFolderError, getFilesError, getFilesLoading, getFolderLoading]);
 
   const navigateToFolder = (folderID: string) => {
     navigate(`/folder/${folderID}`);
@@ -119,8 +148,9 @@ export const FolderPage = () => {
       });
       refetchFolders();
       refetchFiles();
+      showSuccessNotification("File uploaded successfully");
     } catch (err) {
-      throw new Error(err as string);
+      showErrorNotification((err as Error).message);
     }
   };
 
@@ -138,8 +168,9 @@ export const FolderPage = () => {
         },
       });
       refetchFolders();
+      showSuccessNotification("Folder uploaded successfully");
     } catch (err) {
-      throw new Error(err as string);
+      showErrorNotification((err as Error).message);
     }
   };
 
@@ -186,8 +217,9 @@ export const FolderPage = () => {
           },
         },
       });
+      showSuccessNotification("Folder created successfully");
     } catch (err) {
-      console.log(err);
+      showErrorNotification((err as Error).message);
     }
   };
 
@@ -195,12 +227,25 @@ export const FolderPage = () => {
     setIsShownNewFolderDialog(false);
   };
 
-  useEffect(() => {
-    if (folderInputRef.current !== null) {
-      folderInputRef.current.setAttribute("directory", "");
-      folderInputRef.current.setAttribute("webkitdirectory", "");
-    }
-  }, [folderInputRef]);
+  const onOkAccessDeniedModal = () => {
+    setIsShowAccessDeniedModal(false);
+    navigate("/");
+  };
+
+  // useEffect(() => {
+  //   if (folderInputRef.current !== null) {
+  //     folderInputRef.current.setAttribute("directory", "");
+  //     folderInputRef.current.setAttribute("webkitdirectory", "");
+  //   }
+  // }, [folderInputRef]);
+
+  if (getFolderLoading || getFilesLoading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -259,6 +304,16 @@ export const FolderPage = () => {
           />
         </Modal>
       )}
+      {isShowAccessDeniedModal && (
+        <Modal
+          title="Access Denied"
+          open={isShowAccessDeniedModal}
+          onOk={onOkAccessDeniedModal}
+          cancelButtonProps={{ style: { display: "none" } }}
+        >
+          <Typography.Text>{`You don't have access to this folder`}</Typography.Text>
+        </Modal>
+      )}
       <input
         type="file"
         className="hidden"
@@ -270,6 +325,11 @@ export const FolderPage = () => {
         className="hidden"
         ref={folderInputRef}
         multiple
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // eslint-disable-next-line react/no-unknown-property
+        directory=""
+        webkitdirectory=""
         onChange={handleUploadFolder}
       />
     </>

@@ -20,24 +20,32 @@ export type File = {
   ID: Scalars['String'];
   fileType: Scalars['String'];
   folder?: Maybe<Folder>;
+  isPublic: Scalars['Boolean'];
   isTrash: Scalars['Boolean'];
   name: Scalars['String'];
   ownerID: Scalars['String'];
+  readonlyUsers?: Maybe<Array<User>>;
+  sharedUsers?: Maybe<Array<User>>;
   url: Scalars['String'];
 };
 
 export type Folder = {
   ID: Scalars['String'];
   files?: Maybe<Array<File>>;
+  isPublic: Scalars['Boolean'];
   isTrash: Scalars['Boolean'];
   name: Scalars['String'];
   ownerID: Scalars['String'];
   path: Scalars['String'];
+  readonlyUsers?: Maybe<Array<User>>;
   rootFolder?: Maybe<Folder>;
+  sharedUsers?: Maybe<Array<User>>;
   subFolders?: Maybe<Array<Folder>>;
 };
 
 export type Mutation = {
+  addSharedUserToFolder: Scalars['String'];
+  addUserToFolderReadOnlyUsers: Scalars['String'];
   createFolder: Folder;
   deleteFile: Scalars['String'];
   deleteFolder: Scalars['String'];
@@ -46,9 +54,26 @@ export type Mutation = {
   moveFolderOutOfTrash: Scalars['String'];
   moveFolderToTrash: Scalars['String'];
   restoreFileFromTrash: File;
+  setGeneralFolderAccess: Scalars['String'];
   signup: NewUserReturn;
   uploadFile: File;
   uploadFolder: Scalars['String'];
+};
+
+
+export type MutationAddSharedUserToFolderArgs = {
+  folderID: Scalars['String'];
+  sharedUserIDs: Array<Scalars['String']>;
+  shouldSendMail: Scalars['Boolean'];
+  userMessage?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationAddUserToFolderReadOnlyUsersArgs = {
+  folderID: Scalars['String'];
+  readOnlyUserIDs: Array<Scalars['String']>;
+  shouldSendMail: Scalars['Boolean'];
+  userMessage?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -93,6 +118,12 @@ export type MutationRestoreFileFromTrashArgs = {
 };
 
 
+export type MutationSetGeneralFolderAccessArgs = {
+  folderID: Scalars['String'];
+  isPublic: Scalars['Boolean'];
+};
+
+
 export type MutationSignupArgs = {
   email: Scalars['String'];
   name: Scalars['String'];
@@ -121,17 +152,25 @@ export type NewUserReturn = {
   name: Scalars['String'];
 };
 
+export type PeopleWithAccessResponse = {
+  isPublic: Scalars['Boolean'];
+  readonlyUsers: Array<User>;
+  sharedUsers: Array<User>;
+};
+
 export type Query = {
   getAllUsers: Array<User>;
   getArrayOfRootFoldersName: Array<Folder>;
   getFileByID: File;
   getFilesByFolder: Array<File>;
   getMe: User;
+  getPeopleWithAccessToFolder: PeopleWithAccessResponse;
   getUserByID: User;
   getUserFiles: Array<File>;
   getUserFolders: Array<Folder>;
   getUserTrashFiles: Array<File>;
   getUserTrashFolder: Array<Folder>;
+  getUsersBySearchPagination: UserSearchPaginationResponse;
 };
 
 
@@ -150,6 +189,11 @@ export type QueryGetFilesByFolderArgs = {
 };
 
 
+export type QueryGetPeopleWithAccessToFolderArgs = {
+  folderID: Scalars['String'];
+};
+
+
 export type QueryGetUserByIdArgs = {
   ID: Scalars['String'];
 };
@@ -157,6 +201,13 @@ export type QueryGetUserByIdArgs = {
 
 export type QueryGetUserFoldersArgs = {
   folderID: Scalars['String'];
+};
+
+
+export type QueryGetUsersBySearchPaginationArgs = {
+  limit: Scalars['Float'];
+  page: Scalars['Float'];
+  search: Scalars['String'];
 };
 
 export type UploadFolder = {
@@ -175,10 +226,93 @@ export type User = {
   email: Scalars['String'];
   name: Scalars['String'];
   password: Scalars['String'];
-  rootFolder: Folder;
+  rootFolder?: Maybe<Folder>;
+};
+
+export type UserSearchPaginationResponse = {
+  hasMore: Scalars['Boolean'];
+  results: Array<User>;
 };
 
 
+export const AddSharedUserToFolderDocument = gql`
+    mutation addSharedUserToFolder($folderID: String!, $sharedUserIDs: [String!]!, $shouldSendMail: Boolean!, $userMessage: String) {
+  addSharedUserToFolder(
+    folderID: $folderID
+    sharedUserIDs: $sharedUserIDs
+    shouldSendMail: $shouldSendMail
+    userMessage: $userMessage
+  )
+}
+    `;
+export type AddSharedUserToFolderMutationFn = Apollo.MutationFunction<AddSharedUserToFolderMutation, AddSharedUserToFolderMutationVariables>;
+
+/**
+ * __useAddSharedUserToFolderMutation__
+ *
+ * To run a mutation, you first call `useAddSharedUserToFolderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddSharedUserToFolderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addSharedUserToFolderMutation, { data, loading, error }] = useAddSharedUserToFolderMutation({
+ *   variables: {
+ *      folderID: // value for 'folderID'
+ *      sharedUserIDs: // value for 'sharedUserIDs'
+ *      shouldSendMail: // value for 'shouldSendMail'
+ *      userMessage: // value for 'userMessage'
+ *   },
+ * });
+ */
+export function useAddSharedUserToFolderMutation(baseOptions?: Apollo.MutationHookOptions<AddSharedUserToFolderMutation, AddSharedUserToFolderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddSharedUserToFolderMutation, AddSharedUserToFolderMutationVariables>(AddSharedUserToFolderDocument, options);
+      }
+export type AddSharedUserToFolderMutationHookResult = ReturnType<typeof useAddSharedUserToFolderMutation>;
+export type AddSharedUserToFolderMutationResult = Apollo.MutationResult<AddSharedUserToFolderMutation>;
+export type AddSharedUserToFolderMutationOptions = Apollo.BaseMutationOptions<AddSharedUserToFolderMutation, AddSharedUserToFolderMutationVariables>;
+export const AddUserToFolderReadOnlyUsersDocument = gql`
+    mutation addUserToFolderReadOnlyUsers($folderID: String!, $readOnlyUserIDs: [String!]!, $shouldSendMail: Boolean!, $userMessage: String) {
+  addUserToFolderReadOnlyUsers(
+    folderID: $folderID
+    readOnlyUserIDs: $readOnlyUserIDs
+    shouldSendMail: $shouldSendMail
+    userMessage: $userMessage
+  )
+}
+    `;
+export type AddUserToFolderReadOnlyUsersMutationFn = Apollo.MutationFunction<AddUserToFolderReadOnlyUsersMutation, AddUserToFolderReadOnlyUsersMutationVariables>;
+
+/**
+ * __useAddUserToFolderReadOnlyUsersMutation__
+ *
+ * To run a mutation, you first call `useAddUserToFolderReadOnlyUsersMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddUserToFolderReadOnlyUsersMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addUserToFolderReadOnlyUsersMutation, { data, loading, error }] = useAddUserToFolderReadOnlyUsersMutation({
+ *   variables: {
+ *      folderID: // value for 'folderID'
+ *      readOnlyUserIDs: // value for 'readOnlyUserIDs'
+ *      shouldSendMail: // value for 'shouldSendMail'
+ *      userMessage: // value for 'userMessage'
+ *   },
+ * });
+ */
+export function useAddUserToFolderReadOnlyUsersMutation(baseOptions?: Apollo.MutationHookOptions<AddUserToFolderReadOnlyUsersMutation, AddUserToFolderReadOnlyUsersMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddUserToFolderReadOnlyUsersMutation, AddUserToFolderReadOnlyUsersMutationVariables>(AddUserToFolderReadOnlyUsersDocument, options);
+      }
+export type AddUserToFolderReadOnlyUsersMutationHookResult = ReturnType<typeof useAddUserToFolderReadOnlyUsersMutation>;
+export type AddUserToFolderReadOnlyUsersMutationResult = Apollo.MutationResult<AddUserToFolderReadOnlyUsersMutation>;
+export type AddUserToFolderReadOnlyUsersMutationOptions = Apollo.BaseMutationOptions<AddUserToFolderReadOnlyUsersMutation, AddUserToFolderReadOnlyUsersMutationVariables>;
 export const CreateFolderDocument = gql`
     mutation createFolder($input: NewFolderInput!) {
   createFolder(input: $input) {
@@ -437,6 +571,38 @@ export function useRestoreFileFromTrashMutation(baseOptions?: Apollo.MutationHoo
 export type RestoreFileFromTrashMutationHookResult = ReturnType<typeof useRestoreFileFromTrashMutation>;
 export type RestoreFileFromTrashMutationResult = Apollo.MutationResult<RestoreFileFromTrashMutation>;
 export type RestoreFileFromTrashMutationOptions = Apollo.BaseMutationOptions<RestoreFileFromTrashMutation, RestoreFileFromTrashMutationVariables>;
+export const SetGeneralFolderAccessDocument = gql`
+    mutation setGeneralFolderAccess($folderID: String!, $isPublic: Boolean!) {
+  setGeneralFolderAccess(folderID: $folderID, isPublic: $isPublic)
+}
+    `;
+export type SetGeneralFolderAccessMutationFn = Apollo.MutationFunction<SetGeneralFolderAccessMutation, SetGeneralFolderAccessMutationVariables>;
+
+/**
+ * __useSetGeneralFolderAccessMutation__
+ *
+ * To run a mutation, you first call `useSetGeneralFolderAccessMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetGeneralFolderAccessMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setGeneralFolderAccessMutation, { data, loading, error }] = useSetGeneralFolderAccessMutation({
+ *   variables: {
+ *      folderID: // value for 'folderID'
+ *      isPublic: // value for 'isPublic'
+ *   },
+ * });
+ */
+export function useSetGeneralFolderAccessMutation(baseOptions?: Apollo.MutationHookOptions<SetGeneralFolderAccessMutation, SetGeneralFolderAccessMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SetGeneralFolderAccessMutation, SetGeneralFolderAccessMutationVariables>(SetGeneralFolderAccessDocument, options);
+      }
+export type SetGeneralFolderAccessMutationHookResult = ReturnType<typeof useSetGeneralFolderAccessMutation>;
+export type SetGeneralFolderAccessMutationResult = Apollo.MutationResult<SetGeneralFolderAccessMutation>;
+export type SetGeneralFolderAccessMutationOptions = Apollo.BaseMutationOptions<SetGeneralFolderAccessMutation, SetGeneralFolderAccessMutationVariables>;
 export const UploadFileDocument = gql`
     mutation uploadFile($file: Upload!, $folderID: String!) {
   uploadFile(file: $file, folderID: $folderID) {
@@ -632,6 +798,54 @@ export type GetMeQueryResult = Apollo.QueryResult<GetMeQuery, GetMeQueryVariable
 export function refetchGetMeQuery(variables?: GetMeQueryVariables) {
       return { query: GetMeDocument, variables: variables }
     }
+export const GetPeopleWithAccessToFolderDocument = gql`
+    query getPeopleWithAccessToFolder($folderID: String!) {
+  getPeopleWithAccessToFolder(folderID: $folderID) {
+    sharedUsers {
+      ID
+      name
+      email
+    }
+    readonlyUsers {
+      ID
+      name
+      email
+    }
+    isPublic
+  }
+}
+    `;
+
+/**
+ * __useGetPeopleWithAccessToFolderQuery__
+ *
+ * To run a query within a React component, call `useGetPeopleWithAccessToFolderQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPeopleWithAccessToFolderQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPeopleWithAccessToFolderQuery({
+ *   variables: {
+ *      folderID: // value for 'folderID'
+ *   },
+ * });
+ */
+export function useGetPeopleWithAccessToFolderQuery(baseOptions: Apollo.QueryHookOptions<GetPeopleWithAccessToFolderQuery, GetPeopleWithAccessToFolderQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetPeopleWithAccessToFolderQuery, GetPeopleWithAccessToFolderQueryVariables>(GetPeopleWithAccessToFolderDocument, options);
+      }
+export function useGetPeopleWithAccessToFolderLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPeopleWithAccessToFolderQuery, GetPeopleWithAccessToFolderQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetPeopleWithAccessToFolderQuery, GetPeopleWithAccessToFolderQueryVariables>(GetPeopleWithAccessToFolderDocument, options);
+        }
+export type GetPeopleWithAccessToFolderQueryHookResult = ReturnType<typeof useGetPeopleWithAccessToFolderQuery>;
+export type GetPeopleWithAccessToFolderLazyQueryHookResult = ReturnType<typeof useGetPeopleWithAccessToFolderLazyQuery>;
+export type GetPeopleWithAccessToFolderQueryResult = Apollo.QueryResult<GetPeopleWithAccessToFolderQuery, GetPeopleWithAccessToFolderQueryVariables>;
+export function refetchGetPeopleWithAccessToFolderQuery(variables: GetPeopleWithAccessToFolderQueryVariables) {
+      return { query: GetPeopleWithAccessToFolderDocument, variables: variables }
+    }
 export const GetUserFoldersDocument = gql`
     query getUserFolders($folderID: String!) {
   getUserFolders(folderID: $folderID) {
@@ -650,6 +864,7 @@ export const GetUserFoldersDocument = gql`
     }
     path
     isTrash
+    isPublic
   }
 }
     `;
@@ -776,6 +991,71 @@ export type GetUserTrashFolderQueryResult = Apollo.QueryResult<GetUserTrashFolde
 export function refetchGetUserTrashFolderQuery(variables?: GetUserTrashFolderQueryVariables) {
       return { query: GetUserTrashFolderDocument, variables: variables }
     }
+export const GetUsersBySearchPaginationDocument = gql`
+    query getUsersBySearchPagination($search: String!, $page: Float!, $limit: Float!) {
+  getUsersBySearchPagination(search: $search, page: $page, limit: $limit) {
+    results {
+      ID
+      name
+      email
+    }
+    hasMore
+  }
+}
+    `;
+
+/**
+ * __useGetUsersBySearchPaginationQuery__
+ *
+ * To run a query within a React component, call `useGetUsersBySearchPaginationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUsersBySearchPaginationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUsersBySearchPaginationQuery({
+ *   variables: {
+ *      search: // value for 'search'
+ *      page: // value for 'page'
+ *      limit: // value for 'limit'
+ *   },
+ * });
+ */
+export function useGetUsersBySearchPaginationQuery(baseOptions: Apollo.QueryHookOptions<GetUsersBySearchPaginationQuery, GetUsersBySearchPaginationQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUsersBySearchPaginationQuery, GetUsersBySearchPaginationQueryVariables>(GetUsersBySearchPaginationDocument, options);
+      }
+export function useGetUsersBySearchPaginationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUsersBySearchPaginationQuery, GetUsersBySearchPaginationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUsersBySearchPaginationQuery, GetUsersBySearchPaginationQueryVariables>(GetUsersBySearchPaginationDocument, options);
+        }
+export type GetUsersBySearchPaginationQueryHookResult = ReturnType<typeof useGetUsersBySearchPaginationQuery>;
+export type GetUsersBySearchPaginationLazyQueryHookResult = ReturnType<typeof useGetUsersBySearchPaginationLazyQuery>;
+export type GetUsersBySearchPaginationQueryResult = Apollo.QueryResult<GetUsersBySearchPaginationQuery, GetUsersBySearchPaginationQueryVariables>;
+export function refetchGetUsersBySearchPaginationQuery(variables: GetUsersBySearchPaginationQueryVariables) {
+      return { query: GetUsersBySearchPaginationDocument, variables: variables }
+    }
+export type AddSharedUserToFolderMutationVariables = Exact<{
+  folderID: Scalars['String'];
+  sharedUserIDs: Array<Scalars['String']> | Scalars['String'];
+  shouldSendMail: Scalars['Boolean'];
+  userMessage?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type AddSharedUserToFolderMutation = { addSharedUserToFolder: string };
+
+export type AddUserToFolderReadOnlyUsersMutationVariables = Exact<{
+  folderID: Scalars['String'];
+  readOnlyUserIDs: Array<Scalars['String']> | Scalars['String'];
+  shouldSendMail: Scalars['Boolean'];
+  userMessage?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type AddUserToFolderReadOnlyUsersMutation = { addUserToFolderReadOnlyUsers: string };
+
 export type CreateFolderMutationVariables = Exact<{
   input: NewFolderInput;
 }>;
@@ -833,6 +1113,14 @@ export type RestoreFileFromTrashMutationVariables = Exact<{
 
 export type RestoreFileFromTrashMutation = { restoreFileFromTrash: { ID: string, name: string } };
 
+export type SetGeneralFolderAccessMutationVariables = Exact<{
+  folderID: Scalars['String'];
+  isPublic: Scalars['Boolean'];
+}>;
+
+
+export type SetGeneralFolderAccessMutation = { setGeneralFolderAccess: string };
+
 export type UploadFileMutationVariables = Exact<{
   file: Scalars['Upload'];
   folderID: Scalars['String'];
@@ -865,14 +1153,21 @@ export type GetFilesByFolderQuery = { getFilesByFolder: Array<{ ID: string, name
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMeQuery = { getMe: { ID: string, name: string, email: string, rootFolder: { ID: string } } };
+export type GetMeQuery = { getMe: { ID: string, name: string, email: string, rootFolder?: { ID: string } | null } };
+
+export type GetPeopleWithAccessToFolderQueryVariables = Exact<{
+  folderID: Scalars['String'];
+}>;
+
+
+export type GetPeopleWithAccessToFolderQuery = { getPeopleWithAccessToFolder: { isPublic: boolean, sharedUsers: Array<{ ID: string, name: string, email: string }>, readonlyUsers: Array<{ ID: string, name: string, email: string }> } };
 
 export type GetUserFoldersQueryVariables = Exact<{
   folderID: Scalars['String'];
 }>;
 
 
-export type GetUserFoldersQuery = { getUserFolders: Array<{ ID: string, name: string, path: string, isTrash: boolean, files?: Array<{ ID: string, name: string, url: string, fileType: string }> | null, subFolders?: Array<{ ID: string, name: string, path: string }> | null }> };
+export type GetUserFoldersQuery = { getUserFolders: Array<{ ID: string, name: string, path: string, isTrash: boolean, isPublic: boolean, files?: Array<{ ID: string, name: string, url: string, fileType: string }> | null, subFolders?: Array<{ ID: string, name: string, path: string }> | null }> };
 
 export type GetUserTrashFilesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -883,3 +1178,12 @@ export type GetUserTrashFolderQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetUserTrashFolderQuery = { getUserTrashFolder: Array<{ ID: string, name: string, path: string, isTrash: boolean, files?: Array<{ ID: string, name: string, url: string, fileType: string }> | null, subFolders?: Array<{ ID: string, name: string, path: string }> | null }> };
+
+export type GetUsersBySearchPaginationQueryVariables = Exact<{
+  search: Scalars['String'];
+  page: Scalars['Float'];
+  limit: Scalars['Float'];
+}>;
+
+
+export type GetUsersBySearchPaginationQuery = { getUsersBySearchPagination: { hasMore: boolean, results: Array<{ ID: string, name: string, email: string }> } };

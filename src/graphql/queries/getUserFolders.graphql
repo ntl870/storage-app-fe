@@ -15,5 +15,6 @@ query getUserFolders($folderID: String!) {
     }
     path
     isTrash
+    isPublic
   }
 }

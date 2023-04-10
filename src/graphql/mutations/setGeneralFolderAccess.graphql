@@ -1,0 +1,3 @@
+mutation setGeneralFolderAccess($folderID: String!, $isPublic: Boolean!) {
+  setGeneralFolderAccess(folderID: $folderID, isPublic: $isPublic)
+}

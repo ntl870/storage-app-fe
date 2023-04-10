@@ -9,7 +9,7 @@ const useCurrentUser = () => {
     ID: data?.getMe.ID,
     name: data?.getMe.name,
     email: data?.getMe.email,
-    rootFolderID: data?.getMe.rootFolder.ID,
+    rootFolderID: data?.getMe?.rootFolder?.ID,
   };
 };
 

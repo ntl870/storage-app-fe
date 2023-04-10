@@ -1,7 +1,5 @@
+import loadable from "@loadable/component";
 import { DashboardFilled, DeleteFilled } from "@ant-design/icons";
-import { FolderPage } from "@pages/FolderPage/FolderPage";
-import { MyStorage } from "@pages/MyStorage/MyStorage";
-import { Trash } from "@pages/Trash/Trash";
 
 export interface Route {
   path: string;
@@ -11,6 +9,24 @@ export interface Route {
   hidden?: boolean;
   key: string;
 }
+
+const MyStorage = loadable(() =>
+  import("@pages/MyStorage/MyStorage").then((module) => ({
+    default: module.MyStorage,
+  }))
+);
+
+const Trash = loadable(() =>
+  import("@pages/Trash/Trash").then((module) => ({
+    default: module.Trash,
+  }))
+);
+
+const FolderPage = loadable(() =>
+  import("@pages/FolderPage/FolderPage").then((module) => ({
+    default: module.FolderPage,
+  }))
+);
 
 const routes: Route[] = [
   {

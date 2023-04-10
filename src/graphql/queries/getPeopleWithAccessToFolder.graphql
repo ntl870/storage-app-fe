@@ -1,0 +1,15 @@
+query getPeopleWithAccessToFolder($folderID: String!) {
+  getPeopleWithAccessToFolder(folderID: $folderID) {
+    sharedUsers {
+      ID
+      name
+      email
+    }
+    readonlyUsers {
+      ID
+      name
+      email
+    }
+    isPublic
+  }
+}

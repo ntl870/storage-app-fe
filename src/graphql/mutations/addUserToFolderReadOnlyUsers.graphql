@@ -1,0 +1,13 @@
+mutation addUserToFolderReadOnlyUsers(
+  $folderID: String!
+  $readOnlyUserIDs: [String!]!
+  $shouldSendMail: Boolean!
+  $userMessage: String
+) {
+  addUserToFolderReadOnlyUsers(
+    folderID: $folderID
+    readOnlyUserIDs: $readOnlyUserIDs
+    shouldSendMail: $shouldSendMail
+    userMessage: $userMessage
+  )
+}

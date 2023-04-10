@@ -1,0 +1,14 @@
+query getUsersBySearchPagination(
+  $search: String!
+  $page: Float!
+  $limit: Float!
+) {
+  getUsersBySearchPagination(search: $search, page: $page, limit: $limit) {
+    results {
+      ID
+      name
+      email
+    }
+    hasMore
+  }
+}

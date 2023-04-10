@@ -1,0 +1,13 @@
+mutation addSharedUserToFolder(
+  $folderID: String!
+  $sharedUserIDs: [String!]!
+  $shouldSendMail: Boolean!
+  $userMessage: String
+) {
+  addSharedUserToFolder(
+    folderID: $folderID
+    sharedUserIDs: $sharedUserIDs
+    shouldSendMail: $shouldSendMail
+    userMessage: $userMessage
+  )
+}
