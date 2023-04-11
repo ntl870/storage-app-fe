@@ -49,21 +49,18 @@ export const AddUserModal = ({
   const [addUserToModify] = useAddSharedUserToFolderMutation();
   const [addUserToReadOnly] = useAddUserToFolderReadOnlyUsersMutation();
 
-  const items: MenuProps["items"] = useMemo(
-    () => [
-      {
-        label: "Editor",
-        key: "0",
-        onClick: () => setCurrentSelectedRole("Editor"),
-      },
-      {
-        label: "Viewer",
-        key: "1",
-        onClick: () => setCurrentSelectedRole("Viewer"),
-      },
-    ],
-    []
-  );
+  const items: MenuProps["items"] = [
+    {
+      label: "Editor",
+      key: "0",
+      onClick: () => setCurrentSelectedRole("Editor"),
+    },
+    {
+      label: "Viewer",
+      key: "1",
+      onClick: () => setCurrentSelectedRole("Viewer"),
+    },
+  ];
 
   const addUsersToModifyFolder = async () => {
     try {

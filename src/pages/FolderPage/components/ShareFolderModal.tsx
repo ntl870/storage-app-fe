@@ -18,10 +18,12 @@ import {
   Spin,
   Typography,
 } from "antd";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { AddUserModal } from "./AddUserModal";
 import { DownOutlined } from "@ant-design/icons";
 import { useAlert } from "@hooks/useAlert";
+import { SwitchRoleDropdown } from "./SwitchRoleDropdown";
+import { UserRole } from "src/common/types";
 
 interface Props {
   open: boolean;
@@ -59,53 +61,50 @@ export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
     setSelectedUser(null);
   };
 
-  const items: MenuProps["items"] = useMemo(
-    () => [
-      {
-        label: "Private",
-        key: "0",
-        onClick: async () => {
-          if (selectedOptions === "Private") return;
+  const items: MenuProps["items"] = [
+    {
+      label: "Private",
+      key: "0",
+      onClick: async () => {
+        if (selectedOptions === "Private") return;
 
-          try {
-            await setGeneralFolderAccess({
-              variables: {
-                folderID: folder.ID,
-                isPublic: false,
-              },
-            });
-            showSuccessNotification("Folder access changed to private");
-            setSelectedOptions("Private");
-            refetchAccessPeople();
-          } catch (err) {
-            showErrorNotification((err as Error).message);
-          }
-        },
+        try {
+          await setGeneralFolderAccess({
+            variables: {
+              folderID: folder.ID,
+              isPublic: false,
+            },
+          });
+          showSuccessNotification("Folder access changed to private");
+          setSelectedOptions("Private");
+          refetchAccessPeople();
+        } catch (err) {
+          showErrorNotification((err as Error).message);
+        }
       },
-      {
-        label: "Public",
-        key: "1",
-        onClick: async () => {
-          if (selectedOptions === "Public") return;
+    },
+    {
+      label: "Public",
+      key: "1",
+      onClick: async () => {
+        if (selectedOptions === "Public") return;
 
-          try {
-            await setGeneralFolderAccess({
-              variables: {
-                folderID: folder.ID,
-                isPublic: true,
-              },
-            });
-            showSuccessNotification("Folder access changed to private");
-            setSelectedOptions("Private");
-            refetchAccessPeople();
-          } catch (err) {
-            showErrorNotification((err as Error).message);
-          }
-        },
+        try {
+          await setGeneralFolderAccess({
+            variables: {
+              folderID: folder.ID,
+              isPublic: true,
+            },
+          });
+          showSuccessNotification("Folder access changed to public");
+          setSelectedOptions("Public");
+          refetchAccessPeople();
+        } catch (err) {
+          showErrorNotification((err as Error).message);
+        }
       },
-    ],
-    []
-  );
+    },
+  ];
 
   return (
     <>
@@ -117,6 +116,7 @@ export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
         onCancel={handleClose}
         open={open}
         title="Share folder"
+        cancelText="Close"
       >
         {isLoadingAccessPeople || isSetGeneralAccessLoading ? (
           <div className="text-center">
@@ -135,9 +135,12 @@ export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
               }}
             />
             <div className="mt-4">
-              <Typography.Text>Users can modify</Typography.Text>
+              <Typography.Text className="font-bold">
+                Users can modify
+              </Typography.Text>
               <List
                 itemLayout="horizontal"
+                className="max-h-96 overflow-y-auto"
                 dataSource={
                   peopleWithAccess?.getPeopleWithAccessToFolder.sharedUsers
                 }
@@ -152,14 +155,23 @@ export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
                       title={item.name}
                       description={item.email}
                     />
+                    <SwitchRoleDropdown
+                      initialRole={UserRole.EDITOR}
+                      userID={item.ID}
+                      folderID={folder.ID}
+                      refetchAccessPeople={refetchAccessPeople}
+                    />
                   </List.Item>
                 )}
               />
             </div>
             <div>
-              <Typography.Text>Users can view</Typography.Text>
+              <Typography.Text className="font-bold">
+                Users can view
+              </Typography.Text>
               <List
                 itemLayout="horizontal"
+                className="max-h-96 overflow-y-auto"
                 dataSource={
                   peopleWithAccess?.getPeopleWithAccessToFolder.readonlyUsers
                 }
@@ -174,13 +186,21 @@ export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
                       title={item.name}
                       description={item.email}
                     />
+                    <SwitchRoleDropdown
+                      initialRole={UserRole.VIEWER}
+                      userID={item.ID}
+                      folderID={folder.ID}
+                      refetchAccessPeople={refetchAccessPeople}
+                    />
                   </List.Item>
                 )}
               />
             </div>
 
-            <div>
-              <span>General Access</span>
+            <div className="flex flex-col">
+              <Typography.Text className="font-bold">
+                General Access
+              </Typography.Text>
               <Dropdown menu={{ items }} trigger={["click"]}>
                 <Button>
                   <Space>

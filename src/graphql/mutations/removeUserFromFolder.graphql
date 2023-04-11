@@ -1,0 +1,3 @@
+mutation removeUserFromFolder($folderID: String!, $targetUserID: String!) {
+  removeUserFromFolder(folderID: $folderID, targetUserID: $targetUserID)
+}

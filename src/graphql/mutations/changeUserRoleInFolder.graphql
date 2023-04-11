@@ -1,0 +1,11 @@
+mutation changeUserRoleInFolder(
+  $folderID: String!
+  $targetUserID: String!
+  $targetRole: String!
+) {
+  changeUserRoleInFolder(
+    folderID: $folderID
+    targetUserID: $targetUserID
+    targetRole: $targetRole
+  )
+}

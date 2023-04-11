@@ -46,6 +46,7 @@ export type Folder = {
 export type Mutation = {
   addSharedUserToFolder: Scalars['String'];
   addUserToFolderReadOnlyUsers: Scalars['String'];
+  changeUserRoleInFolder: Scalars['String'];
   createFolder: Folder;
   deleteFile: Scalars['String'];
   deleteFolder: Scalars['String'];
@@ -53,6 +54,7 @@ export type Mutation = {
   moveFileToTrash: File;
   moveFolderOutOfTrash: Scalars['String'];
   moveFolderToTrash: Scalars['String'];
+  removeUserFromFolder: Scalars['String'];
   restoreFileFromTrash: File;
   setGeneralFolderAccess: Scalars['String'];
   signup: NewUserReturn;
@@ -74,6 +76,13 @@ export type MutationAddUserToFolderReadOnlyUsersArgs = {
   readOnlyUserIDs: Array<Scalars['String']>;
   shouldSendMail: Scalars['Boolean'];
   userMessage?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationChangeUserRoleInFolderArgs = {
+  folderID: Scalars['String'];
+  targetRole: Scalars['String'];
+  targetUserID: Scalars['String'];
 };
 
 
@@ -110,6 +119,12 @@ export type MutationMoveFolderOutOfTrashArgs = {
 
 export type MutationMoveFolderToTrashArgs = {
   folderID: Scalars['String'];
+};
+
+
+export type MutationRemoveUserFromFolderArgs = {
+  folderID: Scalars['String'];
+  targetUserID: Scalars['String'];
 };
 
 
@@ -313,6 +328,43 @@ export function useAddUserToFolderReadOnlyUsersMutation(baseOptions?: Apollo.Mut
 export type AddUserToFolderReadOnlyUsersMutationHookResult = ReturnType<typeof useAddUserToFolderReadOnlyUsersMutation>;
 export type AddUserToFolderReadOnlyUsersMutationResult = Apollo.MutationResult<AddUserToFolderReadOnlyUsersMutation>;
 export type AddUserToFolderReadOnlyUsersMutationOptions = Apollo.BaseMutationOptions<AddUserToFolderReadOnlyUsersMutation, AddUserToFolderReadOnlyUsersMutationVariables>;
+export const ChangeUserRoleInFolderDocument = gql`
+    mutation changeUserRoleInFolder($folderID: String!, $targetUserID: String!, $targetRole: String!) {
+  changeUserRoleInFolder(
+    folderID: $folderID
+    targetUserID: $targetUserID
+    targetRole: $targetRole
+  )
+}
+    `;
+export type ChangeUserRoleInFolderMutationFn = Apollo.MutationFunction<ChangeUserRoleInFolderMutation, ChangeUserRoleInFolderMutationVariables>;
+
+/**
+ * __useChangeUserRoleInFolderMutation__
+ *
+ * To run a mutation, you first call `useChangeUserRoleInFolderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeUserRoleInFolderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeUserRoleInFolderMutation, { data, loading, error }] = useChangeUserRoleInFolderMutation({
+ *   variables: {
+ *      folderID: // value for 'folderID'
+ *      targetUserID: // value for 'targetUserID'
+ *      targetRole: // value for 'targetRole'
+ *   },
+ * });
+ */
+export function useChangeUserRoleInFolderMutation(baseOptions?: Apollo.MutationHookOptions<ChangeUserRoleInFolderMutation, ChangeUserRoleInFolderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ChangeUserRoleInFolderMutation, ChangeUserRoleInFolderMutationVariables>(ChangeUserRoleInFolderDocument, options);
+      }
+export type ChangeUserRoleInFolderMutationHookResult = ReturnType<typeof useChangeUserRoleInFolderMutation>;
+export type ChangeUserRoleInFolderMutationResult = Apollo.MutationResult<ChangeUserRoleInFolderMutation>;
+export type ChangeUserRoleInFolderMutationOptions = Apollo.BaseMutationOptions<ChangeUserRoleInFolderMutation, ChangeUserRoleInFolderMutationVariables>;
 export const CreateFolderDocument = gql`
     mutation createFolder($input: NewFolderInput!) {
   createFolder(input: $input) {
@@ -537,6 +589,38 @@ export function useMoveFolderToTrashMutation(baseOptions?: Apollo.MutationHookOp
 export type MoveFolderToTrashMutationHookResult = ReturnType<typeof useMoveFolderToTrashMutation>;
 export type MoveFolderToTrashMutationResult = Apollo.MutationResult<MoveFolderToTrashMutation>;
 export type MoveFolderToTrashMutationOptions = Apollo.BaseMutationOptions<MoveFolderToTrashMutation, MoveFolderToTrashMutationVariables>;
+export const RemoveUserFromFolderDocument = gql`
+    mutation removeUserFromFolder($folderID: String!, $targetUserID: String!) {
+  removeUserFromFolder(folderID: $folderID, targetUserID: $targetUserID)
+}
+    `;
+export type RemoveUserFromFolderMutationFn = Apollo.MutationFunction<RemoveUserFromFolderMutation, RemoveUserFromFolderMutationVariables>;
+
+/**
+ * __useRemoveUserFromFolderMutation__
+ *
+ * To run a mutation, you first call `useRemoveUserFromFolderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveUserFromFolderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeUserFromFolderMutation, { data, loading, error }] = useRemoveUserFromFolderMutation({
+ *   variables: {
+ *      folderID: // value for 'folderID'
+ *      targetUserID: // value for 'targetUserID'
+ *   },
+ * });
+ */
+export function useRemoveUserFromFolderMutation(baseOptions?: Apollo.MutationHookOptions<RemoveUserFromFolderMutation, RemoveUserFromFolderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveUserFromFolderMutation, RemoveUserFromFolderMutationVariables>(RemoveUserFromFolderDocument, options);
+      }
+export type RemoveUserFromFolderMutationHookResult = ReturnType<typeof useRemoveUserFromFolderMutation>;
+export type RemoveUserFromFolderMutationResult = Apollo.MutationResult<RemoveUserFromFolderMutation>;
+export type RemoveUserFromFolderMutationOptions = Apollo.BaseMutationOptions<RemoveUserFromFolderMutation, RemoveUserFromFolderMutationVariables>;
 export const RestoreFileFromTrashDocument = gql`
     mutation restoreFileFromTrash($fileID: String!) {
   restoreFileFromTrash(fileID: $fileID) {
@@ -1056,6 +1140,15 @@ export type AddUserToFolderReadOnlyUsersMutationVariables = Exact<{
 
 export type AddUserToFolderReadOnlyUsersMutation = { addUserToFolderReadOnlyUsers: string };
 
+export type ChangeUserRoleInFolderMutationVariables = Exact<{
+  folderID: Scalars['String'];
+  targetUserID: Scalars['String'];
+  targetRole: Scalars['String'];
+}>;
+
+
+export type ChangeUserRoleInFolderMutation = { changeUserRoleInFolder: string };
+
 export type CreateFolderMutationVariables = Exact<{
   input: NewFolderInput;
 }>;
@@ -1105,6 +1198,14 @@ export type MoveFolderToTrashMutationVariables = Exact<{
 
 
 export type MoveFolderToTrashMutation = { moveFolderToTrash: string };
+
+export type RemoveUserFromFolderMutationVariables = Exact<{
+  folderID: Scalars['String'];
+  targetUserID: Scalars['String'];
+}>;
+
+
+export type RemoveUserFromFolderMutation = { removeUserFromFolder: string };
 
 export type RestoreFileFromTrashMutationVariables = Exact<{
   fileID: Scalars['String'];
