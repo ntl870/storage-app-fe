@@ -6,5 +6,6 @@ query getMe {
     rootFolder {
       ID
     }
+    avatar
   }
 }

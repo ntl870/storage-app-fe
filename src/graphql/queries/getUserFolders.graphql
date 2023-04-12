@@ -1,5 +1,5 @@
-query getUserFolders($folderID: String!) {
-  getUserFolders(folderID: $folderID) {
+query getFoldersOfFolder($folderID: String!) {
+  getFoldersOfFolder(folderID: $folderID) {
     ID
     name
     files {

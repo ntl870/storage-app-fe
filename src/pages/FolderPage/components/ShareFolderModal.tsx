@@ -7,23 +7,14 @@ import {
   useGetPeopleWithAccessToFolderQuery,
   useSetGeneralFolderAccessMutation,
 } from "@generated/schemas";
-import {
-  Avatar,
-  Button,
-  Dropdown,
-  List,
-  MenuProps,
-  Modal,
-  Space,
-  Spin,
-  Typography,
-} from "antd";
-import { useState } from "react";
-import { AddUserModal } from "./AddUserModal";
-import { DownOutlined } from "@ant-design/icons";
 import { useAlert } from "@hooks/useAlert";
-import { SwitchRoleDropdown } from "./SwitchRoleDropdown";
+import useCurrentUser from "@hooks/useCurrentUser";
+import { getBase64StringOfImage, getGeneratedAvatar } from "@utils/tools";
+import { Avatar, List, Modal, Radio, Spin, Typography } from "antd";
+import { useMemo, useState } from "react";
 import { UserRole } from "src/common/types";
+import { AddUserModal } from "./AddUserModal";
+import { SwitchRoleDropdown } from "./SwitchRoleDropdown";
 
 interface Props {
   open: boolean;
@@ -32,6 +23,7 @@ interface Props {
 }
 
 export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
+  const { ID: currentUserID } = useCurrentUser();
   const { showErrorNotification, showSuccessNotification } = useAlert();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
@@ -61,50 +53,50 @@ export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
     setSelectedUser(null);
   };
 
-  const items: MenuProps["items"] = [
-    {
-      label: "Private",
-      key: "0",
-      onClick: async () => {
-        if (selectedOptions === "Private") return;
+  const handleChangeGeneralAccess = async (value: "Private" | "Public") => {
+    setSelectedOptions(value);
+    if (value === "Private") {
+      try {
+        await setGeneralFolderAccess({
+          variables: {
+            folderID: folder.ID,
+            isPublic: false,
+          },
+        });
+        showSuccessNotification("Folder access changed to private");
+        setSelectedOptions("Private");
+        refetchAccessPeople();
+      } catch (err) {
+        showErrorNotification((err as Error).message);
+      }
+    }
 
-        try {
-          await setGeneralFolderAccess({
-            variables: {
-              folderID: folder.ID,
-              isPublic: false,
-            },
-          });
-          showSuccessNotification("Folder access changed to private");
-          setSelectedOptions("Private");
-          refetchAccessPeople();
-        } catch (err) {
-          showErrorNotification((err as Error).message);
-        }
-      },
-    },
-    {
-      label: "Public",
-      key: "1",
-      onClick: async () => {
-        if (selectedOptions === "Public") return;
+    if (value === "Public") {
+      try {
+        await setGeneralFolderAccess({
+          variables: {
+            folderID: folder.ID,
+            isPublic: true,
+          },
+        });
+        showSuccessNotification("Folder access changed to public");
+        setSelectedOptions("Public");
+        refetchAccessPeople();
+      } catch (err) {
+        showErrorNotification((err as Error).message);
+      }
+    }
+  };
 
-        try {
-          await setGeneralFolderAccess({
-            variables: {
-              folderID: folder.ID,
-              isPublic: true,
-            },
-          });
-          showSuccessNotification("Folder access changed to public");
-          setSelectedOptions("Public");
-          refetchAccessPeople();
-        } catch (err) {
-          showErrorNotification((err as Error).message);
-        }
-      },
-    },
-  ];
+  const canEdit = useMemo(() => {
+    return (
+      currentUserID ===
+        peopleWithAccess?.getPeopleWithAccessToFolder.owner.ID ||
+      peopleWithAccess?.getPeopleWithAccessToFolder.sharedUsers.some(
+        (user) => user.ID === currentUserID
+      )
+    );
+  }, [peopleWithAccess, currentUserID]);
 
   return (
     <>
@@ -124,45 +116,88 @@ export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
           </div>
         ) : (
           <>
-            <SearchableSelector<User, GetUsersBySearchPaginationQueryVariables>
-              query={GetUsersBySearchPaginationDocument}
-              format={(user) => ({
-                label: `${user.name} - ${user.email}`,
-                value: user.ID,
-              })}
-              onChange={(value) => {
-                setSelectedUser(value);
-              }}
-            />
+            {canEdit && (
+              <SearchableSelector<
+                User,
+                GetUsersBySearchPaginationQueryVariables
+              >
+                query={GetUsersBySearchPaginationDocument}
+                format={(user) => ({
+                  label: `${user.name} - ${user.email}`,
+                  value: user.ID,
+                })}
+                onChange={setSelectedUser}
+              />
+            )}
+
             <div className="mt-4">
               <Typography.Text className="font-bold">
                 Users can modify
               </Typography.Text>
+
               <List
                 itemLayout="horizontal"
                 className="max-h-96 overflow-y-auto"
                 dataSource={
                   peopleWithAccess?.getPeopleWithAccessToFolder.sharedUsers
                 }
-                renderItem={(item, index) => (
-                  <List.Item>
-                    <List.Item.Meta
-                      avatar={
-                        <Avatar
-                          src={`https://joesch.moe/api/v1/random?key=${index}`}
+                renderItem={(user, index) => {
+                  const owner =
+                    peopleWithAccess?.getPeopleWithAccessToFolder.owner;
+                  return (
+                    <>
+                      {index === 0 && (
+                        <List.Item>
+                          <List.Item.Meta
+                            avatar={
+                              <Avatar
+                                size="large"
+                                src={
+                                  !owner?.avatar
+                                    ? getGeneratedAvatar(String(owner?.ID))
+                                    : getBase64StringOfImage(owner.avatar)
+                                }
+                              />
+                            }
+                            title={owner?.name}
+                            description={owner?.email}
+                          />
+                          <Typography.Text
+                            italic
+                            type="secondary"
+                            className="text-lg"
+                          >
+                            Owner
+                          </Typography.Text>
+                        </List.Item>
+                      )}
+                      <List.Item>
+                        <List.Item.Meta
+                          avatar={
+                            <Avatar
+                              size="large"
+                              src={
+                                !user.avatar
+                                  ? getGeneratedAvatar(String(user.ID))
+                                  : getBase64StringOfImage(user.avatar)
+                              }
+                            />
+                          }
+                          title={user.name}
+                          description={user.email}
                         />
-                      }
-                      title={item.name}
-                      description={item.email}
-                    />
-                    <SwitchRoleDropdown
-                      initialRole={UserRole.EDITOR}
-                      userID={item.ID}
-                      folderID={folder.ID}
-                      refetchAccessPeople={refetchAccessPeople}
-                    />
-                  </List.Item>
-                )}
+                        {canEdit && (
+                          <SwitchRoleDropdown
+                            initialRole={UserRole.EDITOR}
+                            userID={user.ID}
+                            folderID={folder.ID}
+                            refetchAccessPeople={refetchAccessPeople}
+                          />
+                        )}
+                      </List.Item>
+                    </>
+                  );
+                }}
               />
             </div>
             <div>
@@ -175,23 +210,30 @@ export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
                 dataSource={
                   peopleWithAccess?.getPeopleWithAccessToFolder.readonlyUsers
                 }
-                renderItem={(item, index) => (
+                renderItem={(user) => (
                   <List.Item>
                     <List.Item.Meta
                       avatar={
                         <Avatar
-                          src={`https://joesch.moe/api/v1/random?key=${index}`}
+                          size="large"
+                          src={
+                            !user.avatar
+                              ? getGeneratedAvatar(String(user.ID))
+                              : getBase64StringOfImage(user.avatar)
+                          }
                         />
                       }
-                      title={item.name}
-                      description={item.email}
+                      title={user.name}
+                      description={user.email}
                     />
-                    <SwitchRoleDropdown
-                      initialRole={UserRole.VIEWER}
-                      userID={item.ID}
-                      folderID={folder.ID}
-                      refetchAccessPeople={refetchAccessPeople}
-                    />
+                    {canEdit && (
+                      <SwitchRoleDropdown
+                        initialRole={UserRole.VIEWER}
+                        userID={user.ID}
+                        folderID={folder.ID}
+                        refetchAccessPeople={refetchAccessPeople}
+                      />
+                    )}
                   </List.Item>
                 )}
               />
@@ -201,14 +243,19 @@ export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
               <Typography.Text className="font-bold">
                 General Access
               </Typography.Text>
-              <Dropdown menu={{ items }} trigger={["click"]}>
-                <Button>
-                  <Space>
-                    {selectedOptions}
-                    <DownOutlined />
-                  </Space>
-                </Button>
-              </Dropdown>
+              <Radio.Group
+                onChange={(e) => handleChangeGeneralAccess(e.target.value)}
+                value={selectedOptions}
+                buttonStyle="solid"
+                disabled={!canEdit}
+              >
+                <Radio.Button value="Public" className="w-1/2 text-center">
+                  Public
+                </Radio.Button>
+                <Radio.Button value="Private" className="w-1/2 text-center">
+                  Private
+                </Radio.Button>
+              </Radio.Group>
             </div>
           </>
         )}

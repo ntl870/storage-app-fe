@@ -1,6 +1,5 @@
 import {
   FilePdfOutlined,
-  FileImageOutlined,
   FileZipOutlined,
   FileTextOutlined,
   FileOutlined,
@@ -127,3 +126,9 @@ export const renderIconByFileType = (file: FileSchema) => {
       return <FileOutlined className="text-7xl mt-6" />;
   }
 };
+
+export const getGeneratedAvatar = (seed: string) =>
+  `https://api.dicebear.com/6.x/fun-emoji/svg?radius=50&seed=${seed}`;
+
+export const getBase64StringOfImage = (base64: string) =>
+  `data:image/png;base64,${base64}`;

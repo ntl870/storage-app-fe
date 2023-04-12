@@ -2,7 +2,7 @@ import { useGetMeQuery } from "../generated/schemas";
 
 const useCurrentUser = () => {
   const { data } = useGetMeQuery({
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
   });
 
   return {
@@ -10,6 +10,7 @@ const useCurrentUser = () => {
     name: data?.getMe.name,
     email: data?.getMe.email,
     rootFolderID: data?.getMe?.rootFolder?.ID,
+    avatar: data?.getMe.avatar,
   };
 };
 

@@ -169,6 +169,7 @@ export type NewUserReturn = {
 
 export type PeopleWithAccessResponse = {
   isPublic: Scalars['Boolean'];
+  owner: User;
   readonlyUsers: Array<User>;
   sharedUsers: Array<User>;
 };
@@ -178,11 +179,11 @@ export type Query = {
   getArrayOfRootFoldersName: Array<Folder>;
   getFileByID: File;
   getFilesByFolder: Array<File>;
+  getFoldersOfFolder: Array<Folder>;
   getMe: User;
   getPeopleWithAccessToFolder: PeopleWithAccessResponse;
   getUserByID: User;
   getUserFiles: Array<File>;
-  getUserFolders: Array<Folder>;
   getUserTrashFiles: Array<File>;
   getUserTrashFolder: Array<Folder>;
   getUsersBySearchPagination: UserSearchPaginationResponse;
@@ -204,6 +205,11 @@ export type QueryGetFilesByFolderArgs = {
 };
 
 
+export type QueryGetFoldersOfFolderArgs = {
+  folderID: Scalars['String'];
+};
+
+
 export type QueryGetPeopleWithAccessToFolderArgs = {
   folderID: Scalars['String'];
 };
@@ -211,11 +217,6 @@ export type QueryGetPeopleWithAccessToFolderArgs = {
 
 export type QueryGetUserByIdArgs = {
   ID: Scalars['String'];
-};
-
-
-export type QueryGetUserFoldersArgs = {
-  folderID: Scalars['String'];
 };
 
 
@@ -238,6 +239,7 @@ export type UploadFolderInput = {
 
 export type User = {
   ID: Scalars['String'];
+  avatar?: Maybe<Scalars['String']>;
   email: Scalars['String'];
   name: Scalars['String'];
   password: Scalars['String'];
@@ -849,6 +851,7 @@ export const GetMeDocument = gql`
     rootFolder {
       ID
     }
+    avatar
   }
 }
     `;
@@ -889,11 +892,19 @@ export const GetPeopleWithAccessToFolderDocument = gql`
       ID
       name
       email
+      avatar
     }
     readonlyUsers {
       ID
       name
       email
+      avatar
+    }
+    owner {
+      ID
+      name
+      email
+      avatar
     }
     isPublic
   }
@@ -930,9 +941,9 @@ export type GetPeopleWithAccessToFolderQueryResult = Apollo.QueryResult<GetPeopl
 export function refetchGetPeopleWithAccessToFolderQuery(variables: GetPeopleWithAccessToFolderQueryVariables) {
       return { query: GetPeopleWithAccessToFolderDocument, variables: variables }
     }
-export const GetUserFoldersDocument = gql`
-    query getUserFolders($folderID: String!) {
-  getUserFolders(folderID: $folderID) {
+export const GetFoldersOfFolderDocument = gql`
+    query getFoldersOfFolder($folderID: String!) {
+  getFoldersOfFolder(folderID: $folderID) {
     ID
     name
     files {
@@ -954,34 +965,34 @@ export const GetUserFoldersDocument = gql`
     `;
 
 /**
- * __useGetUserFoldersQuery__
+ * __useGetFoldersOfFolderQuery__
  *
- * To run a query within a React component, call `useGetUserFoldersQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetUserFoldersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetFoldersOfFolderQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFoldersOfFolderQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetUserFoldersQuery({
+ * const { data, loading, error } = useGetFoldersOfFolderQuery({
  *   variables: {
  *      folderID: // value for 'folderID'
  *   },
  * });
  */
-export function useGetUserFoldersQuery(baseOptions: Apollo.QueryHookOptions<GetUserFoldersQuery, GetUserFoldersQueryVariables>) {
+export function useGetFoldersOfFolderQuery(baseOptions: Apollo.QueryHookOptions<GetFoldersOfFolderQuery, GetFoldersOfFolderQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetUserFoldersQuery, GetUserFoldersQueryVariables>(GetUserFoldersDocument, options);
+        return Apollo.useQuery<GetFoldersOfFolderQuery, GetFoldersOfFolderQueryVariables>(GetFoldersOfFolderDocument, options);
       }
-export function useGetUserFoldersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserFoldersQuery, GetUserFoldersQueryVariables>) {
+export function useGetFoldersOfFolderLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetFoldersOfFolderQuery, GetFoldersOfFolderQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetUserFoldersQuery, GetUserFoldersQueryVariables>(GetUserFoldersDocument, options);
+          return Apollo.useLazyQuery<GetFoldersOfFolderQuery, GetFoldersOfFolderQueryVariables>(GetFoldersOfFolderDocument, options);
         }
-export type GetUserFoldersQueryHookResult = ReturnType<typeof useGetUserFoldersQuery>;
-export type GetUserFoldersLazyQueryHookResult = ReturnType<typeof useGetUserFoldersLazyQuery>;
-export type GetUserFoldersQueryResult = Apollo.QueryResult<GetUserFoldersQuery, GetUserFoldersQueryVariables>;
-export function refetchGetUserFoldersQuery(variables: GetUserFoldersQueryVariables) {
-      return { query: GetUserFoldersDocument, variables: variables }
+export type GetFoldersOfFolderQueryHookResult = ReturnType<typeof useGetFoldersOfFolderQuery>;
+export type GetFoldersOfFolderLazyQueryHookResult = ReturnType<typeof useGetFoldersOfFolderLazyQuery>;
+export type GetFoldersOfFolderQueryResult = Apollo.QueryResult<GetFoldersOfFolderQuery, GetFoldersOfFolderQueryVariables>;
+export function refetchGetFoldersOfFolderQuery(variables: GetFoldersOfFolderQueryVariables) {
+      return { query: GetFoldersOfFolderDocument, variables: variables }
     }
 export const GetUserTrashFilesDocument = gql`
     query getUserTrashFiles {
@@ -1254,21 +1265,21 @@ export type GetFilesByFolderQuery = { getFilesByFolder: Array<{ ID: string, name
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMeQuery = { getMe: { ID: string, name: string, email: string, rootFolder?: { ID: string } | null } };
+export type GetMeQuery = { getMe: { ID: string, name: string, email: string, avatar?: string | null, rootFolder?: { ID: string } | null } };
 
 export type GetPeopleWithAccessToFolderQueryVariables = Exact<{
   folderID: Scalars['String'];
 }>;
 
 
-export type GetPeopleWithAccessToFolderQuery = { getPeopleWithAccessToFolder: { isPublic: boolean, sharedUsers: Array<{ ID: string, name: string, email: string }>, readonlyUsers: Array<{ ID: string, name: string, email: string }> } };
+export type GetPeopleWithAccessToFolderQuery = { getPeopleWithAccessToFolder: { isPublic: boolean, sharedUsers: Array<{ ID: string, name: string, email: string, avatar?: string | null }>, readonlyUsers: Array<{ ID: string, name: string, email: string, avatar?: string | null }>, owner: { ID: string, name: string, email: string, avatar?: string | null } } };
 
-export type GetUserFoldersQueryVariables = Exact<{
+export type GetFoldersOfFolderQueryVariables = Exact<{
   folderID: Scalars['String'];
 }>;
 
 
-export type GetUserFoldersQuery = { getUserFolders: Array<{ ID: string, name: string, path: string, isTrash: boolean, isPublic: boolean, files?: Array<{ ID: string, name: string, url: string, fileType: string }> | null, subFolders?: Array<{ ID: string, name: string, path: string }> | null }> };
+export type GetFoldersOfFolderQuery = { getFoldersOfFolder: Array<{ ID: string, name: string, path: string, isTrash: boolean, isPublic: boolean, files?: Array<{ ID: string, name: string, url: string, fileType: string }> | null, subFolders?: Array<{ ID: string, name: string, path: string }> | null }> };
 
 export type GetUserTrashFilesQueryVariables = Exact<{ [key: string]: never; }>;
 

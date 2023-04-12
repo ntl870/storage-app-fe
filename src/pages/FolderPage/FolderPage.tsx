@@ -1,6 +1,6 @@
 import useRouter from "@hooks/useRouter";
 import {
-  useGetUserFoldersQuery,
+  useGetFoldersOfFolderQuery,
   Folder,
   useGetFilesByFolderQuery,
   File as FileSchema,
@@ -70,7 +70,7 @@ export const FolderPage = () => {
     loading: getFolderLoading,
     refetch: refetchFolders,
     error: getFolderError,
-  } = useGetUserFoldersQuery({
+  } = useGetFoldersOfFolderQuery({
     variables: {
       folderID: currentFolderID,
     },
@@ -259,14 +259,14 @@ export const FolderPage = () => {
           </Dropdown>
         </div>
         <NavigateBreadCrumb />
-        {!!foldersData?.getUserFolders.length && (
+        {!!foldersData?.getFoldersOfFolder.length && (
           <Typography.Text className="inline-block p-4 font-semibold">
             Folders
           </Typography.Text>
         )}
 
         <FolderSection
-          folders={(foldersData?.getUserFolders as Folder[]) || []}
+          folders={(foldersData?.getFoldersOfFolder as Folder[]) || []}
           handleClickFolder={handleClickFolder}
           selectedItem={selectedItem as Folder & { type: "file" | "folder" }}
           refetch={refetchFolders}

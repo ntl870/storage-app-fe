@@ -4,11 +4,19 @@ query getPeopleWithAccessToFolder($folderID: String!) {
       ID
       name
       email
+      avatar
     }
     readonlyUsers {
       ID
       name
       email
+      avatar
+    }
+    owner {
+      ID
+      name
+      email
+      avatar
     }
     isPublic
   }
