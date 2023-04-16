@@ -232,13 +232,6 @@ export const FolderPage = () => {
     navigate("/");
   };
 
-  // useEffect(() => {
-  //   if (folderInputRef.current !== null) {
-  //     folderInputRef.current.setAttribute("directory", "");
-  //     folderInputRef.current.setAttribute("webkitdirectory", "");
-  //   }
-  // }, [folderInputRef]);
-
   if (getFolderLoading || getFilesLoading) {
     return (
       <div className="flex justify-center items-center h-full">

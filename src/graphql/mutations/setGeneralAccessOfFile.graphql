@@ -1,0 +1,3 @@
+mutation setGeneralAccessOfFile($fileID: String!, $isPublic: Boolean!) {
+  setGeneralAccessOfFile(fileID: $fileID, isPublic: $isPublic)
+}

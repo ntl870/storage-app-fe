@@ -1,15 +1,16 @@
+import { LinkOutlined } from "@ant-design/icons";
 import { SearchableSelector } from "@components/SearchableSelector";
 import {
-  Folder,
+  File,
   GetUsersBySearchPaginationDocument,
   GetUsersBySearchPaginationQueryVariables,
   User,
-  useGetPeopleWithAccessToFolderQuery,
-  useSetGeneralFolderAccessMutation,
+  useGetPeopleWithAccessToFileQuery,
+  useSetGeneralAccessOfFileMutation,
 } from "@generated/schemas";
 import { useAlert } from "@hooks/useAlert";
 import useCurrentUser from "@hooks/useCurrentUser";
-import { getBase64StringOfImage, getGeneratedAvatar } from "@utils/tools";
+import { getGeneratedAvatar, getBase64StringOfImage } from "@utils/tools";
 import {
   Avatar,
   Button,
@@ -22,17 +23,16 @@ import {
 } from "antd";
 import { useMemo, useState } from "react";
 import { UserRole } from "src/common/types";
-import { AddUserModal } from "./AddUserModal";
 import { SwitchRoleDropdown } from "./SwitchRoleDropdown";
-import { LinkOutlined } from "@ant-design/icons";
+import { AddUserModal } from "./AddUserModal";
 
 interface Props {
   open: boolean;
   handleClose: () => void;
-  folder: Folder;
+  file: File | null;
 }
 
-export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
+export const ShareFileModal = ({ file, handleClose, open }: Props) => {
   const { ID: currentUserID } = useCurrentUser();
   const { showErrorNotification, showSuccessNotification } = useAlert();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -40,40 +40,37 @@ export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
     "Private"
   );
 
-  const [setGeneralFolderAccess, { loading: isSetGeneralAccessLoading }] =
-    useSetGeneralFolderAccessMutation();
+  const [setGeneralFileAccess, { loading: isLoadingSetGeneralAccess }] =
+    useSetGeneralAccessOfFileMutation();
 
   const {
     data: peopleWithAccess,
     refetch: refetchAccessPeople,
     loading: isLoadingAccessPeople,
-  } = useGetPeopleWithAccessToFolderQuery({
+  } = useGetPeopleWithAccessToFileQuery({
     variables: {
-      folderID: folder.ID,
+      fileID: file?.ID || "",
     },
+    skip: !file?.ID,
     onCompleted: (data) => {
       setSelectedOptions(
-        data.getPeopleWithAccessToFolder.isPublic ? "Public" : "Private"
+        data.getPeopleWithAccessToFile.isPublic ? "Public" : "Private"
       );
     },
     fetchPolicy: "cache-and-network",
   });
 
-  const handleCloseAddUserModal = () => {
-    setSelectedUser(null);
-  };
-
   const handleChangeGeneralAccess = async (value: "Private" | "Public") => {
     setSelectedOptions(value);
     if (value === "Private") {
       try {
-        await setGeneralFolderAccess({
+        await setGeneralFileAccess({
           variables: {
-            folderID: folder.ID,
+            fileID: file?.ID || "",
             isPublic: false,
           },
         });
-        showSuccessNotification("Folder access changed to private");
+        showSuccessNotification("File access changed to private");
         setSelectedOptions("Private");
         refetchAccessPeople();
       } catch (err) {
@@ -83,13 +80,13 @@ export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
 
     if (value === "Public") {
       try {
-        await setGeneralFolderAccess({
+        await setGeneralFileAccess({
           variables: {
-            folderID: folder.ID,
+            fileID: file?.ID || "",
             isPublic: true,
           },
         });
-        showSuccessNotification("Folder access changed to public");
+        showSuccessNotification("File access changed to public");
         setSelectedOptions("Public");
         refetchAccessPeople();
       } catch (err) {
@@ -100,18 +97,15 @@ export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
 
   const canEdit = useMemo(() => {
     return (
-      currentUserID ===
-        peopleWithAccess?.getPeopleWithAccessToFolder.owner.ID ||
-      peopleWithAccess?.getPeopleWithAccessToFolder.sharedUsers.some(
+      currentUserID === peopleWithAccess?.getPeopleWithAccessToFile.owner.ID ||
+      peopleWithAccess?.getPeopleWithAccessToFile.sharedUsers.some(
         (user) => String(user.ID) === currentUserID
       )
     );
   }, [peopleWithAccess, currentUserID]);
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(
-      `${window.location.origin}/folder/${folder.ID}`
-    );
+    navigator.clipboard.writeText(`${window.location.origin}/file/${file?.ID}`);
     message.success("Link copied to clipboard");
   };
 
@@ -123,20 +117,21 @@ export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
         }}
         centered
         open={open}
-        title="Share folder"
+        onCancel={handleClose}
+        title="Share file"
         cancelText="Close"
         footer={
           <>
             <Button key="copy" icon={<LinkOutlined />} onClick={handleCopyLink}>
               Copy link
             </Button>
-            <Button key="done" type="primary" onClick={handleClose}>
+            <Button key="done" type="primary">
               Done
             </Button>
           </>
         }
       >
-        {isLoadingAccessPeople || isSetGeneralAccessLoading ? (
+        {isLoadingAccessPeople || isLoadingSetGeneralAccess ? (
           <div className="text-center">
             <Spin />
           </div>
@@ -160,10 +155,8 @@ export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
               <Typography.Text className="font-bold">
                 Users can modify
               </Typography.Text>
-
               {(() => {
-                const owner =
-                  peopleWithAccess?.getPeopleWithAccessToFolder.owner;
+                const owner = peopleWithAccess?.getPeopleWithAccessToFile.owner;
                 return (
                   <List>
                     <List.Item>
@@ -196,43 +189,41 @@ export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
               <List
                 itemLayout="horizontal"
                 className="max-h-96 overflow-y-auto"
-                dataSource={peopleWithAccess?.getPeopleWithAccessToFolder.sharedUsers.filter(
+                dataSource={peopleWithAccess?.getPeopleWithAccessToFile.sharedUsers.filter(
                   (user) =>
                     user.ID !==
-                    peopleWithAccess.getPeopleWithAccessToFolder.owner.ID
+                    peopleWithAccess.getPeopleWithAccessToFile.owner.ID
                 )}
                 locale={{
                   emptyText: " ",
                 }}
                 renderItem={(user) => {
                   return (
-                    <>
-                      <List.Item>
-                        <List.Item.Meta
-                          avatar={
-                            <Avatar
-                              size="large"
-                              src={
-                                !user?.avatar
-                                  ? getGeneratedAvatar(String(user?.ID))
-                                  : getBase64StringOfImage(user.avatar)
-                              }
-                            />
-                          }
-                          title={user?.name}
-                          description={user?.email}
-                        />
-                        {canEdit && (
-                          <SwitchRoleDropdown
-                            initialRole={UserRole.EDITOR}
-                            userID={user?.ID || ""}
-                            ID={folder.ID}
-                            type="folder"
-                            refetchAccessPeople={refetchAccessPeople}
+                    <List.Item>
+                      <List.Item.Meta
+                        avatar={
+                          <Avatar
+                            size="large"
+                            src={
+                              !user?.avatar
+                                ? getGeneratedAvatar(String(user?.ID))
+                                : getBase64StringOfImage(user.avatar)
+                            }
                           />
-                        )}
-                      </List.Item>
-                    </>
+                        }
+                        title={user?.name}
+                        description={user?.email}
+                      />
+                      {canEdit && (
+                        <SwitchRoleDropdown
+                          initialRole={UserRole.EDITOR}
+                          userID={user?.ID || ""}
+                          ID={file?.ID || ""}
+                          type="file"
+                          refetchAccessPeople={refetchAccessPeople}
+                        />
+                      )}
+                    </List.Item>
                   );
                 }}
               />
@@ -245,7 +236,7 @@ export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
                 itemLayout="horizontal"
                 className="max-h-96 overflow-y-auto"
                 dataSource={
-                  peopleWithAccess?.getPeopleWithAccessToFolder.readonlyUsers
+                  peopleWithAccess?.getPeopleWithAccessToFile.readonlyUsers
                 }
                 renderItem={(user) => (
                   <List.Item>
@@ -267,8 +258,8 @@ export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
                       <SwitchRoleDropdown
                         initialRole={UserRole.VIEWER}
                         userID={user.ID}
-                        ID={folder.ID}
-                        type="folder"
+                        ID={file?.ID || ""}
+                        type="file"
                         refetchAccessPeople={refetchAccessPeople}
                       />
                     )}
@@ -301,11 +292,11 @@ export const ShareFolderModal = ({ open, handleClose, folder }: Props) => {
 
       {!!selectedUser && (
         <AddUserModal
-          type="folder"
+          type="file"
           open={!!selectedUser}
           initialUser={selectedUser as any}
-          handleClose={handleCloseAddUserModal}
-          ID={folder.ID}
+          handleClose={() => setSelectedUser(null)}
+          ID={file?.ID || ""}
           refetchAccessPeople={refetchAccessPeople}
         />
       )}

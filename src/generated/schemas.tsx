@@ -46,16 +46,22 @@ export type Folder = {
 export type Mutation = {
   addSharedUserToFolder: Scalars['String'];
   addUserToFolderReadOnlyUsers: Scalars['String'];
+  addUsersToReadonlyFile: Scalars['String'];
+  addUsersToSharedUserFile: Scalars['String'];
+  changeUserRoleInFile: Scalars['String'];
   changeUserRoleInFolder: Scalars['String'];
   createFolder: Folder;
   deleteFile: Scalars['String'];
   deleteFolder: Scalars['String'];
+  emptyUserTrash: Scalars['String'];
   login: Scalars['String'];
   moveFileToTrash: File;
   moveFolderOutOfTrash: Scalars['String'];
   moveFolderToTrash: Scalars['String'];
+  removeUserFromFile: Scalars['String'];
   removeUserFromFolder: Scalars['String'];
   restoreFileFromTrash: File;
+  setGeneralAccessOfFile: Scalars['String'];
   setGeneralFolderAccess: Scalars['String'];
   signup: NewUserReturn;
   uploadFile: File;
@@ -76,6 +82,29 @@ export type MutationAddUserToFolderReadOnlyUsersArgs = {
   readOnlyUserIDs: Array<Scalars['String']>;
   shouldSendMail: Scalars['Boolean'];
   userMessage?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationAddUsersToReadonlyFileArgs = {
+  fileID: Scalars['String'];
+  readonlyUserIDs: Array<Scalars['String']>;
+  shouldSendMail: Scalars['Boolean'];
+  userMessage?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationAddUsersToSharedUserFileArgs = {
+  fileID: Scalars['String'];
+  sharedUserIDs: Array<Scalars['String']>;
+  shouldSendMail: Scalars['Boolean'];
+  userMessage?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationChangeUserRoleInFileArgs = {
+  fileID: Scalars['String'];
+  targetRole: Scalars['String'];
+  targetUserID: Scalars['String'];
 };
 
 
@@ -122,6 +151,12 @@ export type MutationMoveFolderToTrashArgs = {
 };
 
 
+export type MutationRemoveUserFromFileArgs = {
+  fileID: Scalars['String'];
+  targetUserID: Scalars['String'];
+};
+
+
 export type MutationRemoveUserFromFolderArgs = {
   folderID: Scalars['String'];
   targetUserID: Scalars['String'];
@@ -130,6 +165,12 @@ export type MutationRemoveUserFromFolderArgs = {
 
 export type MutationRestoreFileFromTrashArgs = {
   fileID: Scalars['String'];
+};
+
+
+export type MutationSetGeneralAccessOfFileArgs = {
+  fileID: Scalars['String'];
+  isPublic: Scalars['Boolean'];
 };
 
 
@@ -181,6 +222,7 @@ export type Query = {
   getFilesByFolder: Array<File>;
   getFoldersOfFolder: Array<Folder>;
   getMe: User;
+  getPeopleWithAccessToFile: PeopleWithAccessResponse;
   getPeopleWithAccessToFolder: PeopleWithAccessResponse;
   getUserByID: User;
   getUserFiles: Array<File>;
@@ -207,6 +249,11 @@ export type QueryGetFilesByFolderArgs = {
 
 export type QueryGetFoldersOfFolderArgs = {
   folderID: Scalars['String'];
+};
+
+
+export type QueryGetPeopleWithAccessToFileArgs = {
+  fileID: Scalars['String'];
 };
 
 
@@ -330,6 +377,121 @@ export function useAddUserToFolderReadOnlyUsersMutation(baseOptions?: Apollo.Mut
 export type AddUserToFolderReadOnlyUsersMutationHookResult = ReturnType<typeof useAddUserToFolderReadOnlyUsersMutation>;
 export type AddUserToFolderReadOnlyUsersMutationResult = Apollo.MutationResult<AddUserToFolderReadOnlyUsersMutation>;
 export type AddUserToFolderReadOnlyUsersMutationOptions = Apollo.BaseMutationOptions<AddUserToFolderReadOnlyUsersMutation, AddUserToFolderReadOnlyUsersMutationVariables>;
+export const AddUsersToSharedUserFileDocument = gql`
+    mutation addUsersToSharedUserFile($fileID: String!, $sharedUserIDs: [String!]!, $shouldSendMail: Boolean!, $userMessage: String) {
+  addUsersToSharedUserFile(
+    fileID: $fileID
+    sharedUserIDs: $sharedUserIDs
+    shouldSendMail: $shouldSendMail
+    userMessage: $userMessage
+  )
+}
+    `;
+export type AddUsersToSharedUserFileMutationFn = Apollo.MutationFunction<AddUsersToSharedUserFileMutation, AddUsersToSharedUserFileMutationVariables>;
+
+/**
+ * __useAddUsersToSharedUserFileMutation__
+ *
+ * To run a mutation, you first call `useAddUsersToSharedUserFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddUsersToSharedUserFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addUsersToSharedUserFileMutation, { data, loading, error }] = useAddUsersToSharedUserFileMutation({
+ *   variables: {
+ *      fileID: // value for 'fileID'
+ *      sharedUserIDs: // value for 'sharedUserIDs'
+ *      shouldSendMail: // value for 'shouldSendMail'
+ *      userMessage: // value for 'userMessage'
+ *   },
+ * });
+ */
+export function useAddUsersToSharedUserFileMutation(baseOptions?: Apollo.MutationHookOptions<AddUsersToSharedUserFileMutation, AddUsersToSharedUserFileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddUsersToSharedUserFileMutation, AddUsersToSharedUserFileMutationVariables>(AddUsersToSharedUserFileDocument, options);
+      }
+export type AddUsersToSharedUserFileMutationHookResult = ReturnType<typeof useAddUsersToSharedUserFileMutation>;
+export type AddUsersToSharedUserFileMutationResult = Apollo.MutationResult<AddUsersToSharedUserFileMutation>;
+export type AddUsersToSharedUserFileMutationOptions = Apollo.BaseMutationOptions<AddUsersToSharedUserFileMutation, AddUsersToSharedUserFileMutationVariables>;
+export const AddUsersToReadonlyFileDocument = gql`
+    mutation addUsersToReadonlyFile($fileID: String!, $readonlyUserIDs: [String!]!, $shouldSendMail: Boolean!, $userMessage: String) {
+  addUsersToReadonlyFile(
+    fileID: $fileID
+    readonlyUserIDs: $readonlyUserIDs
+    shouldSendMail: $shouldSendMail
+    userMessage: $userMessage
+  )
+}
+    `;
+export type AddUsersToReadonlyFileMutationFn = Apollo.MutationFunction<AddUsersToReadonlyFileMutation, AddUsersToReadonlyFileMutationVariables>;
+
+/**
+ * __useAddUsersToReadonlyFileMutation__
+ *
+ * To run a mutation, you first call `useAddUsersToReadonlyFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddUsersToReadonlyFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addUsersToReadonlyFileMutation, { data, loading, error }] = useAddUsersToReadonlyFileMutation({
+ *   variables: {
+ *      fileID: // value for 'fileID'
+ *      readonlyUserIDs: // value for 'readonlyUserIDs'
+ *      shouldSendMail: // value for 'shouldSendMail'
+ *      userMessage: // value for 'userMessage'
+ *   },
+ * });
+ */
+export function useAddUsersToReadonlyFileMutation(baseOptions?: Apollo.MutationHookOptions<AddUsersToReadonlyFileMutation, AddUsersToReadonlyFileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddUsersToReadonlyFileMutation, AddUsersToReadonlyFileMutationVariables>(AddUsersToReadonlyFileDocument, options);
+      }
+export type AddUsersToReadonlyFileMutationHookResult = ReturnType<typeof useAddUsersToReadonlyFileMutation>;
+export type AddUsersToReadonlyFileMutationResult = Apollo.MutationResult<AddUsersToReadonlyFileMutation>;
+export type AddUsersToReadonlyFileMutationOptions = Apollo.BaseMutationOptions<AddUsersToReadonlyFileMutation, AddUsersToReadonlyFileMutationVariables>;
+export const ChangeUserRoleInFileDocument = gql`
+    mutation changeUserRoleInFile($fileID: String!, $targetUserID: String!, $targetRole: String!) {
+  changeUserRoleInFile(
+    fileID: $fileID
+    targetUserID: $targetUserID
+    targetRole: $targetRole
+  )
+}
+    `;
+export type ChangeUserRoleInFileMutationFn = Apollo.MutationFunction<ChangeUserRoleInFileMutation, ChangeUserRoleInFileMutationVariables>;
+
+/**
+ * __useChangeUserRoleInFileMutation__
+ *
+ * To run a mutation, you first call `useChangeUserRoleInFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeUserRoleInFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeUserRoleInFileMutation, { data, loading, error }] = useChangeUserRoleInFileMutation({
+ *   variables: {
+ *      fileID: // value for 'fileID'
+ *      targetUserID: // value for 'targetUserID'
+ *      targetRole: // value for 'targetRole'
+ *   },
+ * });
+ */
+export function useChangeUserRoleInFileMutation(baseOptions?: Apollo.MutationHookOptions<ChangeUserRoleInFileMutation, ChangeUserRoleInFileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ChangeUserRoleInFileMutation, ChangeUserRoleInFileMutationVariables>(ChangeUserRoleInFileDocument, options);
+      }
+export type ChangeUserRoleInFileMutationHookResult = ReturnType<typeof useChangeUserRoleInFileMutation>;
+export type ChangeUserRoleInFileMutationResult = Apollo.MutationResult<ChangeUserRoleInFileMutation>;
+export type ChangeUserRoleInFileMutationOptions = Apollo.BaseMutationOptions<ChangeUserRoleInFileMutation, ChangeUserRoleInFileMutationVariables>;
 export const ChangeUserRoleInFolderDocument = gql`
     mutation changeUserRoleInFolder($folderID: String!, $targetUserID: String!, $targetRole: String!) {
   changeUserRoleInFolder(
@@ -463,6 +625,36 @@ export function useDeleteFolderMutation(baseOptions?: Apollo.MutationHookOptions
 export type DeleteFolderMutationHookResult = ReturnType<typeof useDeleteFolderMutation>;
 export type DeleteFolderMutationResult = Apollo.MutationResult<DeleteFolderMutation>;
 export type DeleteFolderMutationOptions = Apollo.BaseMutationOptions<DeleteFolderMutation, DeleteFolderMutationVariables>;
+export const EmptyUserTrashDocument = gql`
+    mutation emptyUserTrash {
+  emptyUserTrash
+}
+    `;
+export type EmptyUserTrashMutationFn = Apollo.MutationFunction<EmptyUserTrashMutation, EmptyUserTrashMutationVariables>;
+
+/**
+ * __useEmptyUserTrashMutation__
+ *
+ * To run a mutation, you first call `useEmptyUserTrashMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEmptyUserTrashMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [emptyUserTrashMutation, { data, loading, error }] = useEmptyUserTrashMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useEmptyUserTrashMutation(baseOptions?: Apollo.MutationHookOptions<EmptyUserTrashMutation, EmptyUserTrashMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<EmptyUserTrashMutation, EmptyUserTrashMutationVariables>(EmptyUserTrashDocument, options);
+      }
+export type EmptyUserTrashMutationHookResult = ReturnType<typeof useEmptyUserTrashMutation>;
+export type EmptyUserTrashMutationResult = Apollo.MutationResult<EmptyUserTrashMutation>;
+export type EmptyUserTrashMutationOptions = Apollo.BaseMutationOptions<EmptyUserTrashMutation, EmptyUserTrashMutationVariables>;
 export const LoginDocument = gql`
     mutation login($email: String!, $password: String!) {
   login(email: $email, password: $password)
@@ -591,6 +783,38 @@ export function useMoveFolderToTrashMutation(baseOptions?: Apollo.MutationHookOp
 export type MoveFolderToTrashMutationHookResult = ReturnType<typeof useMoveFolderToTrashMutation>;
 export type MoveFolderToTrashMutationResult = Apollo.MutationResult<MoveFolderToTrashMutation>;
 export type MoveFolderToTrashMutationOptions = Apollo.BaseMutationOptions<MoveFolderToTrashMutation, MoveFolderToTrashMutationVariables>;
+export const RemoveUserFromFileDocument = gql`
+    mutation removeUserFromFile($fileID: String!, $targetUserID: String!) {
+  removeUserFromFile(fileID: $fileID, targetUserID: $targetUserID)
+}
+    `;
+export type RemoveUserFromFileMutationFn = Apollo.MutationFunction<RemoveUserFromFileMutation, RemoveUserFromFileMutationVariables>;
+
+/**
+ * __useRemoveUserFromFileMutation__
+ *
+ * To run a mutation, you first call `useRemoveUserFromFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveUserFromFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeUserFromFileMutation, { data, loading, error }] = useRemoveUserFromFileMutation({
+ *   variables: {
+ *      fileID: // value for 'fileID'
+ *      targetUserID: // value for 'targetUserID'
+ *   },
+ * });
+ */
+export function useRemoveUserFromFileMutation(baseOptions?: Apollo.MutationHookOptions<RemoveUserFromFileMutation, RemoveUserFromFileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveUserFromFileMutation, RemoveUserFromFileMutationVariables>(RemoveUserFromFileDocument, options);
+      }
+export type RemoveUserFromFileMutationHookResult = ReturnType<typeof useRemoveUserFromFileMutation>;
+export type RemoveUserFromFileMutationResult = Apollo.MutationResult<RemoveUserFromFileMutation>;
+export type RemoveUserFromFileMutationOptions = Apollo.BaseMutationOptions<RemoveUserFromFileMutation, RemoveUserFromFileMutationVariables>;
 export const RemoveUserFromFolderDocument = gql`
     mutation removeUserFromFolder($folderID: String!, $targetUserID: String!) {
   removeUserFromFolder(folderID: $folderID, targetUserID: $targetUserID)
@@ -657,6 +881,38 @@ export function useRestoreFileFromTrashMutation(baseOptions?: Apollo.MutationHoo
 export type RestoreFileFromTrashMutationHookResult = ReturnType<typeof useRestoreFileFromTrashMutation>;
 export type RestoreFileFromTrashMutationResult = Apollo.MutationResult<RestoreFileFromTrashMutation>;
 export type RestoreFileFromTrashMutationOptions = Apollo.BaseMutationOptions<RestoreFileFromTrashMutation, RestoreFileFromTrashMutationVariables>;
+export const SetGeneralAccessOfFileDocument = gql`
+    mutation setGeneralAccessOfFile($fileID: String!, $isPublic: Boolean!) {
+  setGeneralAccessOfFile(fileID: $fileID, isPublic: $isPublic)
+}
+    `;
+export type SetGeneralAccessOfFileMutationFn = Apollo.MutationFunction<SetGeneralAccessOfFileMutation, SetGeneralAccessOfFileMutationVariables>;
+
+/**
+ * __useSetGeneralAccessOfFileMutation__
+ *
+ * To run a mutation, you first call `useSetGeneralAccessOfFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetGeneralAccessOfFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setGeneralAccessOfFileMutation, { data, loading, error }] = useSetGeneralAccessOfFileMutation({
+ *   variables: {
+ *      fileID: // value for 'fileID'
+ *      isPublic: // value for 'isPublic'
+ *   },
+ * });
+ */
+export function useSetGeneralAccessOfFileMutation(baseOptions?: Apollo.MutationHookOptions<SetGeneralAccessOfFileMutation, SetGeneralAccessOfFileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SetGeneralAccessOfFileMutation, SetGeneralAccessOfFileMutationVariables>(SetGeneralAccessOfFileDocument, options);
+      }
+export type SetGeneralAccessOfFileMutationHookResult = ReturnType<typeof useSetGeneralAccessOfFileMutation>;
+export type SetGeneralAccessOfFileMutationResult = Apollo.MutationResult<SetGeneralAccessOfFileMutation>;
+export type SetGeneralAccessOfFileMutationOptions = Apollo.BaseMutationOptions<SetGeneralAccessOfFileMutation, SetGeneralAccessOfFileMutationVariables>;
 export const SetGeneralFolderAccessDocument = gql`
     mutation setGeneralFolderAccess($folderID: String!, $isPublic: Boolean!) {
   setGeneralFolderAccess(folderID: $folderID, isPublic: $isPublic)
@@ -884,6 +1140,62 @@ export type GetMeLazyQueryHookResult = ReturnType<typeof useGetMeLazyQuery>;
 export type GetMeQueryResult = Apollo.QueryResult<GetMeQuery, GetMeQueryVariables>;
 export function refetchGetMeQuery(variables?: GetMeQueryVariables) {
       return { query: GetMeDocument, variables: variables }
+    }
+export const GetPeopleWithAccessToFileDocument = gql`
+    query getPeopleWithAccessToFile($fileID: String!) {
+  getPeopleWithAccessToFile(fileID: $fileID) {
+    sharedUsers {
+      ID
+      name
+      email
+      avatar
+    }
+    readonlyUsers {
+      ID
+      name
+      email
+      avatar
+    }
+    owner {
+      ID
+      name
+      email
+      avatar
+    }
+    isPublic
+  }
+}
+    `;
+
+/**
+ * __useGetPeopleWithAccessToFileQuery__
+ *
+ * To run a query within a React component, call `useGetPeopleWithAccessToFileQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPeopleWithAccessToFileQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPeopleWithAccessToFileQuery({
+ *   variables: {
+ *      fileID: // value for 'fileID'
+ *   },
+ * });
+ */
+export function useGetPeopleWithAccessToFileQuery(baseOptions: Apollo.QueryHookOptions<GetPeopleWithAccessToFileQuery, GetPeopleWithAccessToFileQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetPeopleWithAccessToFileQuery, GetPeopleWithAccessToFileQueryVariables>(GetPeopleWithAccessToFileDocument, options);
+      }
+export function useGetPeopleWithAccessToFileLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPeopleWithAccessToFileQuery, GetPeopleWithAccessToFileQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetPeopleWithAccessToFileQuery, GetPeopleWithAccessToFileQueryVariables>(GetPeopleWithAccessToFileDocument, options);
+        }
+export type GetPeopleWithAccessToFileQueryHookResult = ReturnType<typeof useGetPeopleWithAccessToFileQuery>;
+export type GetPeopleWithAccessToFileLazyQueryHookResult = ReturnType<typeof useGetPeopleWithAccessToFileLazyQuery>;
+export type GetPeopleWithAccessToFileQueryResult = Apollo.QueryResult<GetPeopleWithAccessToFileQuery, GetPeopleWithAccessToFileQueryVariables>;
+export function refetchGetPeopleWithAccessToFileQuery(variables: GetPeopleWithAccessToFileQueryVariables) {
+      return { query: GetPeopleWithAccessToFileDocument, variables: variables }
     }
 export const GetPeopleWithAccessToFolderDocument = gql`
     query getPeopleWithAccessToFolder($folderID: String!) {
@@ -1151,6 +1463,35 @@ export type AddUserToFolderReadOnlyUsersMutationVariables = Exact<{
 
 export type AddUserToFolderReadOnlyUsersMutation = { addUserToFolderReadOnlyUsers: string };
 
+export type AddUsersToSharedUserFileMutationVariables = Exact<{
+  fileID: Scalars['String'];
+  sharedUserIDs: Array<Scalars['String']> | Scalars['String'];
+  shouldSendMail: Scalars['Boolean'];
+  userMessage?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type AddUsersToSharedUserFileMutation = { addUsersToSharedUserFile: string };
+
+export type AddUsersToReadonlyFileMutationVariables = Exact<{
+  fileID: Scalars['String'];
+  readonlyUserIDs: Array<Scalars['String']> | Scalars['String'];
+  shouldSendMail: Scalars['Boolean'];
+  userMessage?: InputMaybe<Scalars['String']>;
+}>;
+
+
+export type AddUsersToReadonlyFileMutation = { addUsersToReadonlyFile: string };
+
+export type ChangeUserRoleInFileMutationVariables = Exact<{
+  fileID: Scalars['String'];
+  targetUserID: Scalars['String'];
+  targetRole: Scalars['String'];
+}>;
+
+
+export type ChangeUserRoleInFileMutation = { changeUserRoleInFile: string };
+
 export type ChangeUserRoleInFolderMutationVariables = Exact<{
   folderID: Scalars['String'];
   targetUserID: Scalars['String'];
@@ -1181,6 +1522,11 @@ export type DeleteFolderMutationVariables = Exact<{
 
 export type DeleteFolderMutation = { deleteFolder: string };
 
+export type EmptyUserTrashMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type EmptyUserTrashMutation = { emptyUserTrash: string };
+
 export type LoginMutationVariables = Exact<{
   email: Scalars['String'];
   password: Scalars['String'];
@@ -1210,6 +1556,14 @@ export type MoveFolderToTrashMutationVariables = Exact<{
 
 export type MoveFolderToTrashMutation = { moveFolderToTrash: string };
 
+export type RemoveUserFromFileMutationVariables = Exact<{
+  fileID: Scalars['String'];
+  targetUserID: Scalars['String'];
+}>;
+
+
+export type RemoveUserFromFileMutation = { removeUserFromFile: string };
+
 export type RemoveUserFromFolderMutationVariables = Exact<{
   folderID: Scalars['String'];
   targetUserID: Scalars['String'];
@@ -1224,6 +1578,14 @@ export type RestoreFileFromTrashMutationVariables = Exact<{
 
 
 export type RestoreFileFromTrashMutation = { restoreFileFromTrash: { ID: string, name: string } };
+
+export type SetGeneralAccessOfFileMutationVariables = Exact<{
+  fileID: Scalars['String'];
+  isPublic: Scalars['Boolean'];
+}>;
+
+
+export type SetGeneralAccessOfFileMutation = { setGeneralAccessOfFile: string };
 
 export type SetGeneralFolderAccessMutationVariables = Exact<{
   folderID: Scalars['String'];
@@ -1266,6 +1628,13 @@ export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetMeQuery = { getMe: { ID: string, name: string, email: string, avatar?: string | null, rootFolder?: { ID: string } | null } };
+
+export type GetPeopleWithAccessToFileQueryVariables = Exact<{
+  fileID: Scalars['String'];
+}>;
+
+
+export type GetPeopleWithAccessToFileQuery = { getPeopleWithAccessToFile: { isPublic: boolean, sharedUsers: Array<{ ID: string, name: string, email: string, avatar?: string | null }>, readonlyUsers: Array<{ ID: string, name: string, email: string, avatar?: string | null }>, owner: { ID: string, name: string, email: string, avatar?: string | null } } };
 
 export type GetPeopleWithAccessToFolderQueryVariables = Exact<{
   folderID: Scalars['String'];

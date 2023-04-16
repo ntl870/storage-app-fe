@@ -1,0 +1,13 @@
+mutation addUsersToReadonlyFile(
+  $fileID: String!
+  $readonlyUserIDs: [String!]!
+  $shouldSendMail: Boolean!
+  $userMessage: String
+) {
+  addUsersToReadonlyFile(
+    fileID: $fileID
+    readonlyUserIDs: $readonlyUserIDs
+    shouldSendMail: $shouldSendMail
+    userMessage: $userMessage
+  )
+}

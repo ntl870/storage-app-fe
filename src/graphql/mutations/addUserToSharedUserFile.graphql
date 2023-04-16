@@ -1,0 +1,13 @@
+mutation addUsersToSharedUserFile(
+  $fileID: String!
+  $sharedUserIDs: [String!]!
+  $shouldSendMail: Boolean!
+  $userMessage: String
+) {
+  addUsersToSharedUserFile(
+    fileID: $fileID
+    sharedUserIDs: $sharedUserIDs
+    shouldSendMail: $shouldSendMail
+    userMessage: $userMessage
+  )
+}

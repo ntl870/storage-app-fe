@@ -1,4 +1,8 @@
-import { CloudDownloadOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  CloudDownloadOutlined,
+  DeleteOutlined,
+  ShareAltOutlined,
+} from "@ant-design/icons";
 import { Col, Dropdown, MenuProps, Row, Typography, Image, Modal } from "antd";
 import ItemCard from "@components/FileCard";
 import ItemCardContent from "@components/FileCardContent";
@@ -6,7 +10,8 @@ import { File, useMoveFileToTrashMutation } from "@generated/schemas";
 import { downloadURI, getFileURL, renderIconByFileType } from "@utils/tools";
 import { useMemo, useState } from "react";
 import { useAlert } from "@hooks/useAlert";
-import { Document, Page } from "react-pdf/dist/esm/entry.vite";
+import PdfViewer from "@components/PDFViewer";
+import { ShareFileModal } from "./ShareFileModal";
 
 interface Props {
   files: File[];
@@ -25,6 +30,7 @@ export const FileSection = ({
   const { showSuccessNotification, showErrorNotification } = useAlert();
   const [moveFileToTrash] = useMoveFileToTrashMutation();
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
+  const [shareModalFile, setShareModalFile] = useState<File | null>(null);
 
   const handlePreviewClick = () => {
     setPreviewModalVisible(true);
@@ -40,13 +46,7 @@ export const FileSection = ({
       return <Image src={url} preview={false} />;
     }
     if (selectedItem?.fileType === "pdf") {
-      return (
-        <div className="flex justify-center">
-          <Document file={url}>
-            <Page pageNumber={1} renderTextLayer={false} />
-          </Document>
-        </div>
-      );
+      return <PdfViewer url={url} />;
     }
     return null;
   };
@@ -78,6 +78,14 @@ export const FileSection = ({
         }
       },
     },
+    {
+      label: "Share this file",
+      key: "3",
+      icon: <ShareAltOutlined />,
+      onClick: () => {
+        setShareModalFile(item);
+      },
+    },
   ];
 
   const filteredFiles = useMemo(
@@ -96,10 +104,7 @@ export const FileSection = ({
           >
             <Col className="m-4">
               <ItemCard
-                cover={
-                  renderIconByFileType(file)
-                  // <FileFilled className="text-7xl mt-6" />
-                }
+                cover={renderIconByFileType(file)}
                 className="w-60"
                 onClick={() => {
                   if (selectedItem && file.ID === selectedItem.ID) {
@@ -140,6 +145,13 @@ export const FileSection = ({
         >
           {renderPreview()}
         </Modal>
+      )}
+      {!!shareModalFile && (
+        <ShareFileModal
+          file={shareModalFile}
+          open={!!shareModalFile}
+          handleClose={() => setShareModalFile(null)}
+        />
       )}
     </>
   );

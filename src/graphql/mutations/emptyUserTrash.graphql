@@ -1,0 +1,3 @@
+mutation emptyUserTrash {
+  emptyUserTrash
+}

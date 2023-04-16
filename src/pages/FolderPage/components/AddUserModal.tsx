@@ -6,6 +6,8 @@ import {
   GetUsersBySearchPaginationDocument,
   useAddSharedUserToFolderMutation,
   useAddUserToFolderReadOnlyUsersMutation,
+  useAddUsersToSharedUserFileMutation,
+  useAddUsersToReadonlyFileMutation,
 } from "@generated/schemas";
 import { useAlert } from "@hooks/useAlert";
 import {
@@ -20,7 +22,7 @@ import {
   Space,
 } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 interface Props {
   open: boolean;
@@ -28,16 +30,18 @@ interface Props {
   initialUser:
     | { label: string; value: string }
     | { label: string; value: string }[];
-  currentFolderID: string;
+  ID: string;
   refetchAccessPeople: () => void;
+  type: "folder" | "file";
 }
 
 export const AddUserModal = ({
   open,
   handleClose,
   initialUser,
-  currentFolderID,
+  ID,
   refetchAccessPeople,
+  type,
 }: Props) => {
   const { showErrorNotification, showSuccessNotification } = useAlert();
   const [currentSelectedRole, setCurrentSelectedRole] = useState<
@@ -46,8 +50,11 @@ export const AddUserModal = ({
   const [selectedUsers, setSelectedUsers] = useState(initialUser);
   const [isCheckedNotifyCheckbox, setIsCheckedNotifyCheckbox] = useState(false);
   const [userMessage, setUserMessage] = useState("");
-  const [addUserToModify] = useAddSharedUserToFolderMutation();
-  const [addUserToReadOnly] = useAddUserToFolderReadOnlyUsersMutation();
+  const [addUserToModifyFolder] = useAddSharedUserToFolderMutation();
+  const [addUserToReadOnlyFolder] = useAddUserToFolderReadOnlyUsersMutation();
+
+  const [addUserToModifyFile] = useAddUsersToSharedUserFileMutation();
+  const [addUserToReadOnlyFile] = useAddUsersToReadonlyFileMutation();
 
   const items: MenuProps["items"] = [
     {
@@ -62,22 +69,37 @@ export const AddUserModal = ({
     },
   ];
 
-  const addUsersToModifyFolder = async () => {
+  const addUsersToModify = async () => {
     try {
       const arrayOfUsersIDs = !Array.isArray(selectedUsers)
         ? [String(selectedUsers?.value)]
         : selectedUsers.map((user) => user.value);
 
-      const { data } = await addUserToModify({
-        variables: {
-          folderID: currentFolderID,
-          sharedUserIDs: arrayOfUsersIDs,
-          shouldSendMail: isCheckedNotifyCheckbox,
-          userMessage,
-        },
-      });
-      showSuccessNotification(data?.addSharedUserToFolder || "");
-      refetchAccessPeople();
+      if (type === "folder") {
+        const { data } = await addUserToModifyFolder({
+          variables: {
+            folderID: ID,
+            sharedUserIDs: arrayOfUsersIDs,
+            shouldSendMail: isCheckedNotifyCheckbox,
+            userMessage,
+          },
+        });
+        showSuccessNotification(data?.addSharedUserToFolder || "");
+        refetchAccessPeople();
+      }
+
+      if (type === "file") {
+        const { data } = await addUserToModifyFile({
+          variables: {
+            fileID: ID,
+            sharedUserIDs: arrayOfUsersIDs,
+            shouldSendMail: isCheckedNotifyCheckbox,
+            userMessage,
+          },
+        });
+        showSuccessNotification(data?.addUsersToSharedUserFile || "");
+        refetchAccessPeople();
+      }
     } catch (err) {
       showErrorNotification((err as Error).message);
     } finally {
@@ -85,22 +107,37 @@ export const AddUserModal = ({
     }
   };
 
-  const addUsersToReadonlyFolder = async () => {
+  const addUsersToReadonly = async () => {
     try {
       const arrayOfUsersIDs = !Array.isArray(selectedUsers)
         ? [String(selectedUsers?.value)]
         : selectedUsers.map((user) => user.value);
 
-      const { data } = await addUserToReadOnly({
-        variables: {
-          folderID: currentFolderID,
-          readOnlyUserIDs: arrayOfUsersIDs,
-          shouldSendMail: isCheckedNotifyCheckbox,
-          userMessage,
-        },
-      });
-      showSuccessNotification(data?.addUserToFolderReadOnlyUsers || "");
-      refetchAccessPeople();
+      if (type === "folder") {
+        const { data } = await addUserToReadOnlyFolder({
+          variables: {
+            folderID: ID,
+            readOnlyUserIDs: arrayOfUsersIDs,
+            shouldSendMail: isCheckedNotifyCheckbox,
+            userMessage,
+          },
+        });
+        showSuccessNotification(data?.addUserToFolderReadOnlyUsers || "");
+        refetchAccessPeople();
+      }
+
+      if (type === "file") {
+        const { data } = await addUserToReadOnlyFile({
+          variables: {
+            fileID: ID,
+            readonlyUserIDs: arrayOfUsersIDs,
+            shouldSendMail: isCheckedNotifyCheckbox,
+            userMessage,
+          },
+        });
+        showSuccessNotification(data?.addUsersToReadonlyFile || "");
+        refetchAccessPeople();
+      }
     } catch (err) {
       showErrorNotification((err as Error).message);
     } finally {
@@ -109,8 +146,8 @@ export const AddUserModal = ({
   };
 
   const onSubmit = () => {
-    if (currentSelectedRole === "Editor") addUsersToModifyFolder();
-    if (currentSelectedRole === "Viewer") addUsersToReadonlyFolder();
+    if (currentSelectedRole === "Editor") addUsersToModify();
+    if (currentSelectedRole === "Viewer") addUsersToReadonly();
   };
 
   const onToggleNotifyCheckbox = (e: CheckboxChangeEvent) => {

@@ -1,0 +1,3 @@
+mutation removeUserFromFile($fileID: String!, $targetUserID: String!) {
+  removeUserFromFile(fileID: $fileID, targetUserID: $targetUserID)
+}

@@ -1,6 +1,8 @@
 import { DownOutlined } from "@ant-design/icons";
 import {
+  useChangeUserRoleInFileMutation,
   useChangeUserRoleInFolderMutation,
+  useRemoveUserFromFileMutation,
   useRemoveUserFromFolderMutation,
 } from "@generated/schemas";
 import { useAlert } from "@hooks/useAlert";
@@ -10,32 +12,50 @@ import { UserRole } from "src/common/types";
 interface Props {
   userID: string;
   initialRole: UserRole;
-  folderID: string;
+  ID: string;
+  type: "file" | "folder";
   refetchAccessPeople: () => void;
 }
 export const SwitchRoleDropdown = ({
   userID,
   initialRole,
-  folderID,
+  ID,
+  type,
   refetchAccessPeople,
 }: Props) => {
   const { showErrorNotification, showSuccessNotification } = useAlert();
   const [currentSelectedRole, setCurrentSelectedRole] =
     useState<UserRole>(initialRole);
-  const [switchUserRole] = useChangeUserRoleInFolderMutation();
+  const [switchUserRoleFolder] = useChangeUserRoleInFolderMutation();
+  const [switchUserRoleFile] = useChangeUserRoleInFileMutation();
   const [removeUserFromFolder] = useRemoveUserFromFolderMutation();
+  const [removeUserFromFile] = useRemoveUserFromFileMutation();
 
   const handleSwitchUserRole = async (targetRole: UserRole) => {
     try {
-      const { data } = await switchUserRole({
-        variables: {
-          targetUserID: userID,
-          targetRole,
-          folderID,
-        },
-      });
-      refetchAccessPeople();
-      showSuccessNotification(data?.changeUserRoleInFolder || "");
+      if (type === "folder") {
+        const { data } = await switchUserRoleFolder({
+          variables: {
+            targetUserID: userID,
+            targetRole,
+            folderID: ID,
+          },
+        });
+        refetchAccessPeople();
+        showSuccessNotification(data?.changeUserRoleInFolder || "");
+      }
+
+      if (type === "file") {
+        const { data } = await switchUserRoleFile({
+          variables: {
+            targetUserID: userID,
+            targetRole,
+            fileID: ID,
+          },
+        });
+        refetchAccessPeople();
+        showSuccessNotification(data?.changeUserRoleInFile || "");
+      }
     } catch (err) {
       showErrorNotification((err as Error).message);
     }
@@ -43,14 +63,27 @@ export const SwitchRoleDropdown = ({
 
   const handleRemoveUserFromFolder = async () => {
     try {
-      const { data } = await removeUserFromFolder({
-        variables: {
-          targetUserID: userID,
-          folderID,
-        },
-      });
-      refetchAccessPeople();
-      showSuccessNotification(data?.removeUserFromFolder || "");
+      if (type === "folder") {
+        const { data } = await removeUserFromFolder({
+          variables: {
+            targetUserID: userID,
+            folderID: ID,
+          },
+        });
+        refetchAccessPeople();
+        showSuccessNotification(data?.removeUserFromFolder || "");
+      }
+
+      if (type === "file") {
+        const { data } = await removeUserFromFile({
+          variables: {
+            targetUserID: userID,
+            fileID: ID,
+          },
+        });
+        refetchAccessPeople();
+        showSuccessNotification(data?.removeUserFromFile || "");
+      }
     } catch (err) {
       showErrorNotification((err as Error).message);
     }

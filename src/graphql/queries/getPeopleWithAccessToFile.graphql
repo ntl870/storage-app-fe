@@ -1,0 +1,23 @@
+query getPeopleWithAccessToFile($fileID: String!) {
+  getPeopleWithAccessToFile(fileID: $fileID) {
+    sharedUsers {
+      ID
+      name
+      email
+      avatar
+    }
+    readonlyUsers {
+      ID
+      name
+      email
+      avatar
+    }
+    owner {
+      ID
+      name
+      email
+      avatar
+    }
+    isPublic
+  }
+}

@@ -1,0 +1,11 @@
+mutation changeUserRoleInFile(
+  $fileID: String!
+  $targetUserID: String!
+  $targetRole: String!
+) {
+  changeUserRoleInFile(
+    fileID: $fileID
+    targetUserID: $targetUserID
+    targetRole: $targetRole
+  )
+}
