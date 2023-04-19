@@ -1,0 +1,9 @@
+query getUserSharedFiles {
+  getUserSharedFiles {
+    ID
+    name
+    url
+    fileType
+    isTrash
+  }
+}

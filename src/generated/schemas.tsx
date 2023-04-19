@@ -26,6 +26,7 @@ export type File = {
   ownerID: Scalars['String'];
   readonlyUsers?: Maybe<Array<User>>;
   sharedUsers?: Maybe<Array<User>>;
+  starredUsers?: Maybe<Array<User>>;
   url: Scalars['String'];
 };
 
@@ -40,6 +41,7 @@ export type Folder = {
   readonlyUsers?: Maybe<Array<User>>;
   rootFolder?: Maybe<Folder>;
   sharedUsers?: Maybe<Array<User>>;
+  starredUsers?: Maybe<Array<User>>;
   subFolders?: Maybe<Array<Folder>>;
 };
 
@@ -64,6 +66,8 @@ export type Mutation = {
   setGeneralAccessOfFile: Scalars['String'];
   setGeneralFolderAccess: Scalars['String'];
   signup: NewUserReturn;
+  starFile: Scalars['String'];
+  starFolder: Scalars['String'];
   uploadFile: File;
   uploadFolder: Scalars['String'];
 };
@@ -187,6 +191,16 @@ export type MutationSignupArgs = {
 };
 
 
+export type MutationStarFileArgs = {
+  fileID: Scalars['String'];
+};
+
+
+export type MutationStarFolderArgs = {
+  folderID: Scalars['String'];
+};
+
+
 export type MutationUploadFileArgs = {
   file: Scalars['Upload'];
   folderID: Scalars['String'];
@@ -219,13 +233,18 @@ export type Query = {
   getAllUsers: Array<User>;
   getArrayOfRootFoldersName: Array<Folder>;
   getFileByID: File;
+  getFileByIDWithAccess: File;
   getFilesByFolder: Array<File>;
   getFoldersOfFolder: Array<Folder>;
   getMe: User;
   getPeopleWithAccessToFile: PeopleWithAccessResponse;
   getPeopleWithAccessToFolder: PeopleWithAccessResponse;
+  getStarredFiles: Array<File>;
+  getStarredFolders: Array<Folder>;
   getUserByID: User;
   getUserFiles: Array<File>;
+  getUserSharedFiles: Array<File>;
+  getUserSharedFolders: Array<Folder>;
   getUserTrashFiles: Array<File>;
   getUserTrashFolder: Array<Folder>;
   getUsersBySearchPagination: UserSearchPaginationResponse;
@@ -239,6 +258,11 @@ export type QueryGetArrayOfRootFoldersNameArgs = {
 
 export type QueryGetFileByIdArgs = {
   ID: Scalars['String'];
+};
+
+
+export type QueryGetFileByIdWithAccessArgs = {
+  fileID: Scalars['String'];
 };
 
 
@@ -945,6 +969,105 @@ export function useSetGeneralFolderAccessMutation(baseOptions?: Apollo.MutationH
 export type SetGeneralFolderAccessMutationHookResult = ReturnType<typeof useSetGeneralFolderAccessMutation>;
 export type SetGeneralFolderAccessMutationResult = Apollo.MutationResult<SetGeneralFolderAccessMutation>;
 export type SetGeneralFolderAccessMutationOptions = Apollo.BaseMutationOptions<SetGeneralFolderAccessMutation, SetGeneralFolderAccessMutationVariables>;
+export const SignupDocument = gql`
+    mutation signup($email: String!, $password: String!, $name: String!) {
+  signup(email: $email, password: $password, name: $name) {
+    name
+    email
+    accessToken
+  }
+}
+    `;
+export type SignupMutationFn = Apollo.MutationFunction<SignupMutation, SignupMutationVariables>;
+
+/**
+ * __useSignupMutation__
+ *
+ * To run a mutation, you first call `useSignupMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSignupMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [signupMutation, { data, loading, error }] = useSignupMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *      password: // value for 'password'
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useSignupMutation(baseOptions?: Apollo.MutationHookOptions<SignupMutation, SignupMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SignupMutation, SignupMutationVariables>(SignupDocument, options);
+      }
+export type SignupMutationHookResult = ReturnType<typeof useSignupMutation>;
+export type SignupMutationResult = Apollo.MutationResult<SignupMutation>;
+export type SignupMutationOptions = Apollo.BaseMutationOptions<SignupMutation, SignupMutationVariables>;
+export const StarFileDocument = gql`
+    mutation starFile($fileID: String!) {
+  starFile(fileID: $fileID)
+}
+    `;
+export type StarFileMutationFn = Apollo.MutationFunction<StarFileMutation, StarFileMutationVariables>;
+
+/**
+ * __useStarFileMutation__
+ *
+ * To run a mutation, you first call `useStarFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStarFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [starFileMutation, { data, loading, error }] = useStarFileMutation({
+ *   variables: {
+ *      fileID: // value for 'fileID'
+ *   },
+ * });
+ */
+export function useStarFileMutation(baseOptions?: Apollo.MutationHookOptions<StarFileMutation, StarFileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<StarFileMutation, StarFileMutationVariables>(StarFileDocument, options);
+      }
+export type StarFileMutationHookResult = ReturnType<typeof useStarFileMutation>;
+export type StarFileMutationResult = Apollo.MutationResult<StarFileMutation>;
+export type StarFileMutationOptions = Apollo.BaseMutationOptions<StarFileMutation, StarFileMutationVariables>;
+export const StarFolderDocument = gql`
+    mutation starFolder($folderID: String!) {
+  starFolder(folderID: $folderID)
+}
+    `;
+export type StarFolderMutationFn = Apollo.MutationFunction<StarFolderMutation, StarFolderMutationVariables>;
+
+/**
+ * __useStarFolderMutation__
+ *
+ * To run a mutation, you first call `useStarFolderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStarFolderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [starFolderMutation, { data, loading, error }] = useStarFolderMutation({
+ *   variables: {
+ *      folderID: // value for 'folderID'
+ *   },
+ * });
+ */
+export function useStarFolderMutation(baseOptions?: Apollo.MutationHookOptions<StarFolderMutation, StarFolderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<StarFolderMutation, StarFolderMutationVariables>(StarFolderDocument, options);
+      }
+export type StarFolderMutationHookResult = ReturnType<typeof useStarFolderMutation>;
+export type StarFolderMutationResult = Apollo.MutationResult<StarFolderMutation>;
+export type StarFolderMutationOptions = Apollo.BaseMutationOptions<StarFolderMutation, StarFolderMutationVariables>;
 export const UploadFileDocument = gql`
     mutation uploadFile($file: Upload!, $folderID: String!) {
   uploadFile(file: $file, folderID: $folderID) {
@@ -1055,6 +1178,46 @@ export type GetArrayOfRootFoldersNameLazyQueryHookResult = ReturnType<typeof use
 export type GetArrayOfRootFoldersNameQueryResult = Apollo.QueryResult<GetArrayOfRootFoldersNameQuery, GetArrayOfRootFoldersNameQueryVariables>;
 export function refetchGetArrayOfRootFoldersNameQuery(variables: GetArrayOfRootFoldersNameQueryVariables) {
       return { query: GetArrayOfRootFoldersNameDocument, variables: variables }
+    }
+export const GetFileByIdWithAccessDocument = gql`
+    query getFileByIDWithAccess($fileID: String!) {
+  getFileByIDWithAccess(fileID: $fileID) {
+    ID
+    name
+    fileType
+  }
+}
+    `;
+
+/**
+ * __useGetFileByIdWithAccessQuery__
+ *
+ * To run a query within a React component, call `useGetFileByIdWithAccessQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFileByIdWithAccessQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFileByIdWithAccessQuery({
+ *   variables: {
+ *      fileID: // value for 'fileID'
+ *   },
+ * });
+ */
+export function useGetFileByIdWithAccessQuery(baseOptions: Apollo.QueryHookOptions<GetFileByIdWithAccessQuery, GetFileByIdWithAccessQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetFileByIdWithAccessQuery, GetFileByIdWithAccessQueryVariables>(GetFileByIdWithAccessDocument, options);
+      }
+export function useGetFileByIdWithAccessLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetFileByIdWithAccessQuery, GetFileByIdWithAccessQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetFileByIdWithAccessQuery, GetFileByIdWithAccessQueryVariables>(GetFileByIdWithAccessDocument, options);
+        }
+export type GetFileByIdWithAccessQueryHookResult = ReturnType<typeof useGetFileByIdWithAccessQuery>;
+export type GetFileByIdWithAccessLazyQueryHookResult = ReturnType<typeof useGetFileByIdWithAccessLazyQuery>;
+export type GetFileByIdWithAccessQueryResult = Apollo.QueryResult<GetFileByIdWithAccessQuery, GetFileByIdWithAccessQueryVariables>;
+export function refetchGetFileByIdWithAccessQuery(variables: GetFileByIdWithAccessQueryVariables) {
+      return { query: GetFileByIdWithAccessDocument, variables: variables }
     }
 export const GetFilesByFolderDocument = gql`
     query getFilesByFolder($folderID: String!) {
@@ -1253,6 +1416,84 @@ export type GetPeopleWithAccessToFolderQueryResult = Apollo.QueryResult<GetPeopl
 export function refetchGetPeopleWithAccessToFolderQuery(variables: GetPeopleWithAccessToFolderQueryVariables) {
       return { query: GetPeopleWithAccessToFolderDocument, variables: variables }
     }
+export const GetStarredFilesDocument = gql`
+    query getStarredFiles {
+  getStarredFiles {
+    ID
+    name
+    url
+  }
+}
+    `;
+
+/**
+ * __useGetStarredFilesQuery__
+ *
+ * To run a query within a React component, call `useGetStarredFilesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetStarredFilesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetStarredFilesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetStarredFilesQuery(baseOptions?: Apollo.QueryHookOptions<GetStarredFilesQuery, GetStarredFilesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetStarredFilesQuery, GetStarredFilesQueryVariables>(GetStarredFilesDocument, options);
+      }
+export function useGetStarredFilesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetStarredFilesQuery, GetStarredFilesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetStarredFilesQuery, GetStarredFilesQueryVariables>(GetStarredFilesDocument, options);
+        }
+export type GetStarredFilesQueryHookResult = ReturnType<typeof useGetStarredFilesQuery>;
+export type GetStarredFilesLazyQueryHookResult = ReturnType<typeof useGetStarredFilesLazyQuery>;
+export type GetStarredFilesQueryResult = Apollo.QueryResult<GetStarredFilesQuery, GetStarredFilesQueryVariables>;
+export function refetchGetStarredFilesQuery(variables?: GetStarredFilesQueryVariables) {
+      return { query: GetStarredFilesDocument, variables: variables }
+    }
+export const GetStarredFoldersDocument = gql`
+    query getStarredFolders {
+  getStarredFolders {
+    ID
+    name
+    path
+  }
+}
+    `;
+
+/**
+ * __useGetStarredFoldersQuery__
+ *
+ * To run a query within a React component, call `useGetStarredFoldersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetStarredFoldersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetStarredFoldersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetStarredFoldersQuery(baseOptions?: Apollo.QueryHookOptions<GetStarredFoldersQuery, GetStarredFoldersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetStarredFoldersQuery, GetStarredFoldersQueryVariables>(GetStarredFoldersDocument, options);
+      }
+export function useGetStarredFoldersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetStarredFoldersQuery, GetStarredFoldersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetStarredFoldersQuery, GetStarredFoldersQueryVariables>(GetStarredFoldersDocument, options);
+        }
+export type GetStarredFoldersQueryHookResult = ReturnType<typeof useGetStarredFoldersQuery>;
+export type GetStarredFoldersLazyQueryHookResult = ReturnType<typeof useGetStarredFoldersLazyQuery>;
+export type GetStarredFoldersQueryResult = Apollo.QueryResult<GetStarredFoldersQuery, GetStarredFoldersQueryVariables>;
+export function refetchGetStarredFoldersQuery(variables?: GetStarredFoldersQueryVariables) {
+      return { query: GetStarredFoldersDocument, variables: variables }
+    }
 export const GetFoldersOfFolderDocument = gql`
     query getFoldersOfFolder($folderID: String!) {
   getFoldersOfFolder(folderID: $folderID) {
@@ -1305,6 +1546,99 @@ export type GetFoldersOfFolderLazyQueryHookResult = ReturnType<typeof useGetFold
 export type GetFoldersOfFolderQueryResult = Apollo.QueryResult<GetFoldersOfFolderQuery, GetFoldersOfFolderQueryVariables>;
 export function refetchGetFoldersOfFolderQuery(variables: GetFoldersOfFolderQueryVariables) {
       return { query: GetFoldersOfFolderDocument, variables: variables }
+    }
+export const GetUserSharedFilesDocument = gql`
+    query getUserSharedFiles {
+  getUserSharedFiles {
+    ID
+    name
+    url
+    fileType
+    isTrash
+  }
+}
+    `;
+
+/**
+ * __useGetUserSharedFilesQuery__
+ *
+ * To run a query within a React component, call `useGetUserSharedFilesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserSharedFilesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserSharedFilesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetUserSharedFilesQuery(baseOptions?: Apollo.QueryHookOptions<GetUserSharedFilesQuery, GetUserSharedFilesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserSharedFilesQuery, GetUserSharedFilesQueryVariables>(GetUserSharedFilesDocument, options);
+      }
+export function useGetUserSharedFilesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserSharedFilesQuery, GetUserSharedFilesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserSharedFilesQuery, GetUserSharedFilesQueryVariables>(GetUserSharedFilesDocument, options);
+        }
+export type GetUserSharedFilesQueryHookResult = ReturnType<typeof useGetUserSharedFilesQuery>;
+export type GetUserSharedFilesLazyQueryHookResult = ReturnType<typeof useGetUserSharedFilesLazyQuery>;
+export type GetUserSharedFilesQueryResult = Apollo.QueryResult<GetUserSharedFilesQuery, GetUserSharedFilesQueryVariables>;
+export function refetchGetUserSharedFilesQuery(variables?: GetUserSharedFilesQueryVariables) {
+      return { query: GetUserSharedFilesDocument, variables: variables }
+    }
+export const GetUserSharedFoldersDocument = gql`
+    query getUserSharedFolders {
+  getUserSharedFolders {
+    ID
+    name
+    files {
+      ID
+      name
+      url
+      fileType
+    }
+    subFolders {
+      ID
+      name
+      path
+    }
+    path
+    isTrash
+    isPublic
+  }
+}
+    `;
+
+/**
+ * __useGetUserSharedFoldersQuery__
+ *
+ * To run a query within a React component, call `useGetUserSharedFoldersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserSharedFoldersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserSharedFoldersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetUserSharedFoldersQuery(baseOptions?: Apollo.QueryHookOptions<GetUserSharedFoldersQuery, GetUserSharedFoldersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserSharedFoldersQuery, GetUserSharedFoldersQueryVariables>(GetUserSharedFoldersDocument, options);
+      }
+export function useGetUserSharedFoldersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserSharedFoldersQuery, GetUserSharedFoldersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserSharedFoldersQuery, GetUserSharedFoldersQueryVariables>(GetUserSharedFoldersDocument, options);
+        }
+export type GetUserSharedFoldersQueryHookResult = ReturnType<typeof useGetUserSharedFoldersQuery>;
+export type GetUserSharedFoldersLazyQueryHookResult = ReturnType<typeof useGetUserSharedFoldersLazyQuery>;
+export type GetUserSharedFoldersQueryResult = Apollo.QueryResult<GetUserSharedFoldersQuery, GetUserSharedFoldersQueryVariables>;
+export function refetchGetUserSharedFoldersQuery(variables?: GetUserSharedFoldersQueryVariables) {
+      return { query: GetUserSharedFoldersDocument, variables: variables }
     }
 export const GetUserTrashFilesDocument = gql`
     query getUserTrashFiles {
@@ -1595,6 +1929,29 @@ export type SetGeneralFolderAccessMutationVariables = Exact<{
 
 export type SetGeneralFolderAccessMutation = { setGeneralFolderAccess: string };
 
+export type SignupMutationVariables = Exact<{
+  email: Scalars['String'];
+  password: Scalars['String'];
+  name: Scalars['String'];
+}>;
+
+
+export type SignupMutation = { signup: { name: string, email: string, accessToken: string } };
+
+export type StarFileMutationVariables = Exact<{
+  fileID: Scalars['String'];
+}>;
+
+
+export type StarFileMutation = { starFile: string };
+
+export type StarFolderMutationVariables = Exact<{
+  folderID: Scalars['String'];
+}>;
+
+
+export type StarFolderMutation = { starFolder: string };
+
 export type UploadFileMutationVariables = Exact<{
   file: Scalars['Upload'];
   folderID: Scalars['String'];
@@ -1616,6 +1973,13 @@ export type GetArrayOfRootFoldersNameQueryVariables = Exact<{
 
 
 export type GetArrayOfRootFoldersNameQuery = { getArrayOfRootFoldersName: Array<{ ID: string, name: string }> };
+
+export type GetFileByIdWithAccessQueryVariables = Exact<{
+  fileID: Scalars['String'];
+}>;
+
+
+export type GetFileByIdWithAccessQuery = { getFileByIDWithAccess: { ID: string, name: string, fileType: string } };
 
 export type GetFilesByFolderQueryVariables = Exact<{
   folderID: Scalars['String'];
@@ -1643,12 +2007,32 @@ export type GetPeopleWithAccessToFolderQueryVariables = Exact<{
 
 export type GetPeopleWithAccessToFolderQuery = { getPeopleWithAccessToFolder: { isPublic: boolean, sharedUsers: Array<{ ID: string, name: string, email: string, avatar?: string | null }>, readonlyUsers: Array<{ ID: string, name: string, email: string, avatar?: string | null }>, owner: { ID: string, name: string, email: string, avatar?: string | null } } };
 
+export type GetStarredFilesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetStarredFilesQuery = { getStarredFiles: Array<{ ID: string, name: string, url: string }> };
+
+export type GetStarredFoldersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetStarredFoldersQuery = { getStarredFolders: Array<{ ID: string, name: string, path: string }> };
+
 export type GetFoldersOfFolderQueryVariables = Exact<{
   folderID: Scalars['String'];
 }>;
 
 
 export type GetFoldersOfFolderQuery = { getFoldersOfFolder: Array<{ ID: string, name: string, path: string, isTrash: boolean, isPublic: boolean, files?: Array<{ ID: string, name: string, url: string, fileType: string }> | null, subFolders?: Array<{ ID: string, name: string, path: string }> | null }> };
+
+export type GetUserSharedFilesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUserSharedFilesQuery = { getUserSharedFiles: Array<{ ID: string, name: string, url: string, fileType: string, isTrash: boolean }> };
+
+export type GetUserSharedFoldersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUserSharedFoldersQuery = { getUserSharedFolders: Array<{ ID: string, name: string, path: string, isTrash: boolean, isPublic: boolean, files?: Array<{ ID: string, name: string, url: string, fileType: string }> | null, subFolders?: Array<{ ID: string, name: string, path: string }> | null }> };
 
 export type GetUserTrashFilesQueryVariables = Exact<{ [key: string]: never; }>;
 

@@ -15,6 +15,10 @@ const useRouter = () => {
 
   const splittedPathname = pathname.split("/").slice(1);
 
+  const goBack = () => {
+    navigate(-1);
+  };
+
   return {
     params,
     pathname,
@@ -22,6 +26,7 @@ const useRouter = () => {
     searchParamsObject,
     navigate,
     splittedPathname,
+    goBack,
   };
 };
 

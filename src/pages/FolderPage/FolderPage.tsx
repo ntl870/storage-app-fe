@@ -11,12 +11,14 @@ import {
 import {
   Button,
   Dropdown,
+  Empty,
   Input,
   InputRef,
   MenuProps,
   Modal,
   Spin,
   Typography,
+  Upload,
 } from "antd";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FileSection } from "./components/FileSection";
@@ -27,10 +29,15 @@ import {
   UploadOutlined,
   FolderOpenFilled,
   PlusOutlined,
+  InboxOutlined,
 } from "@ant-design/icons";
 import { groupFilesByFolder } from "@utils/tools";
 import NavigateBreadCrumb from "@components/NavigateBreadCrumb";
 import { useAlert } from "@hooks/useAlert";
+import useIsDraggingFile from "@hooks/useIsDraggingFile";
+import FileDragDrop from "@components/FileDragDrop";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCloudArrowUp } from "@fortawesome/free-solid-svg-icons";
 
 type SelectedItemType =
   | ((Folder | FileSchema) & { type: "file" | "folder" })
@@ -39,6 +46,7 @@ type SelectedItemType =
 export const FolderPage = () => {
   const { params, navigate } = useRouter();
   const { rootFolderID } = useCurrentUser();
+  const isDraggingFile = useIsDraggingFile();
   const { showErrorNotification, showSuccessNotification } = useAlert();
   const [isShownNewFolderDialog, setIsShownNewFolderDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SelectedItemType>(null);
@@ -141,7 +149,6 @@ export const FolderPage = () => {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     try {
-      event.preventDefault();
       const file = event?.target?.files?.[0];
       await uploadFile({
         variables: { file: file, folderID: currentFolderID },
@@ -174,6 +181,26 @@ export const FolderPage = () => {
     }
   };
 
+  const handleDragUploadFile = async (
+    event: React.DragEvent<HTMLDivElement>
+  ) => {
+    try {
+      const file = event?.dataTransfer?.files?.[0];
+      await uploadFile({
+        variables: { file: file, folderID: currentFolderID },
+      });
+      refetchFolders();
+      refetchFiles();
+      showSuccessNotification("File uploaded successfully");
+    } catch (err) {
+      showErrorNotification((err as Error).message);
+    }
+  };
+
+  const fireFileUpload = () => {
+    fileInputRef.current?.click();
+  };
+
   const addMenuItems: MenuProps["items"] = useMemo(
     () => [
       {
@@ -192,7 +219,7 @@ export const FolderPage = () => {
         key: "1",
         icon: <UploadOutlined />,
         onClick: () => {
-          fileInputRef.current?.click();
+          fireFileUpload();
         },
       },
       {
@@ -232,6 +259,15 @@ export const FolderPage = () => {
     navigate("/");
   };
 
+  const isEmpty = useMemo(() => {
+    return (
+      (!foldersData?.getFoldersOfFolder.length ||
+        foldersData?.getFoldersOfFolder.every((folder) => folder.isTrash)) &&
+      (!filesData?.getFilesByFolder.length ||
+        filesData?.getFilesByFolder.every((file) => file.isTrash))
+    );
+  }, [foldersData, filesData]);
+
   if (getFolderLoading || getFilesLoading) {
     return (
       <div className="flex justify-center items-center h-full">
@@ -245,41 +281,90 @@ export const FolderPage = () => {
       <div className="flex flex-col pt-5">
         <div className="ml-4">
           <Dropdown menu={{ items: addMenuItems }} trigger={["click"]}>
-            <Button className="" size="large">
+            <Button size="large">
               <PlusOutlined />
               Add
             </Button>
           </Dropdown>
         </div>
-        <NavigateBreadCrumb />
-        {!!foldersData?.getFoldersOfFolder.length && (
-          <Typography.Text className="inline-block p-4 font-semibold">
-            Folders
-          </Typography.Text>
-        )}
-
-        <FolderSection
-          folders={(foldersData?.getFoldersOfFolder as Folder[]) || []}
-          handleClickFolder={handleClickFolder}
-          selectedItem={selectedItem as Folder & { type: "file" | "folder" }}
-          refetch={refetchFolders}
-        />
-
-        {!!filesData?.getFilesByFolder.length && (
-          <Typography.Text className="inline-block p-4 font-semibold">
-            Files
-          </Typography.Text>
-        )}
-
-        <FileSection
-          files={(filesData?.getFilesByFolder as FileSchema[]) || []}
-          handleClickItem={handleClickFile}
-          selectedItem={
-            selectedItem as FileSchema & { type: "file" | "folder" }
+        {(() => {
+          if (isEmpty) {
+            return (
+              <>
+                <FileDragDrop
+                  handleDropFile={handleDragUploadFile}
+                  className="flex justify-center items-center flex-col mt-28"
+                >
+                  <FontAwesomeIcon
+                    icon={faCloudArrowUp}
+                    style={{ color: "#256fef" }}
+                    className="text-7xl"
+                  />
+                  <Typography.Text className="font-bold">
+                    Drag file here or use the Add button
+                  </Typography.Text>
+                </FileDragDrop>
+                <input
+                  type="file"
+                  className="hidden"
+                  ref={fileInputRef}
+                  onChange={handleUploadFile}
+                />
+                <input
+                  type="file"
+                  className="hidden"
+                  ref={folderInputRef}
+                  multiple
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-ignore
+                  // eslint-disable-next-line react/no-unknown-property
+                  directory=""
+                  webkitdirectory=""
+                  onChange={handleUploadFolder}
+                />
+              </>
+            );
           }
-          isFilterTrash={false}
-          refetch={refetchFiles}
-        />
+
+          return (
+            <>
+              <NavigateBreadCrumb />
+              {!!foldersData?.getFoldersOfFolder.length &&
+                !foldersData?.getFoldersOfFolder.every(
+                  (folder) => folder.isTrash
+                ) && (
+                  <Typography.Text className="inline-block p-4 font-semibold">
+                    Folders
+                  </Typography.Text>
+                )}
+
+              <FolderSection
+                folders={(foldersData?.getFoldersOfFolder as Folder[]) || []}
+                handleClickFolder={handleClickFolder}
+                selectedItem={
+                  selectedItem as Folder & { type: "file" | "folder" }
+                }
+                refetch={refetchFolders}
+              />
+
+              {!!filesData?.getFilesByFolder.length && (
+                <Typography.Text className="inline-block p-4 font-semibold">
+                  Files
+                </Typography.Text>
+              )}
+
+              <FileSection
+                files={(filesData?.getFilesByFolder as FileSchema[]) || []}
+                handleClickItem={handleClickFile}
+                selectedItem={
+                  selectedItem as FileSchema & { type: "file" | "folder" }
+                }
+                isFilterTrash={false}
+                refetch={refetchFiles}
+              />
+            </>
+          );
+        })()}
       </div>
       {isShownNewFolderDialog && (
         <Modal

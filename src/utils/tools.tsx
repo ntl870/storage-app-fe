@@ -127,6 +127,32 @@ export const renderIconByFileType = (file: FileSchema) => {
   }
 };
 
+export const hasVideoExtension = (fileExtension: string) => {
+  const videoExtensions = [
+    "mp4",
+    "webm",
+    "ogg",
+    "mov",
+    "avi",
+    "wmv",
+    "flv",
+    "3gp",
+    "mkv",
+    "m4v",
+    "mpg",
+    "mpeg",
+    "m2v",
+    "m4v",
+    "svi",
+    "3g2",
+    "f4v",
+    "f4p",
+    "f4a",
+    "f4b",
+  ];
+  return videoExtensions.includes(String(fileExtension));
+};
+
 export const getGeneratedAvatar = (seed: string) =>
   `https://api.dicebear.com/6.x/fun-emoji/svg?radius=50&seed=${seed}`;
 

@@ -1,0 +1,7 @@
+query getFileByIDWithAccess($fileID: String!) {
+  getFileByIDWithAccess(fileID: $fileID) {
+    ID
+    name
+    fileType
+  }
+}

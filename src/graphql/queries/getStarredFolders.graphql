@@ -1,0 +1,7 @@
+query getStarredFolders {
+  getStarredFolders {
+    ID
+    name
+    path
+  }
+}

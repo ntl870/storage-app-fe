@@ -3,14 +3,14 @@ import {
   DeleteOutlined,
   ShareAltOutlined,
 } from "@ant-design/icons";
-import { Col, Dropdown, MenuProps, Row, Typography, Image, Modal } from "antd";
 import ItemCard from "@components/FileCard";
 import ItemCardContent from "@components/FileCardContent";
 import { File, useMoveFileToTrashMutation } from "@generated/schemas";
-import { downloadURI, getFileURL, renderIconByFileType } from "@utils/tools";
-import { useMemo, useState } from "react";
 import { useAlert } from "@hooks/useAlert";
-import PdfViewer from "@components/PDFViewer";
+import useRouter from "@hooks/useRouter";
+import { downloadURI, renderIconByFileType } from "@utils/tools";
+import { Col, Dropdown, MenuProps, Row, Typography } from "antd";
+import { useMemo, useState } from "react";
 import { ShareFileModal } from "./ShareFileModal";
 
 interface Props {
@@ -27,28 +27,13 @@ export const FileSection = ({
   selectedItem,
   refetch,
 }: Props) => {
+  const { navigate } = useRouter();
   const { showSuccessNotification, showErrorNotification } = useAlert();
   const [moveFileToTrash] = useMoveFileToTrashMutation();
-  const [previewModalVisible, setPreviewModalVisible] = useState(false);
   const [shareModalFile, setShareModalFile] = useState<File | null>(null);
 
   const handlePreviewClick = () => {
-    setPreviewModalVisible(true);
-  };
-
-  const handleClosePreviewModal = () => {
-    setPreviewModalVisible(false);
-  };
-
-  const renderPreview = () => {
-    const url = getFileURL(selectedItem?.ID);
-    if (selectedItem?.fileType === "png" || selectedItem?.fileType === "jpg") {
-      return <Image src={url} preview={false} />;
-    }
-    if (selectedItem?.fileType === "pdf") {
-      return <PdfViewer url={url} />;
-    }
-    return null;
+    navigate(`/file/${selectedItem?.ID}`);
   };
 
   const getItems = (item: File): MenuProps["items"] => [
@@ -130,22 +115,7 @@ export const FileSection = ({
           </Dropdown>
         ))}
       </Row>
-      {previewModalVisible && (
-        <Modal
-          open={previewModalVisible}
-          onCancel={handleClosePreviewModal}
-          footer={null}
-          width={selectedItem?.fileType === "pdf" ? "100%" : undefined}
-          style={{
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-          }}
-        >
-          {renderPreview()}
-        </Modal>
-      )}
+
       {!!shareModalFile && (
         <ShareFileModal
           file={shareModalFile}

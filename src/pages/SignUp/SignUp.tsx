@@ -1,24 +1,25 @@
 import { Form, Input, Button, Checkbox, Row, Col, Typography } from "antd";
-import { MutationLoginArgs, useLoginMutation } from "../../generated/schemas";
+import { MutationSignupArgs, useSignupMutation } from "../../generated/schemas";
 import { useAlert } from "../../hooks/useAlert";
 import { useLocalStorage } from "../../utils/tools";
 import useRouter from "../../hooks/useRouter";
 
-const Login = () => {
-  const [login, { loading }] = useLoginMutation();
+const SignUp = () => {
+  const [signup, { loading }] = useSignupMutation();
   const { setLocalStorage } = useLocalStorage();
   const { showSuccessNotification, showErrorNotification } = useAlert();
   const { navigate } = useRouter();
 
-  const onFinish = async ({ email, password }: MutationLoginArgs) => {
+  const onFinish = async ({ email, password, name }: MutationSignupArgs) => {
     try {
-      const { data } = await login({
+      const { data } = await signup({
         variables: {
           email,
           password,
+          name,
         },
       });
-      setLocalStorage("token", data?.login || "");
+      setLocalStorage("token", data?.signup.accessToken || "");
       showSuccessNotification("Login successfully");
       navigate("/");
     } catch (err) {
@@ -32,17 +33,27 @@ const Login = () => {
         span={12}
         className="flex flex-col justify-center items-center bg-gray-100"
       >
-        <h1 className="text-4xl font-bold">Welcome back!</h1>
-        <p className="text-gray-600">Please login to your account</p>
+        <h1 className="text-4xl font-bold">Welcome</h1>
+        <p className="text-gray-600">Create your own account</p>
       </Col>
       <Col span={12} className="flex flex-col justify-center items-center">
-        <h1 className="text-4xl font-bold mb-4">Login</h1>
+        <h1 className="text-4xl font-bold mb-4">Register</h1>
         <Form
           name="login-form"
           initialValues={{ remember: true }}
           onFinish={onFinish}
           className="w-80 max-w-md"
         >
+          <Form.Item
+            name="name"
+            rules={[{ required: true, message: "Please input your name!" }]}
+          >
+            <Input
+              placeholder="Enter your name"
+              size="large"
+              className="rounded-full"
+            />
+          </Form.Item>
           <Form.Item
             name="email"
             rules={[
@@ -69,9 +80,9 @@ const Login = () => {
             <Checkbox className="text-lg">Remember me</Checkbox>
           </Form.Item>
           <div className="mb-4">
-            <Typography.Text>{`Haven't have an account yet ?`}</Typography.Text>
-            <Button type="link" onClick={() => navigate("/signup")}>
-              Sign up
+            <Typography.Text>Already have an account ?</Typography.Text>
+            <Button type="link" onClick={() => navigate("/login")}>
+              Login
             </Button>
           </div>
           <Form.Item>
@@ -82,7 +93,7 @@ const Login = () => {
               className="w-full rounded-full"
               loading={loading}
             >
-              Log in
+              Create Account
             </Button>
           </Form.Item>
         </Form>
@@ -91,4 +102,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignUp;

@@ -1,0 +1,3 @@
+mutation starFile($fileID: String!) {
+  starFile(fileID: $fileID)
+}

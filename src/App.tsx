@@ -5,7 +5,9 @@ import { PrivateRoute } from "./routes/PrivateRoute";
 import Login from "./pages/Login/Login";
 import "antd/dist/reset.css";
 import "./index.css";
+import "./configs/theme/index.less";
 import { AlertProvider } from "./context/AlertContext";
+import SignUp from "@pages/SignUp/SignUp";
 
 function App() {
   return (
@@ -27,14 +29,14 @@ function App() {
             </ProtectedRoute>
           }
         />
-        {/* <Route
-            path="/signup"
-            element={
-              <ProtectedRoute>
-                <Register />
-              </ProtectedRoute>
-            }
-          /> */}
+        <Route
+          path="/signup"
+          element={
+            <ProtectedRoute>
+              <SignUp />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </AlertProvider>
   );

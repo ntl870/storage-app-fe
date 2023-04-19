@@ -11,4 +11,42 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
   height: 100vh;
+  --primary-color: #452dd3;
+  --secondary-color: #ff6f00;
+  --warning-color: #ff934b;
+  --error-color: #f74360;
+  --success-color: #00c48c;
+  --normal-color: #1f2024;
+  --info-color: #5487f5;
+  --surface-color: #fcedeb;
+  --bg-surface-primary: #ffffff;
+  --bg-surface-secondary: #fcf7ff;
 }
+
+/* Global variables */
+@primary-color: var(--primary-color);
+@secondary-color: var(--secondary-color);
+@warning-color: var(--warning-color);
+@error-color: var(--error-color);
+@success-color: var(--success-color);
+@normal-color: var(--normal-color);
+@info-color: var(--info-color);
+@bg-surface-primary: var(--bg-surface-primary);
+@bg-surface-secondary: var(--bg-surface-secondary);
+
+/* Component variables */
+@card-head-height: 70px;
+@card-radius: 20px;
+@border-radius-base: 6px;
+@border-radius-sm: @border-radius-base;
+@border-style-base: solid;
+@btn-border-radius-base: 8px;
+@menu-item-active-bg: @primary-color;
+@menu-highlight-color: #ffffff;
+@menu-inline-toplevel-item-height: 42px;
+@menu-item-height: 42px;
+@menu-item-color: rgba(0, 0, 0, 0.45);
+@table-header-bg: #f7f9ff;
+@table-header-color: #a5a3a8;
+@table-header-cell-split-color: #f7f9ff;
+@table-footer-bg: var(--bg-surface-primary);

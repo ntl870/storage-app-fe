@@ -1,0 +1,3 @@
+mutation starFolder($folderID: String!) {
+  starFolder(folderID: $folderID)
+}

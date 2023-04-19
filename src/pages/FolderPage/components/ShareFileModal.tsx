@@ -125,7 +125,7 @@ export const ShareFileModal = ({ file, handleClose, open }: Props) => {
             <Button key="copy" icon={<LinkOutlined />} onClick={handleCopyLink}>
               Copy link
             </Button>
-            <Button key="done" type="primary">
+            <Button key="done" type="primary" onClick={handleClose}>
               Done
             </Button>
           </>

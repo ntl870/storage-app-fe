@@ -15,6 +15,10 @@ module.exports = {
       borderColor: {
         "primary-grey": "rgb(60,64,67)",
       },
+      backgroundColor: {
+        "header-black": "rgba(31,31,31,0.8)",
+        "primary-purple": "#605BFF",
+      },
     },
   },
   plugins: [],
