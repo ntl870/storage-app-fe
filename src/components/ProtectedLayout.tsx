@@ -1,9 +1,10 @@
 import { Route } from "@routes/routes";
-import { Layout, Menu } from "antd";
+import { Layout, Menu, Typography } from "antd";
 import Sider from "antd/es/layout/Sider";
 import React, { useState } from "react";
 import useRouter from "../hooks/useRouter";
 import { AppHeader } from "./AppHeader";
+import logo from "../assets/logo.png";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -18,6 +19,7 @@ export const ProtectedLayout = ({ children, routes }: ProtectedLayoutProps) => {
       replace: true,
     });
   };
+
   return (
     <Layout className="min-h-screen">
       <Sider
@@ -31,7 +33,12 @@ export const ProtectedLayout = ({ children, routes }: ProtectedLayoutProps) => {
           setCollapsed(broken);
         }}
       >
-        <div className="logo" />
+        <div className="flex items-center p-4">
+          <img id="logo" src={logo} className="w-10 h-10 mr-1" />
+          <Typography.Title level={4} className="mb-0">
+            CloudStorage
+          </Typography.Title>
+        </div>
         <Menu
           theme="light"
           mode="inline"

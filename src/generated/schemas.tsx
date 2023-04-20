@@ -62,12 +62,15 @@ export type Mutation = {
   moveFolderToTrash: Scalars['String'];
   removeUserFromFile: Scalars['String'];
   removeUserFromFolder: Scalars['String'];
+  renameFolder: Scalars['String'];
   restoreFileFromTrash: File;
   setGeneralAccessOfFile: Scalars['String'];
   setGeneralFolderAccess: Scalars['String'];
   signup: NewUserReturn;
   starFile: Scalars['String'];
   starFolder: Scalars['String'];
+  unstarFile: Scalars['String'];
+  unstarFolder: Scalars['String'];
   uploadFile: File;
   uploadFolder: Scalars['String'];
 };
@@ -167,6 +170,12 @@ export type MutationRemoveUserFromFolderArgs = {
 };
 
 
+export type MutationRenameFolderArgs = {
+  folderID: Scalars['String'];
+  name: Scalars['String'];
+};
+
+
 export type MutationRestoreFileFromTrashArgs = {
   fileID: Scalars['String'];
 };
@@ -197,6 +206,16 @@ export type MutationStarFileArgs = {
 
 
 export type MutationStarFolderArgs = {
+  folderID: Scalars['String'];
+};
+
+
+export type MutationUnstarFileArgs = {
+  fileID: Scalars['String'];
+};
+
+
+export type MutationUnstarFolderArgs = {
   folderID: Scalars['String'];
 };
 
@@ -871,6 +890,38 @@ export function useRemoveUserFromFolderMutation(baseOptions?: Apollo.MutationHoo
 export type RemoveUserFromFolderMutationHookResult = ReturnType<typeof useRemoveUserFromFolderMutation>;
 export type RemoveUserFromFolderMutationResult = Apollo.MutationResult<RemoveUserFromFolderMutation>;
 export type RemoveUserFromFolderMutationOptions = Apollo.BaseMutationOptions<RemoveUserFromFolderMutation, RemoveUserFromFolderMutationVariables>;
+export const RenameFolderDocument = gql`
+    mutation renameFolder($folderID: String!, $name: String!) {
+  renameFolder(folderID: $folderID, name: $name)
+}
+    `;
+export type RenameFolderMutationFn = Apollo.MutationFunction<RenameFolderMutation, RenameFolderMutationVariables>;
+
+/**
+ * __useRenameFolderMutation__
+ *
+ * To run a mutation, you first call `useRenameFolderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRenameFolderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [renameFolderMutation, { data, loading, error }] = useRenameFolderMutation({
+ *   variables: {
+ *      folderID: // value for 'folderID'
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useRenameFolderMutation(baseOptions?: Apollo.MutationHookOptions<RenameFolderMutation, RenameFolderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RenameFolderMutation, RenameFolderMutationVariables>(RenameFolderDocument, options);
+      }
+export type RenameFolderMutationHookResult = ReturnType<typeof useRenameFolderMutation>;
+export type RenameFolderMutationResult = Apollo.MutationResult<RenameFolderMutation>;
+export type RenameFolderMutationOptions = Apollo.BaseMutationOptions<RenameFolderMutation, RenameFolderMutationVariables>;
 export const RestoreFileFromTrashDocument = gql`
     mutation restoreFileFromTrash($fileID: String!) {
   restoreFileFromTrash(fileID: $fileID) {
@@ -1068,6 +1119,68 @@ export function useStarFolderMutation(baseOptions?: Apollo.MutationHookOptions<S
 export type StarFolderMutationHookResult = ReturnType<typeof useStarFolderMutation>;
 export type StarFolderMutationResult = Apollo.MutationResult<StarFolderMutation>;
 export type StarFolderMutationOptions = Apollo.BaseMutationOptions<StarFolderMutation, StarFolderMutationVariables>;
+export const UnstarFileDocument = gql`
+    mutation unstarFile($fileID: String!) {
+  unstarFile(fileID: $fileID)
+}
+    `;
+export type UnstarFileMutationFn = Apollo.MutationFunction<UnstarFileMutation, UnstarFileMutationVariables>;
+
+/**
+ * __useUnstarFileMutation__
+ *
+ * To run a mutation, you first call `useUnstarFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUnstarFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [unstarFileMutation, { data, loading, error }] = useUnstarFileMutation({
+ *   variables: {
+ *      fileID: // value for 'fileID'
+ *   },
+ * });
+ */
+export function useUnstarFileMutation(baseOptions?: Apollo.MutationHookOptions<UnstarFileMutation, UnstarFileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UnstarFileMutation, UnstarFileMutationVariables>(UnstarFileDocument, options);
+      }
+export type UnstarFileMutationHookResult = ReturnType<typeof useUnstarFileMutation>;
+export type UnstarFileMutationResult = Apollo.MutationResult<UnstarFileMutation>;
+export type UnstarFileMutationOptions = Apollo.BaseMutationOptions<UnstarFileMutation, UnstarFileMutationVariables>;
+export const UnstarFolderDocument = gql`
+    mutation unstarFolder($folderID: String!) {
+  unstarFolder(folderID: $folderID)
+}
+    `;
+export type UnstarFolderMutationFn = Apollo.MutationFunction<UnstarFolderMutation, UnstarFolderMutationVariables>;
+
+/**
+ * __useUnstarFolderMutation__
+ *
+ * To run a mutation, you first call `useUnstarFolderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUnstarFolderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [unstarFolderMutation, { data, loading, error }] = useUnstarFolderMutation({
+ *   variables: {
+ *      folderID: // value for 'folderID'
+ *   },
+ * });
+ */
+export function useUnstarFolderMutation(baseOptions?: Apollo.MutationHookOptions<UnstarFolderMutation, UnstarFolderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UnstarFolderMutation, UnstarFolderMutationVariables>(UnstarFolderDocument, options);
+      }
+export type UnstarFolderMutationHookResult = ReturnType<typeof useUnstarFolderMutation>;
+export type UnstarFolderMutationResult = Apollo.MutationResult<UnstarFolderMutation>;
+export type UnstarFolderMutationOptions = Apollo.BaseMutationOptions<UnstarFolderMutation, UnstarFolderMutationVariables>;
 export const UploadFileDocument = gql`
     mutation uploadFile($file: Upload!, $folderID: String!) {
   uploadFile(file: $file, folderID: $folderID) {
@@ -1906,6 +2019,14 @@ export type RemoveUserFromFolderMutationVariables = Exact<{
 
 export type RemoveUserFromFolderMutation = { removeUserFromFolder: string };
 
+export type RenameFolderMutationVariables = Exact<{
+  folderID: Scalars['String'];
+  name: Scalars['String'];
+}>;
+
+
+export type RenameFolderMutation = { renameFolder: string };
+
 export type RestoreFileFromTrashMutationVariables = Exact<{
   fileID: Scalars['String'];
 }>;
@@ -1951,6 +2072,20 @@ export type StarFolderMutationVariables = Exact<{
 
 
 export type StarFolderMutation = { starFolder: string };
+
+export type UnstarFileMutationVariables = Exact<{
+  fileID: Scalars['String'];
+}>;
+
+
+export type UnstarFileMutation = { unstarFile: string };
+
+export type UnstarFolderMutationVariables = Exact<{
+  folderID: Scalars['String'];
+}>;
+
+
+export type UnstarFolderMutation = { unstarFolder: string };
 
 export type UploadFileMutationVariables = Exact<{
   file: Scalars['Upload'];

@@ -1,19 +1,25 @@
 import {
   CloudDownloadOutlined,
   DeleteOutlined,
+  EditOutlined,
   FolderFilled,
   ShareAltOutlined,
+  StarOutlined,
 } from "@ant-design/icons";
-import { Row, Col, Typography, Dropdown, MenuProps } from "antd";
+import { Row, Col, Typography, Dropdown, MenuProps, Modal, Input } from "antd";
 import {
   Folder,
   useMoveFolderToTrashMutation,
+  useRenameFolderMutation,
+  useStarFolderMutation,
+  useUnstarFolderMutation,
 } from "../../../generated/schemas";
 import styled from "styled-components";
 import { downloadURI } from "@utils/tools";
 import { useMemo, useState } from "react";
 import { useAlert } from "@hooks/useAlert";
 import { ShareFolderModal } from "./ShareFolderModal";
+import { RenameFolderModal } from "./RenameFolderModal";
 
 const StyledItem = styled.div`
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -27,6 +33,7 @@ interface Props {
   handleClickFolder?: (item: Folder) => void;
   selectedItem: (Folder & { type: "folder" | "file" }) | null;
   refetch: () => void;
+  isStarred?: boolean;
 }
 
 export const FolderSection = ({
@@ -34,10 +41,16 @@ export const FolderSection = ({
   selectedItem,
   handleClickFolder,
   refetch,
+  isStarred,
 }: Props) => {
   const [moveFolderToTrash] = useMoveFolderToTrashMutation();
   const { showErrorNotification, showSuccessNotification } = useAlert();
   const [shareModalFolder, setShareModalFolder] = useState<Folder | null>(null);
+  const [currentRenameFolder, setCurrentRenameFolder] = useState<Folder | null>(
+    null
+  );
+  const [starFolder] = useStarFolderMutation();
+  const [unstarFolder] = useUnstarFolderMutation();
 
   const getItems = (item: Folder): MenuProps["items"] => [
     {
@@ -48,32 +61,84 @@ export const FolderSection = ({
         downloadURI(String(item.ID), "folders", item.name);
       },
     },
-    {
-      label: "Move to trash",
-      key: "2",
-      icon: <DeleteOutlined />,
-      onClick: async () => {
-        try {
-          await moveFolderToTrash({
-            variables: {
-              folderID: item.ID,
+    ...(!isStarred
+      ? [
+          {
+            label: "Move to trash",
+            key: "2",
+            icon: <DeleteOutlined />,
+            onClick: async () => {
+              try {
+                await moveFolderToTrash({
+                  variables: {
+                    folderID: item.ID,
+                  },
+                });
+                showSuccessNotification("Folder moved to trash successfully");
+                refetch();
+              } catch (err) {
+                showErrorNotification((err as Error).message);
+              }
             },
-          });
-          showSuccessNotification("Folder moved to trash successfully");
-          refetch();
-        } catch (err) {
-          showErrorNotification((err as Error).message);
-        }
-      },
-    },
-    {
-      label: "Share this folder",
-      key: "3",
-      icon: <ShareAltOutlined />,
-      onClick: () => {
-        setShareModalFolder(item);
-      },
-    },
+          },
+          {
+            label: "Share this folder",
+            key: "3",
+            icon: <ShareAltOutlined />,
+            onClick: () => {
+              setShareModalFolder(item);
+            },
+          },
+          {
+            label: "Add to starred",
+            key: "4",
+            icon: <StarOutlined />,
+            onClick: async () => {
+              try {
+                await starFolder({
+                  variables: {
+                    folderID: item.ID,
+                  },
+                });
+                showSuccessNotification("Folder added to starred successfully");
+                refetch();
+              } catch (err) {
+                showErrorNotification((err as Error).message);
+              }
+            },
+          },
+          {
+            label: "Rename",
+            key: "5",
+            icon: <EditOutlined />,
+            onClick: async () => {
+              setCurrentRenameFolder(item);
+            },
+          },
+        ]
+      : []),
+    ...(isStarred
+      ? [
+          {
+            label: "Remove from starred",
+            key: "5",
+            icon: <StarOutlined />,
+            onClick: async () => {
+              try {
+                const { data } = await unstarFolder({
+                  variables: {
+                    folderID: item.ID,
+                  },
+                });
+                showSuccessNotification(data?.unstarFolder || "");
+                refetch();
+              } catch (err) {
+                showErrorNotification((err as Error).message);
+              }
+            },
+          },
+        ]
+      : []),
   ];
 
   const handleCloseShareFolderModal = () => {
@@ -118,6 +183,14 @@ export const FolderSection = ({
           open={!!shareModalFolder}
           handleClose={handleCloseShareFolderModal}
           folder={shareModalFolder}
+        />
+      )}
+      {!!currentRenameFolder && (
+        <RenameFolderModal
+          open={!!currentRenameFolder}
+          selectedFolder={currentRenameFolder}
+          refetch={refetch}
+          handleClose={() => setCurrentRenameFolder(null)}
         />
       )}
     </>

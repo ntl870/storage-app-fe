@@ -7,7 +7,7 @@ import {
 import useRouter from "@hooks/useRouter";
 import { FileSection } from "@pages/FolderPage/components/FileSection";
 import { FolderSection } from "@pages/FolderPage/components/FolderSection";
-import { Spin, Typography } from "antd";
+import { Empty, Spin, Typography } from "antd";
 import { useState } from "react";
 
 export type SelectedItemType =
@@ -62,6 +62,17 @@ export const ShareFoldersPage = () => {
     }
     setSelectedItem({ ...item, type: "file" } as SelectedItemType);
   };
+
+  if (
+    !foldersData?.getUserSharedFolders.length &&
+    !filesData?.getUserSharedFiles.length
+  ) {
+    return (
+      <div className="h-full flex justify-center items-center">
+        <Empty description="There is no shared files or folders" />
+      </div>
+    );
+  }
 
   if (getFolderLoading || getFilesLoading) {
     return (

@@ -1,6 +1,4 @@
 import {
-  useGetUserSharedFoldersQuery,
-  useGetUserSharedFilesQuery,
   File as FileSchema,
   Folder,
   useGetStarredFoldersQuery,
@@ -74,7 +72,7 @@ export const StarredPage = () => {
     <>
       <div className="flex flex-col pt-5">
         <Typography.Title level={4} className="ml-4 font-normal">
-          Shared with me
+          Starred
         </Typography.Title>
         {!!foldersData?.getStarredFolders.length && (
           <Typography.Text className="inline-block p-4 font-semibold">
@@ -87,6 +85,7 @@ export const StarredPage = () => {
           handleClickFolder={handleClickFolder}
           selectedItem={selectedItem as Folder & { type: "file" | "folder" }}
           refetch={refetchFolders}
+          isStarred
         />
 
         {!!filesData?.getStarredFiles.length && (
@@ -103,6 +102,7 @@ export const StarredPage = () => {
           }
           isFilterTrash={false}
           refetch={refetchFiles}
+          isStarred
         />
       </div>
     </>

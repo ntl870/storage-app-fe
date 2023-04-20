@@ -1,0 +1,3 @@
+mutation renameFolder($folderID: String!, $name: String!) {
+  renameFolder(folderID: $folderID, name: $name)
+}

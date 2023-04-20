@@ -18,7 +18,6 @@ import {
   Modal,
   Spin,
   Typography,
-  Upload,
 } from "antd";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FileSection } from "./components/FileSection";
@@ -29,12 +28,10 @@ import {
   UploadOutlined,
   FolderOpenFilled,
   PlusOutlined,
-  InboxOutlined,
 } from "@ant-design/icons";
 import { groupFilesByFolder } from "@utils/tools";
 import NavigateBreadCrumb from "@components/NavigateBreadCrumb";
 import { useAlert } from "@hooks/useAlert";
-import useIsDraggingFile from "@hooks/useIsDraggingFile";
 import FileDragDrop from "@components/FileDragDrop";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCloudArrowUp } from "@fortawesome/free-solid-svg-icons";
@@ -46,7 +43,6 @@ type SelectedItemType =
 export const FolderPage = () => {
   const { params, navigate } = useRouter();
   const { rootFolderID } = useCurrentUser();
-  const isDraggingFile = useIsDraggingFile();
   const { showErrorNotification, showSuccessNotification } = useAlert();
   const [isShownNewFolderDialog, setIsShownNewFolderDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SelectedItemType>(null);
@@ -278,7 +274,7 @@ export const FolderPage = () => {
 
   return (
     <>
-      <div className="flex flex-col pt-5">
+      <div className="flex flex-col pt-5 h-full">
         <div className="ml-4">
           <Dropdown menu={{ items: addMenuItems }} trigger={["click"]}>
             <Button size="large">
@@ -293,7 +289,7 @@ export const FolderPage = () => {
               <>
                 <FileDragDrop
                   handleDropFile={handleDragUploadFile}
-                  className="flex justify-center items-center flex-col mt-28"
+                  className="flex justify-center items-center flex-col mt-28 h-full"
                 >
                   <FontAwesomeIcon
                     icon={faCloudArrowUp}

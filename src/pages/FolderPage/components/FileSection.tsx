@@ -2,10 +2,16 @@ import {
   CloudDownloadOutlined,
   DeleteOutlined,
   ShareAltOutlined,
+  StarOutlined,
 } from "@ant-design/icons";
 import ItemCard from "@components/FileCard";
 import ItemCardContent from "@components/FileCardContent";
-import { File, useMoveFileToTrashMutation } from "@generated/schemas";
+import {
+  File,
+  useMoveFileToTrashMutation,
+  useStarFileMutation,
+  useUnstarFileMutation,
+} from "@generated/schemas";
 import { useAlert } from "@hooks/useAlert";
 import useRouter from "@hooks/useRouter";
 import { downloadURI, renderIconByFileType } from "@utils/tools";
@@ -19,6 +25,7 @@ interface Props {
   handleClickItem: (file: File | null) => void;
   isFilterTrash?: boolean;
   refetch: () => void;
+  isStarred?: boolean;
 }
 
 export const FileSection = ({
@@ -26,10 +33,13 @@ export const FileSection = ({
   handleClickItem,
   selectedItem,
   refetch,
+  isStarred,
 }: Props) => {
   const { navigate } = useRouter();
   const { showSuccessNotification, showErrorNotification } = useAlert();
   const [moveFileToTrash] = useMoveFileToTrashMutation();
+  const [starFile] = useStarFileMutation();
+  const [unstarFile] = useUnstarFileMutation();
   const [shareModalFile, setShareModalFile] = useState<File | null>(null);
 
   const handlePreviewClick = () => {
@@ -45,32 +55,80 @@ export const FileSection = ({
         downloadURI(String(item.ID), "files", item.name);
       },
     },
-    {
-      label: "Move to trash",
-      key: "2",
-      icon: <DeleteOutlined />,
-      onClick: async () => {
-        try {
-          await moveFileToTrash({
-            variables: {
-              fileID: item.ID,
+    ...(!isStarred
+      ? [
+          {
+            label: "Move to trash",
+            key: "2",
+            icon: <DeleteOutlined />,
+            onClick: async () => {
+              try {
+                await moveFileToTrash({
+                  variables: {
+                    fileID: item.ID,
+                  },
+                });
+                refetch();
+                showSuccessNotification("File moved to trash");
+              } catch (err) {
+                showErrorNotification((err as Error).message);
+              }
             },
-          });
-          refetch();
-          showSuccessNotification("File moved to trash");
-        } catch (err) {
-          showErrorNotification((err as Error).message);
-        }
-      },
-    },
-    {
-      label: "Share this file",
-      key: "3",
-      icon: <ShareAltOutlined />,
-      onClick: () => {
-        setShareModalFile(item);
-      },
-    },
+          },
+          {
+            label: "Share this file",
+            key: "3",
+            icon: <ShareAltOutlined />,
+            onClick: () => {
+              setShareModalFile(item);
+            },
+          },
+          {
+            label: "Star this file",
+            key: "4",
+            icon: <StarOutlined />,
+            onClick: async () => {
+              try {
+                const { data } = await starFile({
+                  variables: {
+                    fileID: item.ID,
+                  },
+                });
+                if (data?.starFile) {
+                  refetch();
+                  showSuccessNotification(data?.starFile);
+                }
+              } catch (err) {
+                showErrorNotification((err as Error).message);
+              }
+            },
+          },
+        ]
+      : []),
+    ...(isStarred
+      ? [
+          {
+            label: "Un-star this file",
+            key: "4",
+            icon: <StarOutlined />,
+            onClick: async () => {
+              try {
+                const { data } = await unstarFile({
+                  variables: {
+                    fileID: item.ID,
+                  },
+                });
+                if (data?.unstarFile) {
+                  refetch();
+                  showSuccessNotification(data?.unstarFile);
+                }
+              } catch (err) {
+                showErrorNotification((err as Error).message);
+              }
+            },
+          },
+        ]
+      : []),
   ];
 
   const filteredFiles = useMemo(

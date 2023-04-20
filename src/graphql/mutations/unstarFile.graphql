@@ -1,0 +1,3 @@
+mutation unstarFile($fileID: String!) {
+  unstarFile(fileID: $fileID)
+}
