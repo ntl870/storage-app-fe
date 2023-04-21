@@ -105,6 +105,7 @@ export const renderIconByFileType = (file: FileSchema) => {
       return <FilePdfOutlined className="text-7xl mt-6" />;
     case "png":
     case "jpg":
+    case "svg":
       // eslint-disable-next-line no-case-declarations
       const url = getFileURL(file.ID);
       return (

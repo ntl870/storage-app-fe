@@ -57,6 +57,7 @@ export type Mutation = {
   deleteFolder: Scalars['String'];
   emptyUserTrash: Scalars['String'];
   login: Scalars['String'];
+  makeCopyOfFolder: Scalars['String'];
   moveFileToTrash: File;
   moveFolderOutOfTrash: Scalars['String'];
   moveFolderToTrash: Scalars['String'];
@@ -140,6 +141,11 @@ export type MutationDeleteFolderArgs = {
 export type MutationLoginArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
+};
+
+
+export type MutationMakeCopyOfFolderArgs = {
+  folderID: Scalars['String'];
 };
 
 
@@ -730,6 +736,37 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export const MakeCopyOfFolderDocument = gql`
+    mutation makeCopyOfFolder($folderID: String!) {
+  makeCopyOfFolder(folderID: $folderID)
+}
+    `;
+export type MakeCopyOfFolderMutationFn = Apollo.MutationFunction<MakeCopyOfFolderMutation, MakeCopyOfFolderMutationVariables>;
+
+/**
+ * __useMakeCopyOfFolderMutation__
+ *
+ * To run a mutation, you first call `useMakeCopyOfFolderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMakeCopyOfFolderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [makeCopyOfFolderMutation, { data, loading, error }] = useMakeCopyOfFolderMutation({
+ *   variables: {
+ *      folderID: // value for 'folderID'
+ *   },
+ * });
+ */
+export function useMakeCopyOfFolderMutation(baseOptions?: Apollo.MutationHookOptions<MakeCopyOfFolderMutation, MakeCopyOfFolderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MakeCopyOfFolderMutation, MakeCopyOfFolderMutationVariables>(MakeCopyOfFolderDocument, options);
+      }
+export type MakeCopyOfFolderMutationHookResult = ReturnType<typeof useMakeCopyOfFolderMutation>;
+export type MakeCopyOfFolderMutationResult = Apollo.MutationResult<MakeCopyOfFolderMutation>;
+export type MakeCopyOfFolderMutationOptions = Apollo.BaseMutationOptions<MakeCopyOfFolderMutation, MakeCopyOfFolderMutationVariables>;
 export const MoveFileToTrashDocument = gql`
     mutation moveFileToTrash($fileID: String!) {
   moveFileToTrash(fileID: $fileID) {
@@ -1535,6 +1572,7 @@ export const GetStarredFilesDocument = gql`
     ID
     name
     url
+    fileType
   }
 }
     `;
@@ -1982,6 +2020,13 @@ export type LoginMutationVariables = Exact<{
 
 export type LoginMutation = { login: string };
 
+export type MakeCopyOfFolderMutationVariables = Exact<{
+  folderID: Scalars['String'];
+}>;
+
+
+export type MakeCopyOfFolderMutation = { makeCopyOfFolder: string };
+
 export type MoveFileToTrashMutationVariables = Exact<{
   fileID: Scalars['String'];
 }>;
@@ -2145,7 +2190,7 @@ export type GetPeopleWithAccessToFolderQuery = { getPeopleWithAccessToFolder: { 
 export type GetStarredFilesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetStarredFilesQuery = { getStarredFiles: Array<{ ID: string, name: string, url: string }> };
+export type GetStarredFilesQuery = { getStarredFiles: Array<{ ID: string, name: string, url: string, fileType: string }> };
 
 export type GetStarredFoldersQueryVariables = Exact<{ [key: string]: never; }>;
 

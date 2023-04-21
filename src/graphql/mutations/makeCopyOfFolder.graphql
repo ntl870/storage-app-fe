@@ -1,0 +1,3 @@
+mutation makeCopyOfFolder($folderID: String!) {
+  makeCopyOfFolder(folderID: $folderID)
+}

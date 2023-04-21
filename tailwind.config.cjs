@@ -16,8 +16,9 @@ module.exports = {
         "primary-grey": "rgb(60,64,67)",
       },
       backgroundColor: {
-        "header-black": "rgba(31,31,31,0.8)",
+        "header-black": "rgba(31,31,31)",
         "primary-purple": "#605BFF",
+        png: "repeating-conic-gradient(#fff 0 90deg, grey 0 180deg) 0 0/25% 25%;",
       },
     },
   },
