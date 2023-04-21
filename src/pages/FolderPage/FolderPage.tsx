@@ -1,4 +1,4 @@
-import useRouter from "@hooks/useRouter";
+import useRouter from '@hooks/useRouter';
 import {
   useGetFoldersOfFolderQuery,
   Folder,
@@ -7,38 +7,21 @@ import {
   useCreateFolderMutation,
   useUploadFileMutation,
   useUploadFolderMutation,
-} from "@generated/schemas";
-import {
-  Button,
-  Dropdown,
-  Empty,
-  Input,
-  InputRef,
-  MenuProps,
-  Modal,
-  Spin,
-  Typography,
-} from "antd";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { FileSection } from "./components/FileSection";
-import useCurrentUser from "@hooks/useCurrentUser";
-import { FolderSection } from "./components/FolderSection";
-import {
-  FolderAddFilled,
-  UploadOutlined,
-  FolderOpenFilled,
-  PlusOutlined,
-} from "@ant-design/icons";
-import { groupFilesByFolder } from "@utils/tools";
-import NavigateBreadCrumb from "@components/NavigateBreadCrumb";
-import { useAlert } from "@hooks/useAlert";
-import FileDragDrop from "@components/FileDragDrop";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCloudArrowUp } from "@fortawesome/free-solid-svg-icons";
+} from '@generated/schemas';
+import { Button, Dropdown, Empty, Input, InputRef, MenuProps, Modal, Spin, Typography } from 'antd';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { FileSection } from './components/FileSection';
+import useCurrentUser from '@hooks/useCurrentUser';
+import { FolderSection } from './components/FolderSection';
+import { FolderAddFilled, UploadOutlined, FolderOpenFilled, PlusOutlined } from '@ant-design/icons';
+import { groupFilesByFolder } from '@utils/tools';
+import NavigateBreadCrumb from '@components/NavigateBreadCrumb';
+import { useAlert } from '@hooks/useAlert';
+import FileDragDrop from '@components/FileDragDrop';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCloudArrowUp } from '@fortawesome/free-solid-svg-icons';
 
-type SelectedItemType =
-  | ((Folder | FileSchema) & { type: "file" | "folder" })
-  | null;
+type SelectedItemType = ((Folder | FileSchema) & { type: 'file' | 'folder' }) | null;
 
 export const FolderPage = () => {
   const { params, navigate } = useRouter();
@@ -54,20 +37,16 @@ export const FolderPage = () => {
 
   const [uploadFolder] = useUploadFolderMutation();
 
-  const [createFolder, { loading: createFolderLoading }] =
-    useCreateFolderMutation({
-      onCompleted: () => {
-        setIsShownNewFolderDialog(false);
-        refetchFolders();
-      },
-    });
+  const [createFolder, { loading: createFolderLoading }] = useCreateFolderMutation({
+    onCompleted: () => {
+      setIsShownNewFolderDialog(false);
+      refetchFolders();
+    },
+  });
 
   const [uploadFile] = useUploadFileMutation();
 
-  const currentFolderID = useMemo(
-    () => params.folderID || rootFolderID || "",
-    [params.folderID, rootFolderID]
-  );
+  const currentFolderID = useMemo(() => params.folderID || rootFolderID || '', [params.folderID, rootFolderID]);
 
   const {
     data: foldersData,
@@ -79,7 +58,7 @@ export const FolderPage = () => {
       folderID: currentFolderID,
     },
     skip: !currentFolderID,
-    fetchPolicy: "network-only",
+    fetchPolicy: 'network-only',
   });
 
   const {
@@ -92,19 +71,17 @@ export const FolderPage = () => {
       folderID: currentFolderID,
     },
     skip: !currentFolderID,
-    fetchPolicy: "network-only",
+    fetchPolicy: 'network-only',
   });
 
   useEffect(() => {
     if (
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      (getFolderError?.graphQLErrors[0]?.extensions?.exception?.status ===
-        403 ||
+      (getFolderError?.graphQLErrors[0]?.extensions?.exception?.status === 403 ||
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        getFilesError?.graphQLErrors[0]?.extensions?.exception?.status ===
-          403) &&
+        getFilesError?.graphQLErrors[0]?.extensions?.exception?.status === 403) &&
       !getFilesLoading &&
       !getFolderLoading
     ) {
@@ -126,7 +103,7 @@ export const FolderPage = () => {
       setSelectedItem(null);
       return;
     }
-    setSelectedItem({ ...item, type: "folder" });
+    setSelectedItem({ ...item, type: 'folder' });
   };
 
   const handleClickFile = (item: FileSchema | null) => {
@@ -138,12 +115,10 @@ export const FolderPage = () => {
       setSelectedItem(null);
       return;
     }
-    setSelectedItem({ ...item, type: "file" } as SelectedItemType);
+    setSelectedItem({ ...item, type: 'file' } as SelectedItemType);
   };
 
-  const handleUploadFile = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleUploadFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const file = event?.target?.files?.[0];
       await uploadFile({
@@ -151,15 +126,13 @@ export const FolderPage = () => {
       });
       refetchFolders();
       refetchFiles();
-      showSuccessNotification("File uploaded successfully");
+      showSuccessNotification('File uploaded successfully');
     } catch (err) {
       showErrorNotification((err as Error).message);
     }
   };
 
-  const handleUploadFolder = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleUploadFolder = async (event: React.ChangeEvent<HTMLInputElement>) => {
     try {
       const files = event?.target?.files;
       await uploadFolder({
@@ -171,15 +144,13 @@ export const FolderPage = () => {
         },
       });
       refetchFolders();
-      showSuccessNotification("Folder uploaded successfully");
+      showSuccessNotification('Folder uploaded successfully');
     } catch (err) {
       showErrorNotification((err as Error).message);
     }
   };
 
-  const handleDragUploadFile = async (
-    event: React.DragEvent<HTMLDivElement>
-  ) => {
+  const handleDragUploadFile = async (event: React.DragEvent<HTMLDivElement>) => {
     try {
       const file = event?.dataTransfer?.files?.[0];
       await uploadFile({
@@ -187,7 +158,7 @@ export const FolderPage = () => {
       });
       refetchFolders();
       refetchFiles();
-      showSuccessNotification("File uploaded successfully");
+      showSuccessNotification('File uploaded successfully');
     } catch (err) {
       showErrorNotification((err as Error).message);
     }
@@ -197,30 +168,30 @@ export const FolderPage = () => {
     fileInputRef.current?.click();
   };
 
-  const addMenuItems: MenuProps["items"] = useMemo(
+  const addMenuItems: MenuProps['items'] = useMemo(
     () => [
       {
-        label: "New Folder",
-        key: "0",
+        label: 'New Folder',
+        key: '0',
         icon: <FolderAddFilled />,
         onClick: () => {
           setIsShownNewFolderDialog(true);
         },
       },
       {
-        type: "divider",
+        type: 'divider',
       },
       {
-        label: "Upload File",
-        key: "1",
+        label: 'Upload File',
+        key: '1',
         icon: <UploadOutlined />,
         onClick: () => {
           fireFileUpload();
         },
       },
       {
-        label: "Upload Folder",
-        key: "3",
+        label: 'Upload Folder',
+        key: '3',
         icon: <FolderOpenFilled />,
         onClick: () => {
           folderInputRef.current?.click();
@@ -235,12 +206,12 @@ export const FolderPage = () => {
       await createFolder({
         variables: {
           input: {
-            name: createFolderInputRef.current?.input?.value || "",
-            rootFolderID: params.folderID || rootFolderID || "",
+            name: createFolderInputRef.current?.input?.value || '',
+            rootFolderID: params.folderID || rootFolderID || '',
           },
         },
       });
-      showSuccessNotification("Folder created successfully");
+      showSuccessNotification('Folder created successfully');
     } catch (err) {
       showErrorNotification((err as Error).message);
     }
@@ -252,15 +223,13 @@ export const FolderPage = () => {
 
   const onOkAccessDeniedModal = () => {
     setIsShowAccessDeniedModal(false);
-    navigate("/");
+    navigate('/');
   };
 
   const isEmpty = useMemo(() => {
     return (
-      (!foldersData?.getFoldersOfFolder.length ||
-        foldersData?.getFoldersOfFolder.every((folder) => folder.isTrash)) &&
-      (!filesData?.getFilesByFolder.length ||
-        filesData?.getFilesByFolder.every((file) => file.isTrash))
+      (!foldersData?.getFoldersOfFolder.length || foldersData?.getFoldersOfFolder.every((folder) => folder.isTrash)) &&
+      (!filesData?.getFilesByFolder.length || filesData?.getFilesByFolder.every((file) => file.isTrash))
     );
   }, [foldersData, filesData]);
 
@@ -276,7 +245,7 @@ export const FolderPage = () => {
     <>
       <div className="flex flex-col pt-5 h-full">
         <div className="ml-4">
-          <Dropdown menu={{ items: addMenuItems }} trigger={["click"]}>
+          <Dropdown menu={{ items: addMenuItems }} trigger={['click']}>
             <Button size="large">
               <PlusOutlined />
               Add
@@ -291,21 +260,10 @@ export const FolderPage = () => {
                   handleDropFile={handleDragUploadFile}
                   className="flex justify-center items-center flex-col mt-28 h-full"
                 >
-                  <FontAwesomeIcon
-                    icon={faCloudArrowUp}
-                    style={{ color: "#256fef" }}
-                    className="text-7xl"
-                  />
-                  <Typography.Text className="font-bold">
-                    Drag file here or use the Add button
-                  </Typography.Text>
+                  <FontAwesomeIcon icon={faCloudArrowUp} style={{ color: '#256fef' }} className="text-7xl" />
+                  <Typography.Text className="font-bold">Drag file here or use the Add button</Typography.Text>
                 </FileDragDrop>
-                <input
-                  type="file"
-                  className="hidden"
-                  ref={fileInputRef}
-                  onChange={handleUploadFile}
-                />
+                <input type="file" className="hidden" ref={fileInputRef} onChange={handleUploadFile} />
                 <input
                   type="file"
                   className="hidden"
@@ -326,35 +284,25 @@ export const FolderPage = () => {
             <>
               <NavigateBreadCrumb />
               {!!foldersData?.getFoldersOfFolder.length &&
-                !foldersData?.getFoldersOfFolder.every(
-                  (folder) => folder.isTrash
-                ) && (
-                  <Typography.Text className="inline-block p-4 font-semibold">
-                    Folders
-                  </Typography.Text>
+                !foldersData?.getFoldersOfFolder.every((folder) => folder.isTrash) && (
+                  <Typography.Text className="inline-block p-4 font-semibold">Folders</Typography.Text>
                 )}
 
               <FolderSection
                 folders={(foldersData?.getFoldersOfFolder as Folder[]) || []}
                 handleClickFolder={handleClickFolder}
-                selectedItem={
-                  selectedItem as Folder & { type: "file" | "folder" }
-                }
+                selectedItem={selectedItem as Folder & { type: 'file' | 'folder' }}
                 refetch={refetchFolders}
               />
 
               {!!filesData?.getFilesByFolder.length && (
-                <Typography.Text className="inline-block p-4 font-semibold">
-                  Files
-                </Typography.Text>
+                <Typography.Text className="inline-block p-4 font-semibold">Files</Typography.Text>
               )}
 
               <FileSection
                 files={(filesData?.getFilesByFolder as FileSchema[]) || []}
                 handleClickItem={handleClickFile}
-                selectedItem={
-                  selectedItem as FileSchema & { type: "file" | "folder" }
-                }
+                selectedItem={selectedItem as FileSchema & { type: 'file' | 'folder' }}
                 isFilterTrash={false}
                 refetch={refetchFiles}
               />
@@ -370,12 +318,7 @@ export const FolderPage = () => {
           confirmLoading={createFolderLoading}
           onCancel={handleCancelCreateFolderModal}
         >
-          <Input
-            size="large"
-            placeholder="Enter folder name"
-            allowClear
-            ref={createFolderInputRef}
-          />
+          <Input size="large" placeholder="Enter folder name" allowClear ref={createFolderInputRef} />
         </Modal>
       )}
       {isShowAccessDeniedModal && (
@@ -383,17 +326,12 @@ export const FolderPage = () => {
           title="Access Denied"
           open={isShowAccessDeniedModal}
           onOk={onOkAccessDeniedModal}
-          cancelButtonProps={{ style: { display: "none" } }}
+          cancelButtonProps={{ style: { display: 'none' } }}
         >
           <Typography.Text>{`You don't have access to this folder`}</Typography.Text>
         </Modal>
       )}
-      <input
-        type="file"
-        className="hidden"
-        ref={fileInputRef}
-        onChange={handleUploadFile}
-      />
+      <input type="file" className="hidden" ref={fileInputRef} onChange={handleUploadFile} />
       <input
         type="file"
         className="hidden"
