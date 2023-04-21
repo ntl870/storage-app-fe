@@ -1,4 +1,4 @@
-import { DownloadOutlined, LeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, DownloadOutlined } from '@ant-design/icons';
 import PdfViewer from '@components/PDFViewer';
 import { useGetFileByIdWithAccessQuery } from '@generated/schemas';
 import useRouter from '@hooks/useRouter';
@@ -59,12 +59,18 @@ export const FilePage = () => {
         // onClick={onClose}
       >
         <Header className="w-full flex items-center justify-between bg-header-black mb-8">
-          <Button icon={<LeftOutlined />} shape="circle" onClick={goBack}></Button>
-          <Typography.Title level={3} className="text-white">
-            {data?.getFileByIDWithAccess?.name}
-          </Typography.Title>
+          <div className="flex gap-2 items-center">
+            <ArrowLeftOutlined
+              onClick={goBack}
+              className="text-white text-xl hover:bg-[rgba(145,144,144,0.87)] rounded-2xl p-2"
+            />
+            <span className="text-white text-sm">{data?.getFileByIDWithAccess?.name}</span>
+          </div>
           <div>
-            <Button type="default" shape="circle" icon={<DownloadOutlined />} size="large" onClick={handleDownload} />
+            <DownloadOutlined
+              onClick={handleDownload}
+              className="text-white text-xl hover:bg-[rgba(145,144,144,0.87)]  rounded-2xl p-2"
+            />
           </div>
         </Header>
         {renderPreview()}
