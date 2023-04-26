@@ -1,0 +1,9 @@
+query getAllPackages {
+  getAllPackages {
+    ID
+    price
+    name
+    maxStorage
+    detail
+  }
+}

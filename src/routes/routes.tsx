@@ -51,6 +51,12 @@ const StarredPage = loadable(() =>
   }))
 );
 
+const BuyStoragePage = loadable(() =>
+  import("@pages/BuyStoragePage/BuyStoragePage").then((module) => ({
+    default: module.BuyStoragePage,
+  }))
+);
+
 const routes: Route[] = [
   {
     path: "/",
@@ -91,6 +97,12 @@ const routes: Route[] = [
     element: <StarredPage />,
     label: "Starred",
     icon: <StarOutlined />,
+  },
+  {
+    path: "/buy-storage",
+    key: "/buy-storage",
+    element: <BuyStoragePage />,
+    hidden: true,
   },
 ];
 export default routes;

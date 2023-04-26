@@ -159,3 +159,31 @@ export const getGeneratedAvatar = (seed: string) =>
 
 export const getBase64StringOfImage = (base64: string) =>
   `data:image/png;base64,${base64}`;
+
+export const covertBytesToGiB = (bytes: number) => {
+  return bytes / (1024 * 1024 * 1024);
+};
+
+export const convertGibToBytes = (gib: number) => {
+  return gib * 1024 * 1024 * 1024;
+};
+
+export const getTotalSizeOfFolder = (files: FileList | null) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return Object.keys(files).reduce((acc, file) => {
+    return (
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      Number(files[acc]?.size || 0) + Number(files[file as keyof FileList].size)
+    );
+  });
+};
+
+export const isEnoughSpaceLeft = (
+  maxStorage: number,
+  usedStorage: number,
+  size: number
+) => {
+  return usedStorage + size < maxStorage;
+};

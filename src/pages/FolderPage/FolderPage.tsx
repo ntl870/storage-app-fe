@@ -17,6 +17,7 @@ import {
   Modal,
   Spin,
   Typography,
+  message,
 } from "antd";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FileSection } from "./components/FileSection";
@@ -28,12 +29,17 @@ import {
   FolderOpenFilled,
   PlusOutlined,
 } from "@ant-design/icons";
-import { groupFilesByFolder } from "@utils/tools";
+import {
+  convertGibToBytes,
+  getTotalSizeOfFolder,
+  groupFilesByFolder,
+  isEnoughSpaceLeft,
+} from "@utils/tools";
 import NavigateBreadCrumb from "@components/NavigateBreadCrumb";
 import { useAlert } from "@hooks/useAlert";
 import FileDragDrop from "@components/FileDragDrop";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCloudArrowUp } from "@fortawesome/free-solid-svg-icons";
+import { fa0, faCloudArrowUp } from "@fortawesome/free-solid-svg-icons";
 
 type SelectedItemType =
   | ((Folder | FileSchema) & { type: "file" | "folder" })
@@ -41,13 +47,13 @@ type SelectedItemType =
 
 export const FolderPage = () => {
   const { params, navigate } = useRouter();
-  const { rootFolderID } = useCurrentUser();
+  const { rootFolderID, maxStorage, storageUsed } = useCurrentUser();
   const { showErrorNotification, showSuccessNotification } = useAlert();
   const [isShownNewFolderDialog, setIsShownNewFolderDialog] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SelectedItemType>(null);
   const [isShowAccessDeniedModal, setIsShowAccessDeniedModal] = useState(false);
+  const [isProcessingFiles, setIsProcessingFiles] = useState(false);
   const createFolderInputRef = useRef<InputRef>(null);
-
   const fileInputRef = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
 
@@ -143,8 +149,21 @@ export const FolderPage = () => {
   const handleUploadFile = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    setIsProcessingFiles(true);
+    const file = event?.target?.files?.[0];
+    const isEnoughSpace = isEnoughSpaceLeft(
+      convertGibToBytes(Number(maxStorage)),
+      Number(storageUsed),
+      file?.size || 0
+    );
+
+    if (!isEnoughSpace) {
+      showErrorNotification("Not enough space left");
+      setIsProcessingFiles(false);
+      return;
+    }
+
     try {
-      const file = event?.target?.files?.[0];
       await uploadFile({
         variables: { file: file, folderID: currentFolderID },
       });
@@ -153,14 +172,29 @@ export const FolderPage = () => {
       showSuccessNotification("File uploaded successfully");
     } catch (err) {
       showErrorNotification((err as Error).message);
+    } finally {
+      setIsProcessingFiles(false);
     }
   };
 
   const handleUploadFolder = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    setIsProcessingFiles(true);
+    const files = event?.target?.files;
+    const isEnoughSpace = isEnoughSpaceLeft(
+      convertGibToBytes(Number(maxStorage)),
+      Number(storageUsed),
+      Number(getTotalSizeOfFolder(files))
+    );
+
+    if (!isEnoughSpace) {
+      showErrorNotification("Not enough space left");
+      setIsProcessingFiles(false);
+      return;
+    }
+
     try {
-      const files = event?.target?.files;
       await uploadFolder({
         variables: {
           input: {
@@ -173,6 +207,8 @@ export const FolderPage = () => {
       showSuccessNotification("Folder uploaded successfully");
     } catch (err) {
       showErrorNotification((err as Error).message);
+    } finally {
+      setIsProcessingFiles(false);
     }
   };
 
@@ -195,6 +231,16 @@ export const FolderPage = () => {
   const fireFileUpload = () => {
     fileInputRef.current?.click();
   };
+
+  useEffect(() => {
+    if (isProcessingFiles)
+      message.loading({
+        content: "Uploading files...",
+        key: "uploading",
+        duration: 0,
+      });
+    else message.destroy();
+  }, [isProcessingFiles]);
 
   const addMenuItems: MenuProps["items"] = useMemo(
     () => [

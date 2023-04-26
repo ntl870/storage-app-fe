@@ -11,6 +11,9 @@ const useCurrentUser = () => {
     email: data?.getMe.email,
     rootFolderID: data?.getMe?.rootFolder?.ID,
     avatar: data?.getMe.avatar,
+    maxStorage: data?.getMe.currentPackage.maxStorage,
+    storageUsed: data?.getMe.storageUsed,
+    currentPackageID: data?.getMe.currentPackage.ID,
   };
 };
 

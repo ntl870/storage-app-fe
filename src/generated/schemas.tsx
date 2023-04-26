@@ -18,6 +18,7 @@ export type Scalars = {
 
 export type File = {
   ID: Scalars['String'];
+  fileSize: Scalars['Float'];
   fileType: Scalars['String'];
   folder?: Maybe<Folder>;
   isPublic: Scalars['Boolean'];
@@ -50,8 +51,10 @@ export type Mutation = {
   addUserToFolderReadOnlyUsers: Scalars['String'];
   addUsersToReadonlyFile: Scalars['String'];
   addUsersToSharedUserFile: Scalars['String'];
+  bulkCreatePackages: Scalars['String'];
   changeUserRoleInFile: Scalars['String'];
   changeUserRoleInFolder: Scalars['String'];
+  createCheckoutSession: Scalars['String'];
   createFolder: Folder;
   deleteFile: Scalars['String'];
   deleteFolder: Scalars['String'];
@@ -120,6 +123,11 @@ export type MutationChangeUserRoleInFolderArgs = {
   folderID: Scalars['String'];
   targetRole: Scalars['String'];
   targetUserID: Scalars['String'];
+};
+
+
+export type MutationCreateCheckoutSessionArgs = {
+  packageId: Scalars['Float'];
 };
 
 
@@ -247,6 +255,14 @@ export type NewUserReturn = {
   name: Scalars['String'];
 };
 
+export type Package = {
+  ID: Scalars['Float'];
+  detail: Scalars['String'];
+  maxStorage: Scalars['Float'];
+  name: Scalars['String'];
+  price: Scalars['Float'];
+};
+
 export type PeopleWithAccessResponse = {
   isPublic: Scalars['Boolean'];
   owner: User;
@@ -255,6 +271,7 @@ export type PeopleWithAccessResponse = {
 };
 
 export type Query = {
+  getAllPackages: Array<Package>;
   getAllUsers: Array<User>;
   getArrayOfRootFoldersName: Array<Folder>;
   getFileByID: File;
@@ -336,10 +353,13 @@ export type UploadFolderInput = {
 export type User = {
   ID: Scalars['String'];
   avatar?: Maybe<Scalars['String']>;
+  currentPackage: Package;
   email: Scalars['String'];
   name: Scalars['String'];
   password: Scalars['String'];
   rootFolder?: Maybe<Folder>;
+  storageUsed: Scalars['Float'];
+  stripeCustomerID: Scalars['String'];
 };
 
 export type UserSearchPaginationResponse = {
@@ -578,6 +598,37 @@ export function useChangeUserRoleInFolderMutation(baseOptions?: Apollo.MutationH
 export type ChangeUserRoleInFolderMutationHookResult = ReturnType<typeof useChangeUserRoleInFolderMutation>;
 export type ChangeUserRoleInFolderMutationResult = Apollo.MutationResult<ChangeUserRoleInFolderMutation>;
 export type ChangeUserRoleInFolderMutationOptions = Apollo.BaseMutationOptions<ChangeUserRoleInFolderMutation, ChangeUserRoleInFolderMutationVariables>;
+export const CreateCheckoutSessionDocument = gql`
+    mutation createCheckoutSession($packageId: Float!) {
+  createCheckoutSession(packageId: $packageId)
+}
+    `;
+export type CreateCheckoutSessionMutationFn = Apollo.MutationFunction<CreateCheckoutSessionMutation, CreateCheckoutSessionMutationVariables>;
+
+/**
+ * __useCreateCheckoutSessionMutation__
+ *
+ * To run a mutation, you first call `useCreateCheckoutSessionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateCheckoutSessionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createCheckoutSessionMutation, { data, loading, error }] = useCreateCheckoutSessionMutation({
+ *   variables: {
+ *      packageId: // value for 'packageId'
+ *   },
+ * });
+ */
+export function useCreateCheckoutSessionMutation(baseOptions?: Apollo.MutationHookOptions<CreateCheckoutSessionMutation, CreateCheckoutSessionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateCheckoutSessionMutation, CreateCheckoutSessionMutationVariables>(CreateCheckoutSessionDocument, options);
+      }
+export type CreateCheckoutSessionMutationHookResult = ReturnType<typeof useCreateCheckoutSessionMutation>;
+export type CreateCheckoutSessionMutationResult = Apollo.MutationResult<CreateCheckoutSessionMutation>;
+export type CreateCheckoutSessionMutationOptions = Apollo.BaseMutationOptions<CreateCheckoutSessionMutation, CreateCheckoutSessionMutationVariables>;
 export const CreateFolderDocument = gql`
     mutation createFolder($input: NewFolderInput!) {
   createFolder(input: $input) {
@@ -1290,6 +1341,47 @@ export function useUploadFolderMutation(baseOptions?: Apollo.MutationHookOptions
 export type UploadFolderMutationHookResult = ReturnType<typeof useUploadFolderMutation>;
 export type UploadFolderMutationResult = Apollo.MutationResult<UploadFolderMutation>;
 export type UploadFolderMutationOptions = Apollo.BaseMutationOptions<UploadFolderMutation, UploadFolderMutationVariables>;
+export const GetAllPackagesDocument = gql`
+    query getAllPackages {
+  getAllPackages {
+    ID
+    price
+    name
+    maxStorage
+    detail
+  }
+}
+    `;
+
+/**
+ * __useGetAllPackagesQuery__
+ *
+ * To run a query within a React component, call `useGetAllPackagesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllPackagesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllPackagesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetAllPackagesQuery(baseOptions?: Apollo.QueryHookOptions<GetAllPackagesQuery, GetAllPackagesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllPackagesQuery, GetAllPackagesQueryVariables>(GetAllPackagesDocument, options);
+      }
+export function useGetAllPackagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllPackagesQuery, GetAllPackagesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllPackagesQuery, GetAllPackagesQueryVariables>(GetAllPackagesDocument, options);
+        }
+export type GetAllPackagesQueryHookResult = ReturnType<typeof useGetAllPackagesQuery>;
+export type GetAllPackagesLazyQueryHookResult = ReturnType<typeof useGetAllPackagesLazyQuery>;
+export type GetAllPackagesQueryResult = Apollo.QueryResult<GetAllPackagesQuery, GetAllPackagesQueryVariables>;
+export function refetchGetAllPackagesQuery(variables?: GetAllPackagesQueryVariables) {
+      return { query: GetAllPackagesDocument, variables: variables }
+    }
 export const GetArrayOfRootFoldersNameDocument = gql`
     query getArrayOfRootFoldersName($folderID: String!) {
   getArrayOfRootFoldersName(folderID: $folderID) {
@@ -1421,6 +1513,11 @@ export const GetMeDocument = gql`
       ID
     }
     avatar
+    storageUsed
+    currentPackage {
+      ID
+      maxStorage
+    }
   }
 }
     `;
@@ -1986,6 +2083,13 @@ export type ChangeUserRoleInFolderMutationVariables = Exact<{
 
 export type ChangeUserRoleInFolderMutation = { changeUserRoleInFolder: string };
 
+export type CreateCheckoutSessionMutationVariables = Exact<{
+  packageId: Scalars['Float'];
+}>;
+
+
+export type CreateCheckoutSessionMutation = { createCheckoutSession: string };
+
 export type CreateFolderMutationVariables = Exact<{
   input: NewFolderInput;
 }>;
@@ -2147,6 +2251,11 @@ export type UploadFolderMutationVariables = Exact<{
 
 export type UploadFolderMutation = { uploadFolder: string };
 
+export type GetAllPackagesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAllPackagesQuery = { getAllPackages: Array<{ ID: number, price: number, name: string, maxStorage: number, detail: string }> };
+
 export type GetArrayOfRootFoldersNameQueryVariables = Exact<{
   folderID: Scalars['String'];
 }>;
@@ -2171,7 +2280,7 @@ export type GetFilesByFolderQuery = { getFilesByFolder: Array<{ ID: string, name
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMeQuery = { getMe: { ID: string, name: string, email: string, avatar?: string | null, rootFolder?: { ID: string } | null } };
+export type GetMeQuery = { getMe: { ID: string, name: string, email: string, avatar?: string | null, storageUsed: number, rootFolder?: { ID: string } | null, currentPackage: { ID: number, maxStorage: number } } };
 
 export type GetPeopleWithAccessToFileQueryVariables = Exact<{
   fileID: Scalars['String'];
