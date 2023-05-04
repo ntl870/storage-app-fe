@@ -39,7 +39,7 @@ import NavigateBreadCrumb from "@components/NavigateBreadCrumb";
 import { useAlert } from "@hooks/useAlert";
 import FileDragDrop from "@components/FileDragDrop";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { fa0, faCloudArrowUp } from "@fortawesome/free-solid-svg-icons";
+import { faCloudArrowUp } from "@fortawesome/free-solid-svg-icons";
 
 type SelectedItemType =
   | ((Folder | FileSchema) & { type: "file" | "folder" })
@@ -84,7 +84,7 @@ export const FolderPage = () => {
       folderID: currentFolderID,
     },
     skip: !currentFolderID,
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
   });
 
   const {
@@ -97,7 +97,7 @@ export const FolderPage = () => {
       folderID: currentFolderID,
     },
     skip: !currentFolderID,
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
   });
 
   useEffect(() => {

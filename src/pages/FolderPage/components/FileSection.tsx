@@ -2,6 +2,7 @@ import {
   CloudDownloadOutlined,
   CopyOutlined,
   DeleteOutlined,
+  EditOutlined,
   ShareAltOutlined,
   StarOutlined,
 } from "@ant-design/icons";
@@ -9,8 +10,7 @@ import ItemCard from "@components/FileCard";
 import ItemCardContent from "@components/FileCardContent";
 import {
   File,
-  GetFilesByFolderQuery,
-  useMakeCopyOfFolderMutation,
+  useMakeCopyOfFileMutation,
   useMoveFileToTrashMutation,
   useStarFileMutation,
   useUnstarFileMutation,
@@ -18,10 +18,13 @@ import {
 import { useAlert } from "@hooks/useAlert";
 import useRouter from "@hooks/useRouter";
 import { downloadURI, renderIconByFileType } from "@utils/tools";
-import { Col, Dropdown, MenuProps, Row, Typography } from "antd";
+import { Col, Dropdown, MenuProps, Row, Tooltip, Typography } from "antd";
 import { useMemo, useState } from "react";
 import { ShareFileModal } from "./ShareFileModal";
-import { ApolloQueryResult } from "@apollo/client";
+import { RenameFileModal } from "./RenameFileModal";
+import { MoveFileToFolderModal } from "./MoveFileToFolderModal";
+import { faArrowTurnRight } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface Props {
   files: File[];
@@ -44,7 +47,10 @@ export const FileSection = ({
   const [moveFileToTrash] = useMoveFileToTrashMutation();
   const [starFile] = useStarFileMutation();
   const [unstarFile] = useUnstarFileMutation();
+  const [makeACopy] = useMakeCopyOfFileMutation();
   const [shareModalFile, setShareModalFile] = useState<File | null>(null);
+  const [currentRenameFile, setCurrentRenameFile] = useState<File | null>(null);
+  const [moveToFolderFile, setMoveToFolderFile] = useState<File | null>(null);
 
   const handlePreviewClick = () => {
     navigate(`/file/${selectedItem?.ID}`);
@@ -107,6 +113,42 @@ export const FileSection = ({
               }
             },
           },
+          {
+            label: "Rename",
+            key: "5",
+            icon: <EditOutlined />,
+            onClick: () => {
+              setCurrentRenameFile(item);
+            },
+          },
+          {
+            label: "Make a Copy",
+            key: "6",
+            icon: <CopyOutlined />,
+            onClick: async () => {
+              try {
+                const { data } = await makeACopy({
+                  variables: {
+                    fileID: item.ID,
+                  },
+                });
+                if (data?.makeCopyOfFile) {
+                  await refetch();
+                  showSuccessNotification(data?.makeCopyOfFile);
+                }
+              } catch (err) {
+                showErrorNotification((err as Error).message);
+              }
+            },
+          },
+          {
+            label: "Move to",
+            key: "7",
+            icon: <FontAwesomeIcon icon={faArrowTurnRight} />,
+            onClick: () => {
+              setMoveToFolderFile(item);
+            },
+          },
         ]
       : []),
     ...(isStarred
@@ -150,29 +192,32 @@ export const FileSection = ({
             trigger={["contextMenu"]}
           >
             <Col className="m-4">
-              <ItemCard
-                cover={renderIconByFileType(file)}
-                className="w-[17rem]"
-                onClick={() => {
-                  if (selectedItem && file.ID === selectedItem.ID) {
-                    handlePreviewClick();
-                  } else {
-                    handleClickItem(file as File);
-                  }
-                }}
-              >
-                <ItemCardContent
-                  className={`${
-                    selectedItem?.ID === file.ID && selectedItem.type === "file"
-                      ? "bg-blue-100"
-                      : ""
-                  }`}
+              <Tooltip title={file.name}>
+                <ItemCard
+                  cover={renderIconByFileType(file)}
+                  className="w-[17rem]"
+                  onClick={() => {
+                    if (selectedItem && file.ID === selectedItem.ID) {
+                      handlePreviewClick();
+                    } else {
+                      handleClickItem(file as File);
+                    }
+                  }}
                 >
-                  <Typography.Text className="w-full font-semibold pointer-events-none truncate inline-block select-none">
-                    {file.name}
-                  </Typography.Text>
-                </ItemCardContent>
-              </ItemCard>
+                  <ItemCardContent
+                    className={`${
+                      selectedItem?.ID === file.ID &&
+                      selectedItem.type === "file"
+                        ? "bg-blue-100"
+                        : ""
+                    }`}
+                  >
+                    <Typography.Text className="w-full font-semibold pointer-events-none truncate inline-block select-none">
+                      {file.name}
+                    </Typography.Text>
+                  </ItemCardContent>
+                </ItemCard>
+              </Tooltip>
             </Col>
           </Dropdown>
         ))}
@@ -183,6 +228,24 @@ export const FileSection = ({
           file={shareModalFile}
           open={!!shareModalFile}
           handleClose={() => setShareModalFile(null)}
+        />
+      )}
+
+      {!!currentRenameFile && (
+        <RenameFileModal
+          open={!!currentRenameFile}
+          selectedFile={currentRenameFile}
+          refetch={refetch}
+          handleClose={() => setCurrentRenameFile(null)}
+        />
+      )}
+
+      {!!moveToFolderFile && (
+        <MoveFileToFolderModal
+          open={!!moveToFolderFile}
+          movingFileID={moveToFolderFile.ID}
+          handleClose={() => setMoveToFolderFile(null)}
+          refetch={refetch}
         />
       )}
     </>

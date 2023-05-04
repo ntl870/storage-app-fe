@@ -1,0 +1,3 @@
+mutation moveFileToNewFolder($fileID: String!, $targetFolderID: String!) {
+  moveFileToNewFolder(fileID: $fileID, targetFolderID: $targetFolderID)
+}

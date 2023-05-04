@@ -7,7 +7,13 @@ import {
   ShareAltOutlined,
   StarOutlined,
 } from "@ant-design/icons";
-import { Row, Col, Typography, Dropdown, MenuProps, Modal, Input } from "antd";
+import { faArrowTurnRight } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAlert } from "@hooks/useAlert";
+import { downloadURI } from "@utils/tools";
+import { Col, Dropdown, MenuProps, Row, Tooltip, Typography } from "antd";
+import { useMemo, useState } from "react";
+import styled from "styled-components";
 import {
   Folder,
   useMakeCopyOfFolderMutation,
@@ -15,12 +21,9 @@ import {
   useStarFolderMutation,
   useUnstarFolderMutation,
 } from "../../../generated/schemas";
-import styled from "styled-components";
-import { downloadURI } from "@utils/tools";
-import { useMemo, useState } from "react";
-import { useAlert } from "@hooks/useAlert";
-import { ShareFolderModal } from "./ShareFolderModal";
+import { MoveToFolderModal } from "./MoveToFolderModal";
 import { RenameFolderModal } from "./RenameFolderModal";
+import { ShareFolderModal } from "./ShareFolderModal";
 
 const StyledItem = styled.div`
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -49,6 +52,9 @@ export const FolderSection = ({
   const { showErrorNotification, showSuccessNotification } = useAlert();
   const [shareModalFolder, setShareModalFolder] = useState<Folder | null>(null);
   const [currentRenameFolder, setCurrentRenameFolder] = useState<Folder | null>(
+    null
+  );
+  const [currentMoveToFolder, setCurrentMoveToFolder] = useState<Folder | null>(
     null
   );
   const [starFolder] = useStarFolderMutation();
@@ -137,6 +143,14 @@ export const FolderSection = ({
               }
             },
           },
+          {
+            label: "Move to",
+            key: "7",
+            icon: <FontAwesomeIcon icon={faArrowTurnRight} />,
+            onClick: async () => {
+              setCurrentMoveToFolder(item);
+            },
+          },
         ]
       : []),
     ...(isStarred
@@ -182,20 +196,22 @@ export const FolderSection = ({
             trigger={["contextMenu"]}
           >
             <Col className="m-4">
-              <StyledItem
-                className={`p-3 flex flex-row items-center min-w-[17rem] max-w-[17rem] ${
-                  selectedItem?.ID === folder.ID &&
-                  selectedItem.type === "folder"
-                    ? "bg-blue-100"
-                    : "bg-white hover:bg-neutral-100"
-                }`}
-                onClick={() => handleClickFolder?.(folder as Folder)}
-              >
-                <FolderFilled className="text-xl mr-3 flex items-center" />
-                <Text className="inline-block truncate select-none font-semibold">
-                  {folder.name}
-                </Text>
-              </StyledItem>
+              <Tooltip title={folder.name}>
+                <StyledItem
+                  className={`p-3 flex flex-row items-center min-w-[17rem] max-w-[17rem] ${
+                    selectedItem?.ID === folder.ID &&
+                    selectedItem.type === "folder"
+                      ? "bg-blue-100"
+                      : "bg-white hover:bg-neutral-100"
+                  }`}
+                  onClick={() => handleClickFolder?.(folder as Folder)}
+                >
+                  <FolderFilled className="text-xl mr-3 flex items-center" />
+                  <Text className="inline-block truncate select-none font-semibold">
+                    {folder.name}
+                  </Text>
+                </StyledItem>
+              </Tooltip>
             </Col>
           </Dropdown>
         ))}
@@ -213,6 +229,14 @@ export const FolderSection = ({
           selectedFolder={currentRenameFolder}
           refetch={refetch}
           handleClose={() => setCurrentRenameFolder(null)}
+        />
+      )}
+      {!!currentMoveToFolder && (
+        <MoveToFolderModal
+          open={!!currentMoveToFolder}
+          movingFolderID={currentMoveToFolder.ID}
+          handleClose={() => setCurrentMoveToFolder(null)}
+          refetch={refetch}
         />
       )}
     </>

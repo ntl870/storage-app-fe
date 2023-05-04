@@ -9,6 +9,7 @@ const useCurrentUser = () => {
     ID: data?.getMe.ID,
     name: data?.getMe.name,
     email: data?.getMe.email,
+    rootFolder: data?.getMe.rootFolder,
     rootFolderID: data?.getMe?.rootFolder?.ID,
     avatar: data?.getMe.avatar,
     maxStorage: data?.getMe.currentPackage.maxStorage,

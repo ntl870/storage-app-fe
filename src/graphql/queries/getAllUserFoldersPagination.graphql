@@ -1,0 +1,13 @@
+query getAllUserFoldersPagination(
+  $search: String!
+  $page: Float!
+  $limit: Float!
+) {
+  getAllUserFoldersPagination(search: $search, page: $page, limit: $limit) {
+    results {
+      ID
+      name
+    }
+    hasMore
+  }
+}

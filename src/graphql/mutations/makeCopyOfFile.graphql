@@ -1,0 +1,3 @@
+mutation makeCopyOfFile($fileID: String!) {
+  makeCopyOfFile(fileID: $fileID)
+}

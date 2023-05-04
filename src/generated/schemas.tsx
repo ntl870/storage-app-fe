@@ -46,6 +46,11 @@ export type Folder = {
   subFolders?: Maybe<Array<Folder>>;
 };
 
+export type GetFoldersByOwnerIdPaginationResponse = {
+  hasMore: Scalars['Boolean'];
+  results: Array<Folder>;
+};
+
 export type Mutation = {
   addSharedUserToFolder: Scalars['String'];
   addUserToFolderReadOnlyUsers: Scalars['String'];
@@ -60,12 +65,16 @@ export type Mutation = {
   deleteFolder: Scalars['String'];
   emptyUserTrash: Scalars['String'];
   login: Scalars['String'];
+  makeCopyOfFile: Scalars['String'];
   makeCopyOfFolder: Scalars['String'];
+  moveFileToNewFolder: Scalars['String'];
   moveFileToTrash: File;
+  moveFolder: Scalars['String'];
   moveFolderOutOfTrash: Scalars['String'];
   moveFolderToTrash: Scalars['String'];
   removeUserFromFile: Scalars['String'];
   removeUserFromFolder: Scalars['String'];
+  renameFile: Scalars['String'];
   renameFolder: Scalars['String'];
   restoreFileFromTrash: File;
   setGeneralAccessOfFile: Scalars['String'];
@@ -152,13 +161,30 @@ export type MutationLoginArgs = {
 };
 
 
+export type MutationMakeCopyOfFileArgs = {
+  fileID: Scalars['String'];
+};
+
+
 export type MutationMakeCopyOfFolderArgs = {
   folderID: Scalars['String'];
 };
 
 
+export type MutationMoveFileToNewFolderArgs = {
+  fileID: Scalars['String'];
+  targetFolderID: Scalars['String'];
+};
+
+
 export type MutationMoveFileToTrashArgs = {
   fileID: Scalars['String'];
+};
+
+
+export type MutationMoveFolderArgs = {
+  folderID: Scalars['String'];
+  targetFolderID: Scalars['String'];
 };
 
 
@@ -181,6 +207,12 @@ export type MutationRemoveUserFromFileArgs = {
 export type MutationRemoveUserFromFolderArgs = {
   folderID: Scalars['String'];
   targetUserID: Scalars['String'];
+};
+
+
+export type MutationRenameFileArgs = {
+  fileID: Scalars['String'];
+  newName: Scalars['String'];
 };
 
 
@@ -272,6 +304,7 @@ export type PeopleWithAccessResponse = {
 
 export type Query = {
   getAllPackages: Array<Package>;
+  getAllUserFoldersPagination: GetFoldersByOwnerIdPaginationResponse;
   getAllUsers: Array<User>;
   getArrayOfRootFoldersName: Array<Folder>;
   getFileByID: File;
@@ -290,6 +323,13 @@ export type Query = {
   getUserTrashFiles: Array<File>;
   getUserTrashFolder: Array<Folder>;
   getUsersBySearchPagination: UserSearchPaginationResponse;
+};
+
+
+export type QueryGetAllUserFoldersPaginationArgs = {
+  limit: Scalars['Float'];
+  page: Scalars['Float'];
+  search: Scalars['String'];
 };
 
 
@@ -787,6 +827,37 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
+export const MakeCopyOfFileDocument = gql`
+    mutation makeCopyOfFile($fileID: String!) {
+  makeCopyOfFile(fileID: $fileID)
+}
+    `;
+export type MakeCopyOfFileMutationFn = Apollo.MutationFunction<MakeCopyOfFileMutation, MakeCopyOfFileMutationVariables>;
+
+/**
+ * __useMakeCopyOfFileMutation__
+ *
+ * To run a mutation, you first call `useMakeCopyOfFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMakeCopyOfFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [makeCopyOfFileMutation, { data, loading, error }] = useMakeCopyOfFileMutation({
+ *   variables: {
+ *      fileID: // value for 'fileID'
+ *   },
+ * });
+ */
+export function useMakeCopyOfFileMutation(baseOptions?: Apollo.MutationHookOptions<MakeCopyOfFileMutation, MakeCopyOfFileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MakeCopyOfFileMutation, MakeCopyOfFileMutationVariables>(MakeCopyOfFileDocument, options);
+      }
+export type MakeCopyOfFileMutationHookResult = ReturnType<typeof useMakeCopyOfFileMutation>;
+export type MakeCopyOfFileMutationResult = Apollo.MutationResult<MakeCopyOfFileMutation>;
+export type MakeCopyOfFileMutationOptions = Apollo.BaseMutationOptions<MakeCopyOfFileMutation, MakeCopyOfFileMutationVariables>;
 export const MakeCopyOfFolderDocument = gql`
     mutation makeCopyOfFolder($folderID: String!) {
   makeCopyOfFolder(folderID: $folderID)
@@ -818,6 +889,38 @@ export function useMakeCopyOfFolderMutation(baseOptions?: Apollo.MutationHookOpt
 export type MakeCopyOfFolderMutationHookResult = ReturnType<typeof useMakeCopyOfFolderMutation>;
 export type MakeCopyOfFolderMutationResult = Apollo.MutationResult<MakeCopyOfFolderMutation>;
 export type MakeCopyOfFolderMutationOptions = Apollo.BaseMutationOptions<MakeCopyOfFolderMutation, MakeCopyOfFolderMutationVariables>;
+export const MoveFileToNewFolderDocument = gql`
+    mutation moveFileToNewFolder($fileID: String!, $targetFolderID: String!) {
+  moveFileToNewFolder(fileID: $fileID, targetFolderID: $targetFolderID)
+}
+    `;
+export type MoveFileToNewFolderMutationFn = Apollo.MutationFunction<MoveFileToNewFolderMutation, MoveFileToNewFolderMutationVariables>;
+
+/**
+ * __useMoveFileToNewFolderMutation__
+ *
+ * To run a mutation, you first call `useMoveFileToNewFolderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMoveFileToNewFolderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [moveFileToNewFolderMutation, { data, loading, error }] = useMoveFileToNewFolderMutation({
+ *   variables: {
+ *      fileID: // value for 'fileID'
+ *      targetFolderID: // value for 'targetFolderID'
+ *   },
+ * });
+ */
+export function useMoveFileToNewFolderMutation(baseOptions?: Apollo.MutationHookOptions<MoveFileToNewFolderMutation, MoveFileToNewFolderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MoveFileToNewFolderMutation, MoveFileToNewFolderMutationVariables>(MoveFileToNewFolderDocument, options);
+      }
+export type MoveFileToNewFolderMutationHookResult = ReturnType<typeof useMoveFileToNewFolderMutation>;
+export type MoveFileToNewFolderMutationResult = Apollo.MutationResult<MoveFileToNewFolderMutation>;
+export type MoveFileToNewFolderMutationOptions = Apollo.BaseMutationOptions<MoveFileToNewFolderMutation, MoveFileToNewFolderMutationVariables>;
 export const MoveFileToTrashDocument = gql`
     mutation moveFileToTrash($fileID: String!) {
   moveFileToTrash(fileID: $fileID) {
@@ -852,6 +955,38 @@ export function useMoveFileToTrashMutation(baseOptions?: Apollo.MutationHookOpti
 export type MoveFileToTrashMutationHookResult = ReturnType<typeof useMoveFileToTrashMutation>;
 export type MoveFileToTrashMutationResult = Apollo.MutationResult<MoveFileToTrashMutation>;
 export type MoveFileToTrashMutationOptions = Apollo.BaseMutationOptions<MoveFileToTrashMutation, MoveFileToTrashMutationVariables>;
+export const MoveFolderDocument = gql`
+    mutation moveFolder($folderID: String!, $targetFolderID: String!) {
+  moveFolder(folderID: $folderID, targetFolderID: $targetFolderID)
+}
+    `;
+export type MoveFolderMutationFn = Apollo.MutationFunction<MoveFolderMutation, MoveFolderMutationVariables>;
+
+/**
+ * __useMoveFolderMutation__
+ *
+ * To run a mutation, you first call `useMoveFolderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMoveFolderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [moveFolderMutation, { data, loading, error }] = useMoveFolderMutation({
+ *   variables: {
+ *      folderID: // value for 'folderID'
+ *      targetFolderID: // value for 'targetFolderID'
+ *   },
+ * });
+ */
+export function useMoveFolderMutation(baseOptions?: Apollo.MutationHookOptions<MoveFolderMutation, MoveFolderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MoveFolderMutation, MoveFolderMutationVariables>(MoveFolderDocument, options);
+      }
+export type MoveFolderMutationHookResult = ReturnType<typeof useMoveFolderMutation>;
+export type MoveFolderMutationResult = Apollo.MutationResult<MoveFolderMutation>;
+export type MoveFolderMutationOptions = Apollo.BaseMutationOptions<MoveFolderMutation, MoveFolderMutationVariables>;
 export const MoveFolderOutOfTrashDocument = gql`
     mutation moveFolderOutOfTrash($folderID: String!) {
   moveFolderOutOfTrash(folderID: $folderID)
@@ -978,6 +1113,38 @@ export function useRemoveUserFromFolderMutation(baseOptions?: Apollo.MutationHoo
 export type RemoveUserFromFolderMutationHookResult = ReturnType<typeof useRemoveUserFromFolderMutation>;
 export type RemoveUserFromFolderMutationResult = Apollo.MutationResult<RemoveUserFromFolderMutation>;
 export type RemoveUserFromFolderMutationOptions = Apollo.BaseMutationOptions<RemoveUserFromFolderMutation, RemoveUserFromFolderMutationVariables>;
+export const RenameFileDocument = gql`
+    mutation renameFile($fileID: String!, $newName: String!) {
+  renameFile(fileID: $fileID, newName: $newName)
+}
+    `;
+export type RenameFileMutationFn = Apollo.MutationFunction<RenameFileMutation, RenameFileMutationVariables>;
+
+/**
+ * __useRenameFileMutation__
+ *
+ * To run a mutation, you first call `useRenameFileMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRenameFileMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [renameFileMutation, { data, loading, error }] = useRenameFileMutation({
+ *   variables: {
+ *      fileID: // value for 'fileID'
+ *      newName: // value for 'newName'
+ *   },
+ * });
+ */
+export function useRenameFileMutation(baseOptions?: Apollo.MutationHookOptions<RenameFileMutation, RenameFileMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RenameFileMutation, RenameFileMutationVariables>(RenameFileDocument, options);
+      }
+export type RenameFileMutationHookResult = ReturnType<typeof useRenameFileMutation>;
+export type RenameFileMutationResult = Apollo.MutationResult<RenameFileMutation>;
+export type RenameFileMutationOptions = Apollo.BaseMutationOptions<RenameFileMutation, RenameFileMutationVariables>;
 export const RenameFolderDocument = gql`
     mutation renameFolder($folderID: String!, $name: String!) {
   renameFolder(folderID: $folderID, name: $name)
@@ -1382,6 +1549,50 @@ export type GetAllPackagesQueryResult = Apollo.QueryResult<GetAllPackagesQuery, 
 export function refetchGetAllPackagesQuery(variables?: GetAllPackagesQueryVariables) {
       return { query: GetAllPackagesDocument, variables: variables }
     }
+export const GetAllUserFoldersPaginationDocument = gql`
+    query getAllUserFoldersPagination($search: String!, $page: Float!, $limit: Float!) {
+  getAllUserFoldersPagination(search: $search, page: $page, limit: $limit) {
+    results {
+      ID
+      name
+    }
+    hasMore
+  }
+}
+    `;
+
+/**
+ * __useGetAllUserFoldersPaginationQuery__
+ *
+ * To run a query within a React component, call `useGetAllUserFoldersPaginationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllUserFoldersPaginationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllUserFoldersPaginationQuery({
+ *   variables: {
+ *      search: // value for 'search'
+ *      page: // value for 'page'
+ *      limit: // value for 'limit'
+ *   },
+ * });
+ */
+export function useGetAllUserFoldersPaginationQuery(baseOptions: Apollo.QueryHookOptions<GetAllUserFoldersPaginationQuery, GetAllUserFoldersPaginationQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllUserFoldersPaginationQuery, GetAllUserFoldersPaginationQueryVariables>(GetAllUserFoldersPaginationDocument, options);
+      }
+export function useGetAllUserFoldersPaginationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllUserFoldersPaginationQuery, GetAllUserFoldersPaginationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllUserFoldersPaginationQuery, GetAllUserFoldersPaginationQueryVariables>(GetAllUserFoldersPaginationDocument, options);
+        }
+export type GetAllUserFoldersPaginationQueryHookResult = ReturnType<typeof useGetAllUserFoldersPaginationQuery>;
+export type GetAllUserFoldersPaginationLazyQueryHookResult = ReturnType<typeof useGetAllUserFoldersPaginationLazyQuery>;
+export type GetAllUserFoldersPaginationQueryResult = Apollo.QueryResult<GetAllUserFoldersPaginationQuery, GetAllUserFoldersPaginationQueryVariables>;
+export function refetchGetAllUserFoldersPaginationQuery(variables: GetAllUserFoldersPaginationQueryVariables) {
+      return { query: GetAllUserFoldersPaginationDocument, variables: variables }
+    }
 export const GetArrayOfRootFoldersNameDocument = gql`
     query getArrayOfRootFoldersName($folderID: String!) {
   getArrayOfRootFoldersName(folderID: $folderID) {
@@ -1758,6 +1969,10 @@ export const GetFoldersOfFolderDocument = gql`
       name
       path
     }
+    rootFolder {
+      ID
+      name
+    }
     path
     isTrash
     isPublic
@@ -2124,6 +2339,13 @@ export type LoginMutationVariables = Exact<{
 
 export type LoginMutation = { login: string };
 
+export type MakeCopyOfFileMutationVariables = Exact<{
+  fileID: Scalars['String'];
+}>;
+
+
+export type MakeCopyOfFileMutation = { makeCopyOfFile: string };
+
 export type MakeCopyOfFolderMutationVariables = Exact<{
   folderID: Scalars['String'];
 }>;
@@ -2131,12 +2353,28 @@ export type MakeCopyOfFolderMutationVariables = Exact<{
 
 export type MakeCopyOfFolderMutation = { makeCopyOfFolder: string };
 
+export type MoveFileToNewFolderMutationVariables = Exact<{
+  fileID: Scalars['String'];
+  targetFolderID: Scalars['String'];
+}>;
+
+
+export type MoveFileToNewFolderMutation = { moveFileToNewFolder: string };
+
 export type MoveFileToTrashMutationVariables = Exact<{
   fileID: Scalars['String'];
 }>;
 
 
 export type MoveFileToTrashMutation = { moveFileToTrash: { ID: string, name: string } };
+
+export type MoveFolderMutationVariables = Exact<{
+  folderID: Scalars['String'];
+  targetFolderID: Scalars['String'];
+}>;
+
+
+export type MoveFolderMutation = { moveFolder: string };
 
 export type MoveFolderOutOfTrashMutationVariables = Exact<{
   folderID: Scalars['String'];
@@ -2167,6 +2405,14 @@ export type RemoveUserFromFolderMutationVariables = Exact<{
 
 
 export type RemoveUserFromFolderMutation = { removeUserFromFolder: string };
+
+export type RenameFileMutationVariables = Exact<{
+  fileID: Scalars['String'];
+  newName: Scalars['String'];
+}>;
+
+
+export type RenameFileMutation = { renameFile: string };
 
 export type RenameFolderMutationVariables = Exact<{
   folderID: Scalars['String'];
@@ -2256,6 +2502,15 @@ export type GetAllPackagesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetAllPackagesQuery = { getAllPackages: Array<{ ID: number, price: number, name: string, maxStorage: number, detail: string }> };
 
+export type GetAllUserFoldersPaginationQueryVariables = Exact<{
+  search: Scalars['String'];
+  page: Scalars['Float'];
+  limit: Scalars['Float'];
+}>;
+
+
+export type GetAllUserFoldersPaginationQuery = { getAllUserFoldersPagination: { hasMore: boolean, results: Array<{ ID: string, name: string }> } };
+
 export type GetArrayOfRootFoldersNameQueryVariables = Exact<{
   folderID: Scalars['String'];
 }>;
@@ -2311,7 +2566,7 @@ export type GetFoldersOfFolderQueryVariables = Exact<{
 }>;
 
 
-export type GetFoldersOfFolderQuery = { getFoldersOfFolder: Array<{ ID: string, name: string, path: string, isTrash: boolean, isPublic: boolean, files?: Array<{ ID: string, name: string, url: string, fileType: string }> | null, subFolders?: Array<{ ID: string, name: string, path: string }> | null }> };
+export type GetFoldersOfFolderQuery = { getFoldersOfFolder: Array<{ ID: string, name: string, path: string, isTrash: boolean, isPublic: boolean, files?: Array<{ ID: string, name: string, url: string, fileType: string }> | null, subFolders?: Array<{ ID: string, name: string, path: string }> | null, rootFolder?: { ID: string, name: string } | null }> };
 
 export type GetUserSharedFilesQueryVariables = Exact<{ [key: string]: never; }>;
 

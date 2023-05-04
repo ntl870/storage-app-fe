@@ -177,9 +177,7 @@ export const AddUserModal = ({
               label: `${user.name} - ${user.email}`,
               value: user.ID,
             })}
-            onChange={(value) => {
-              setSelectedUsers(value);
-            }}
+            onChange={setSelectedUsers}
             value={selectedUsers as any}
           />
         </Col>

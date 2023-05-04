@@ -1,0 +1,3 @@
+mutation moveFolder($folderID: String!, $targetFolderID: String!) {
+  moveFolder(folderID: $folderID, targetFolderID: $targetFolderID)
+}
