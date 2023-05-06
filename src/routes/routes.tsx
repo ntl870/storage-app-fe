@@ -57,6 +57,12 @@ const BuyStoragePage = loadable(() =>
   }))
 );
 
+const SearchPage = loadable(() =>
+  import("@pages/SearchPage/SearchPage").then((module) => ({
+    default: module.SearchPage,
+  }))
+);
+
 const routes: Route[] = [
   {
     path: "/",
@@ -102,6 +108,12 @@ const routes: Route[] = [
     path: "/buy-storage",
     key: "/buy-storage",
     element: <BuyStoragePage />,
+    hidden: true,
+  },
+  {
+    path: "/search",
+    key: "/search",
+    element: <SearchPage />,
     hidden: true,
   },
 ];

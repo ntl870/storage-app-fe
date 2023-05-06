@@ -1,6 +1,7 @@
 import { MenuUnfoldOutlined, MenuFoldOutlined } from "@ant-design/icons";
 import { Button, Layout } from "antd";
 import { HeaderProfileIcon } from "./HeaderProfileIcon";
+import { SearchBar } from "./SearchBar";
 
 interface Props {
   collapsed: boolean;
@@ -10,11 +11,14 @@ interface Props {
 export const AppHeader = ({ collapsed, setCollapsed }: Props) => {
   return (
     <Layout.Header className="bg-white px-4 flex justify-between items-center">
-      <Button
-        icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-        onClick={() => setCollapsed(!collapsed)}
-        type="text"
-      ></Button>
+      <div className="flex flex-row">
+        <Button
+          icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          onClick={() => setCollapsed(!collapsed)}
+          type="text"
+        ></Button>
+        <SearchBar />
+      </div>
       <HeaderProfileIcon />
     </Layout.Header>
   );

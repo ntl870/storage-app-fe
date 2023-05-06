@@ -24,6 +24,7 @@ export type File = {
   isPublic: Scalars['Boolean'];
   isTrash: Scalars['Boolean'];
   name: Scalars['String'];
+  owner: User;
   ownerID: Scalars['String'];
   readonlyUsers?: Maybe<Array<User>>;
   sharedUsers?: Maybe<Array<User>>;
@@ -309,6 +310,7 @@ export type Query = {
   getArrayOfRootFoldersName: Array<Folder>;
   getFileByID: File;
   getFileByIDWithAccess: File;
+  getFileDetail: File;
   getFilesByFolder: Array<File>;
   getFoldersOfFolder: Array<Folder>;
   getMe: User;
@@ -323,6 +325,7 @@ export type Query = {
   getUserTrashFiles: Array<File>;
   getUserTrashFolder: Array<Folder>;
   getUsersBySearchPagination: UserSearchPaginationResponse;
+  searchFilesAndFolders: SearchFilesAndFoldersResponse;
 };
 
 
@@ -344,6 +347,11 @@ export type QueryGetFileByIdArgs = {
 
 
 export type QueryGetFileByIdWithAccessArgs = {
+  fileID: Scalars['String'];
+};
+
+
+export type QueryGetFileDetailArgs = {
   fileID: Scalars['String'];
 };
 
@@ -377,6 +385,17 @@ export type QueryGetUsersBySearchPaginationArgs = {
   limit: Scalars['Float'];
   page: Scalars['Float'];
   search: Scalars['String'];
+};
+
+
+export type QuerySearchFilesAndFoldersArgs = {
+  search: Scalars['String'];
+};
+
+export type SearchFilesAndFoldersResponse = {
+  files: Array<File>;
+  folders: Array<Folder>;
+  hasMore: Scalars['Boolean'];
 };
 
 export type UploadFolder = {
@@ -1672,6 +1691,61 @@ export type GetFileByIdWithAccessQueryResult = Apollo.QueryResult<GetFileByIdWit
 export function refetchGetFileByIdWithAccessQuery(variables: GetFileByIdWithAccessQueryVariables) {
       return { query: GetFileByIdWithAccessDocument, variables: variables }
     }
+export const GetFileDetailDocument = gql`
+    query getFileDetail($fileID: String!) {
+  getFileDetail(fileID: $fileID) {
+    ID
+    name
+    fileType
+    ownerID
+    isPublic
+    fileSize
+    sharedUsers {
+      ID
+      name
+      email
+      avatar
+    }
+    owner {
+      ID
+      name
+      avatar
+      email
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetFileDetailQuery__
+ *
+ * To run a query within a React component, call `useGetFileDetailQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFileDetailQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFileDetailQuery({
+ *   variables: {
+ *      fileID: // value for 'fileID'
+ *   },
+ * });
+ */
+export function useGetFileDetailQuery(baseOptions: Apollo.QueryHookOptions<GetFileDetailQuery, GetFileDetailQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetFileDetailQuery, GetFileDetailQueryVariables>(GetFileDetailDocument, options);
+      }
+export function useGetFileDetailLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetFileDetailQuery, GetFileDetailQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetFileDetailQuery, GetFileDetailQueryVariables>(GetFileDetailDocument, options);
+        }
+export type GetFileDetailQueryHookResult = ReturnType<typeof useGetFileDetailQuery>;
+export type GetFileDetailLazyQueryHookResult = ReturnType<typeof useGetFileDetailLazyQuery>;
+export type GetFileDetailQueryResult = Apollo.QueryResult<GetFileDetailQuery, GetFileDetailQueryVariables>;
+export function refetchGetFileDetailQuery(variables: GetFileDetailQueryVariables) {
+      return { query: GetFileDetailDocument, variables: variables }
+    }
 export const GetFilesByFolderDocument = gql`
     query getFilesByFolder($folderID: String!) {
   getFilesByFolder(folderID: $folderID) {
@@ -2240,6 +2314,51 @@ export type GetUsersBySearchPaginationQueryResult = Apollo.QueryResult<GetUsersB
 export function refetchGetUsersBySearchPaginationQuery(variables: GetUsersBySearchPaginationQueryVariables) {
       return { query: GetUsersBySearchPaginationDocument, variables: variables }
     }
+export const SearchFilesAndFoldersDocument = gql`
+    query searchFilesAndFolders($search: String!) {
+  searchFilesAndFolders(search: $search) {
+    folders {
+      ID
+      name
+    }
+    files {
+      ID
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useSearchFilesAndFoldersQuery__
+ *
+ * To run a query within a React component, call `useSearchFilesAndFoldersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchFilesAndFoldersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchFilesAndFoldersQuery({
+ *   variables: {
+ *      search: // value for 'search'
+ *   },
+ * });
+ */
+export function useSearchFilesAndFoldersQuery(baseOptions: Apollo.QueryHookOptions<SearchFilesAndFoldersQuery, SearchFilesAndFoldersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SearchFilesAndFoldersQuery, SearchFilesAndFoldersQueryVariables>(SearchFilesAndFoldersDocument, options);
+      }
+export function useSearchFilesAndFoldersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchFilesAndFoldersQuery, SearchFilesAndFoldersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SearchFilesAndFoldersQuery, SearchFilesAndFoldersQueryVariables>(SearchFilesAndFoldersDocument, options);
+        }
+export type SearchFilesAndFoldersQueryHookResult = ReturnType<typeof useSearchFilesAndFoldersQuery>;
+export type SearchFilesAndFoldersLazyQueryHookResult = ReturnType<typeof useSearchFilesAndFoldersLazyQuery>;
+export type SearchFilesAndFoldersQueryResult = Apollo.QueryResult<SearchFilesAndFoldersQuery, SearchFilesAndFoldersQueryVariables>;
+export function refetchSearchFilesAndFoldersQuery(variables: SearchFilesAndFoldersQueryVariables) {
+      return { query: SearchFilesAndFoldersDocument, variables: variables }
+    }
 export type AddSharedUserToFolderMutationVariables = Exact<{
   folderID: Scalars['String'];
   sharedUserIDs: Array<Scalars['String']> | Scalars['String'];
@@ -2525,6 +2644,13 @@ export type GetFileByIdWithAccessQueryVariables = Exact<{
 
 export type GetFileByIdWithAccessQuery = { getFileByIDWithAccess: { ID: string, name: string, fileType: string } };
 
+export type GetFileDetailQueryVariables = Exact<{
+  fileID: Scalars['String'];
+}>;
+
+
+export type GetFileDetailQuery = { getFileDetail: { ID: string, name: string, fileType: string, ownerID: string, isPublic: boolean, fileSize: number, sharedUsers?: Array<{ ID: string, name: string, email: string, avatar?: string | null }> | null, owner: { ID: string, name: string, avatar?: string | null, email: string } } };
+
 export type GetFilesByFolderQueryVariables = Exact<{
   folderID: Scalars['String'];
 }>;
@@ -2596,3 +2722,10 @@ export type GetUsersBySearchPaginationQueryVariables = Exact<{
 
 
 export type GetUsersBySearchPaginationQuery = { getUsersBySearchPagination: { hasMore: boolean, results: Array<{ ID: string, name: string, email: string }> } };
+
+export type SearchFilesAndFoldersQueryVariables = Exact<{
+  search: Scalars['String'];
+}>;
+
+
+export type SearchFilesAndFoldersQuery = { searchFilesAndFolders: { folders: Array<{ ID: string, name: string }>, files: Array<{ ID: string, name: string }> } };

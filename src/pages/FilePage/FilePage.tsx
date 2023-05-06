@@ -1,5 +1,6 @@
 import { ArrowLeftOutlined, DownloadOutlined } from "@ant-design/icons";
 import PdfViewer from "@components/PDFViewer";
+import TextFileReader from "@components/TextFileReader";
 import { useGetFileByIdWithAccessQuery } from "@generated/schemas";
 import useRouter from "@hooks/useRouter";
 import { downloadURI, getFileURL, hasVideoExtension } from "@utils/tools";
@@ -50,6 +51,10 @@ export const FilePage = () => {
 
     if (hasVideoExtension(String(file?.fileType)))
       return <ReactPlayer url={url} controls height="800px" width="1422px" />;
+
+    if (file?.fileType === "text") {
+      return <TextFileReader url={url} />;
+    }
 
     return null;
   };

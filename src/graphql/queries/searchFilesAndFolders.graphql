@@ -1,0 +1,12 @@
+query searchFilesAndFolders($search: String!) {
+  searchFilesAndFolders(search: $search) {
+    folders {
+      ID
+      name
+    }
+    files {
+      ID
+      name
+    }
+  }
+}

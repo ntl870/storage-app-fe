@@ -1,0 +1,22 @@
+query getFileDetail($fileID: String!) {
+  getFileDetail(fileID: $fileID) {
+    ID
+    name
+    fileType
+    ownerID
+    isPublic
+    fileSize
+    sharedUsers {
+      ID
+      name
+      email
+      avatar
+    }
+    owner {
+      ID
+      name
+      avatar
+      email
+    }
+  }
+}

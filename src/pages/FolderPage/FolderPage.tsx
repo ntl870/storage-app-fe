@@ -10,11 +10,13 @@ import {
 } from "@generated/schemas";
 import {
   Button,
+  Col,
   Dropdown,
   Input,
   InputRef,
   MenuProps,
   Modal,
+  Row,
   Spin,
   Typography,
   message,
@@ -40,6 +42,7 @@ import { useAlert } from "@hooks/useAlert";
 import FileDragDrop from "@components/FileDragDrop";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCloudArrowUp } from "@fortawesome/free-solid-svg-icons";
+import { FileDetail } from "@components/FileDetail";
 
 type SelectedItemType =
   | ((Folder | FileSchema) & { type: "file" | "folder" })
@@ -369,41 +372,47 @@ export const FolderPage = () => {
           }
 
           return (
-            <>
-              {!!foldersData?.getFoldersOfFolder.length &&
-                !foldersData?.getFoldersOfFolder.every(
-                  (folder) => folder.isTrash
-                ) && (
+            <Row gutter={[16, 16]}>
+              <Col span={18}>
+                {!!foldersData?.getFoldersOfFolder.length &&
+                  !foldersData?.getFoldersOfFolder.every(
+                    (folder) => folder.isTrash
+                  ) && (
+                    <Typography.Text className="inline-block p-4 font-semibold">
+                      Folders
+                    </Typography.Text>
+                  )}
+
+                <FolderSection
+                  folders={(foldersData?.getFoldersOfFolder as Folder[]) || []}
+                  handleClickFolder={handleClickFolder}
+                  selectedItem={
+                    selectedItem as Folder & { type: "file" | "folder" }
+                  }
+                  refetch={refetchFolders}
+                />
+
+                {!!filesData?.getFilesByFolder.length && (
                   <Typography.Text className="inline-block p-4 font-semibold">
-                    Folders
+                    Files
                   </Typography.Text>
                 )}
 
-              <FolderSection
-                folders={(foldersData?.getFoldersOfFolder as Folder[]) || []}
-                handleClickFolder={handleClickFolder}
-                selectedItem={
-                  selectedItem as Folder & { type: "file" | "folder" }
-                }
-                refetch={refetchFolders}
-              />
+                <FileSection
+                  files={(filesData?.getFilesByFolder as FileSchema[]) || []}
+                  handleClickItem={handleClickFile}
+                  selectedItem={
+                    selectedItem as FileSchema & { type: "file" | "folder" }
+                  }
+                  isFilterTrash={false}
+                  refetch={refetchFiles}
+                />
+              </Col>
 
-              {!!filesData?.getFilesByFolder.length && (
-                <Typography.Text className="inline-block p-4 font-semibold">
-                  Files
-                </Typography.Text>
-              )}
-
-              <FileSection
-                files={(filesData?.getFilesByFolder as FileSchema[]) || []}
-                handleClickItem={handleClickFile}
-                selectedItem={
-                  selectedItem as FileSchema & { type: "file" | "folder" }
-                }
-                isFilterTrash={false}
-                refetch={refetchFiles}
-              />
-            </>
+              <Col span={6}>
+                <FileDetail fileID={selectedItem?.ID} />
+              </Col>
+            </Row>
           );
         })()}
       </div>
