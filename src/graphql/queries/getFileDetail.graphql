@@ -18,5 +18,11 @@ query getFileDetail($fileID: String!) {
       avatar
       email
     }
+    folder {
+      ID
+      name
+    }
+    createdDate
+    modifiedDate
   }
 }

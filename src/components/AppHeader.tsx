@@ -16,7 +16,8 @@ export const AppHeader = ({ collapsed, setCollapsed }: Props) => {
           icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           onClick={() => setCollapsed(!collapsed)}
           type="text"
-        ></Button>
+          className="mr-4"
+        />
         <SearchBar />
       </div>
       <HeaderProfileIcon />

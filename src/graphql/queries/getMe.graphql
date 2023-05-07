@@ -11,6 +11,9 @@ query getMe {
     currentPackage {
       ID
       maxStorage
+      name
+      detail
     }
+    stripeCustomerID
   }
 }

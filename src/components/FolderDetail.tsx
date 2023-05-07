@@ -1,30 +1,28 @@
-import { useGetFileDetailQuery } from "@generated/schemas";
+import { FolderOutlined } from "@ant-design/icons";
+import { File, Folder, useGetFolderDetailQuery } from "@generated/schemas";
+import useRouter from "@hooks/useRouter";
+import { ShareFolderModal } from "@pages/FolderPage/components/ShareFolderModal";
 import {
-  formatFileSize,
   getBase64StringOfImage,
   getGeneratedAvatar,
   renderIconByFileType,
 } from "@utils/tools";
 import { Avatar, Button, Divider, Spin, Tooltip, Typography } from "antd";
-import { File } from "@generated/schemas";
 import { useState } from "react";
-import { ShareFileModal } from "@pages/FolderPage/components/ShareFileModal";
-import { FolderOutlined } from "@ant-design/icons";
-import useRouter from "@hooks/useRouter";
 
 interface Props {
-  fileID?: string;
+  folderID?: string;
 }
 
-export const FileDetail = ({ fileID }: Props) => {
+export const FolderDetail = ({ folderID }: Props) => {
   const { navigate } = useRouter();
   const [isOpenManageAccessModal, setIsOpenManageAccessModal] = useState(false);
 
-  const { data, loading } = useGetFileDetailQuery({
+  const { data, loading } = useGetFolderDetailQuery({
     variables: {
-      fileID: fileID || "",
+      folderID: folderID || "",
     },
-    skip: !fileID,
+    skip: !folderID,
     fetchPolicy: "cache-and-network",
   });
 
@@ -45,10 +43,10 @@ export const FileDetail = ({ fileID }: Props) => {
       <div className="flex flex-col p-4 bg-white rounded-xl mr-6">
         <div className="flex justify-center items-center flex-col">
           <Typography.Title level={5}>
-            {data?.getFileDetail.name}
+            {data?.getFolderDetail.name}
           </Typography.Title>
-          {data?.getFileDetail &&
-            renderIconByFileType(data?.getFileDetail as File)}
+          {data?.getFolderDetail &&
+            renderIconByFileType(data?.getFolderDetail as File)}
         </div>
         <div>
           <Typography.Title level={5} className="text-left">
@@ -56,27 +54,29 @@ export const FileDetail = ({ fileID }: Props) => {
           </Typography.Title>
           <div className="flex flex-col">
             <Typography.Text className="font-bold">Owner</Typography.Text>
-            {data?.getFileDetail.owner && (
+            {data?.getFolderDetail.owner && (
               <Tooltip
-                title={`${data?.getFileDetail.owner.name} - ${data?.getFileDetail.owner.email}`}
+                title={`${data?.getFolderDetail.owner.name} - ${data?.getFolderDetail.owner.email}`}
               >
                 <Avatar
                   src={
-                    data?.getFileDetail.owner.avatar
-                      ? getBase64StringOfImage(data?.getFileDetail.owner.avatar)
-                      : getGeneratedAvatar(data?.getFileDetail.owner.ID)
+                    data?.getFolderDetail.owner.avatar
+                      ? getBase64StringOfImage(
+                          data?.getFolderDetail.owner.avatar
+                        )
+                      : getGeneratedAvatar(data?.getFolderDetail.owner.ID)
                   }
                 />
               </Tooltip>
             )}
           </div>
-          {!!data?.getFileDetail.sharedUsers?.length && (
+          {!!data?.getFolderDetail.sharedUsers?.length && (
             <div className="mt-4 flex flex-col">
               <Typography.Text className="font-bold">
                 People with access
               </Typography.Text>
               <Avatar.Group>
-                {data?.getFileDetail.sharedUsers?.map((user) => {
+                {data?.getFolderDetail.sharedUsers?.map((user) => {
                   return (
                     <Tooltip
                       key={user.ID}
@@ -102,41 +102,24 @@ export const FileDetail = ({ fileID }: Props) => {
         <Divider />
         <div>
           <Typography.Text className="font-bold">File details</Typography.Text>
-          <div className="flex flex-col mt-2">
+          <div className="flex flex-col mt-2 max-w-[10rem]">
             <Typography.Text className="text-xs font-bold">
-              Type
-            </Typography.Text>
-            <Typography.Text className="text-sm">
-              {data?.getFileDetail.fileType}
-            </Typography.Text>
-          </div>
-
-          <div className="flex flex-col mt-2">
-            <Typography.Text className="text-xs font-bold">
-              Size
-            </Typography.Text>
-            <Typography.Text className="text-sm">
-              {formatFileSize(data?.getFileDetail.fileSize || 0)}
-            </Typography.Text>
-          </div>
-          <div className="flex flex-col mt-2">
-            <Typography.Text className="text-xs font-bold mt-2">
               Location
             </Typography.Text>
           </div>
           <Button
             className="mt-1"
-            onClick={() => navigate(`/folder/${data?.getFileDetail.ID}`)}
+            onClick={() => navigate(`/folder/${data?.getFolderDetail.ID}`)}
           >
             <FolderOutlined />
-            <span>{data?.getFileDetail.folder?.name}</span>
+            <span>{data?.getFolderDetail.rootFolder?.name}</span>
           </Button>
           <div className="flex flex-col mt-2">
             <Typography.Text className="text-xs font-bold">
               Created Date
             </Typography.Text>
             <Typography.Text className="text-sm">
-              {new Date(data?.getFileDetail.createdDate || "").toLocaleString(
+              {new Date(data?.getFolderDetail.createdDate || "").toLocaleString(
                 "en-US"
               )}
             </Typography.Text>
@@ -146,16 +129,16 @@ export const FileDetail = ({ fileID }: Props) => {
               Modified Date
             </Typography.Text>
             <Typography.Text className="text-sm">
-              {new Date(data?.getFileDetail.modifiedDate || "").toLocaleString(
-                "en-US"
-              )}
+              {new Date(
+                data?.getFolderDetail.modifiedDate || ""
+              ).toLocaleString("en-US")}
             </Typography.Text>
           </div>
         </div>
       </div>
       {isOpenManageAccessModal && (
-        <ShareFileModal
-          file={data?.getFileDetail as File}
+        <ShareFolderModal
+          folder={data?.getFolderDetail as Folder}
           open={isOpenManageAccessModal}
           handleClose={() => setIsOpenManageAccessModal(false)}
         />

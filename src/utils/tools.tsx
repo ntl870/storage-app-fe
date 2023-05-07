@@ -201,3 +201,8 @@ export const formatFileSize = (bytes: number) => {
 
   return (bytes / 1073741824).toFixed(1) + " GB";
 };
+
+export const isAudioExtension = (extension: string): boolean => {
+  const audioExtensions: string[] = ["mp3", "wav", "ogg", "flac", "aac"];
+  return audioExtensions.includes(extension.toLowerCase());
+};

@@ -63,6 +63,12 @@ const SearchPage = loadable(() =>
   }))
 );
 
+const ProfilePage = loadable(() =>
+  import("@pages/ProfilePage/ProfilePage").then((module) => ({
+    default: module.ProfilePage,
+  }))
+);
+
 const routes: Route[] = [
   {
     path: "/",
@@ -114,6 +120,12 @@ const routes: Route[] = [
     path: "/search",
     key: "/search",
     element: <SearchPage />,
+    hidden: true,
+  },
+  {
+    path: "/profile",
+    key: "/profile",
+    element: <ProfilePage />,
     hidden: true,
   },
 ];

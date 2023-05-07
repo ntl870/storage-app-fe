@@ -36,7 +36,7 @@ export const SearchPage = () => {
         <Typography.Title>Folders</Typography.Title>
         <List
           itemLayout="horizontal"
-          dataSource={data?.searchFilesAndFolders.folders}
+          dataSource={data?.searchFilesAndFolders.folders ?? []}
           renderItem={(folder) => (
             <List.Item>
               <Button
@@ -55,7 +55,7 @@ export const SearchPage = () => {
         <Typography.Title>Files</Typography.Title>
         <List
           itemLayout="horizontal"
-          dataSource={data?.searchFilesAndFolders.files}
+          dataSource={data?.searchFilesAndFolders.files ?? []}
           renderItem={(file) => (
             <List.Item>
               <Button

@@ -3,5 +3,6 @@ query getFileByIDWithAccess($fileID: String!) {
     ID
     name
     fileType
+    url
   }
 }

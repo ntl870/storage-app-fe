@@ -1,0 +1,5 @@
+mutation updateUser($input: UpdateUserPayload!) {
+  updateUser(input: $input) {
+    ID
+  }
+}

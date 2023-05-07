@@ -13,16 +13,19 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  DateTime: any;
   Upload: any;
 };
 
 export type File = {
   ID: Scalars['String'];
+  createdDate?: Maybe<Scalars['DateTime']>;
   fileSize: Scalars['Float'];
   fileType: Scalars['String'];
   folder?: Maybe<Folder>;
   isPublic: Scalars['Boolean'];
   isTrash: Scalars['Boolean'];
+  modifiedDate?: Maybe<Scalars['DateTime']>;
   name: Scalars['String'];
   owner: User;
   ownerID: Scalars['String'];
@@ -34,11 +37,14 @@ export type File = {
 
 export type Folder = {
   ID: Scalars['String'];
+  createdDate?: Maybe<Scalars['DateTime']>;
   files?: Maybe<Array<File>>;
   isPublic: Scalars['Boolean'];
   isTrash: Scalars['Boolean'];
+  modifiedDate?: Maybe<Scalars['DateTime']>;
   name: Scalars['String'];
-  ownerID: Scalars['String'];
+  owner?: Maybe<User>;
+  ownerID?: Maybe<Scalars['String']>;
   path: Scalars['String'];
   readonlyUsers?: Maybe<Array<User>>;
   rootFolder?: Maybe<Folder>;
@@ -85,6 +91,7 @@ export type Mutation = {
   starFolder: Scalars['String'];
   unstarFile: Scalars['String'];
   unstarFolder: Scalars['String'];
+  updateUser: User;
   uploadFile: File;
   uploadFolder: Scalars['String'];
 };
@@ -267,6 +274,11 @@ export type MutationUnstarFolderArgs = {
 };
 
 
+export type MutationUpdateUserArgs = {
+  input: UpdateUserPayload;
+};
+
+
 export type MutationUploadFileArgs = {
   file: Scalars['Upload'];
   folderID: Scalars['String'];
@@ -312,6 +324,7 @@ export type Query = {
   getFileByIDWithAccess: File;
   getFileDetail: File;
   getFilesByFolder: Array<File>;
+  getFolderDetail: Folder;
   getFoldersOfFolder: Array<Folder>;
   getMe: User;
   getPeopleWithAccessToFile: PeopleWithAccessResponse;
@@ -361,6 +374,11 @@ export type QueryGetFilesByFolderArgs = {
 };
 
 
+export type QueryGetFolderDetailArgs = {
+  folderID: Scalars['String'];
+};
+
+
 export type QueryGetFoldersOfFolderArgs = {
   folderID: Scalars['String'];
 };
@@ -393,9 +411,13 @@ export type QuerySearchFilesAndFoldersArgs = {
 };
 
 export type SearchFilesAndFoldersResponse = {
-  files: Array<File>;
-  folders: Array<Folder>;
-  hasMore: Scalars['Boolean'];
+  files?: Maybe<Array<File>>;
+  folders?: Maybe<Array<Folder>>;
+};
+
+export type UpdateUserPayload = {
+  avatar: Scalars['String'];
+  name: Scalars['String'];
 };
 
 export type UploadFolder = {
@@ -1455,6 +1477,39 @@ export function useUnstarFolderMutation(baseOptions?: Apollo.MutationHookOptions
 export type UnstarFolderMutationHookResult = ReturnType<typeof useUnstarFolderMutation>;
 export type UnstarFolderMutationResult = Apollo.MutationResult<UnstarFolderMutation>;
 export type UnstarFolderMutationOptions = Apollo.BaseMutationOptions<UnstarFolderMutation, UnstarFolderMutationVariables>;
+export const UpdateUserDocument = gql`
+    mutation updateUser($input: UpdateUserPayload!) {
+  updateUser(input: $input) {
+    ID
+  }
+}
+    `;
+export type UpdateUserMutationFn = Apollo.MutationFunction<UpdateUserMutation, UpdateUserMutationVariables>;
+
+/**
+ * __useUpdateUserMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserMutation, { data, loading, error }] = useUpdateUserMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateUserMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserMutation, UpdateUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument, options);
+      }
+export type UpdateUserMutationHookResult = ReturnType<typeof useUpdateUserMutation>;
+export type UpdateUserMutationResult = Apollo.MutationResult<UpdateUserMutation>;
+export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;
 export const UploadFileDocument = gql`
     mutation uploadFile($file: Upload!, $folderID: String!) {
   uploadFile(file: $file, folderID: $folderID) {
@@ -1657,6 +1712,7 @@ export const GetFileByIdWithAccessDocument = gql`
     ID
     name
     fileType
+    url
   }
 }
     `;
@@ -1712,6 +1768,12 @@ export const GetFileDetailDocument = gql`
       avatar
       email
     }
+    folder {
+      ID
+      name
+    }
+    createdDate
+    modifiedDate
   }
 }
     `;
@@ -1788,6 +1850,63 @@ export type GetFilesByFolderQueryResult = Apollo.QueryResult<GetFilesByFolderQue
 export function refetchGetFilesByFolderQuery(variables: GetFilesByFolderQueryVariables) {
       return { query: GetFilesByFolderDocument, variables: variables }
     }
+export const GetFolderDetailDocument = gql`
+    query getFolderDetail($folderID: String!) {
+  getFolderDetail(folderID: $folderID) {
+    ID
+    name
+    rootFolder {
+      ID
+      name
+    }
+    owner {
+      ID
+      name
+      email
+      avatar
+    }
+    sharedUsers {
+      ID
+      name
+      email
+      avatar
+    }
+    createdDate
+    modifiedDate
+  }
+}
+    `;
+
+/**
+ * __useGetFolderDetailQuery__
+ *
+ * To run a query within a React component, call `useGetFolderDetailQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFolderDetailQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFolderDetailQuery({
+ *   variables: {
+ *      folderID: // value for 'folderID'
+ *   },
+ * });
+ */
+export function useGetFolderDetailQuery(baseOptions: Apollo.QueryHookOptions<GetFolderDetailQuery, GetFolderDetailQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetFolderDetailQuery, GetFolderDetailQueryVariables>(GetFolderDetailDocument, options);
+      }
+export function useGetFolderDetailLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetFolderDetailQuery, GetFolderDetailQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetFolderDetailQuery, GetFolderDetailQueryVariables>(GetFolderDetailDocument, options);
+        }
+export type GetFolderDetailQueryHookResult = ReturnType<typeof useGetFolderDetailQuery>;
+export type GetFolderDetailLazyQueryHookResult = ReturnType<typeof useGetFolderDetailLazyQuery>;
+export type GetFolderDetailQueryResult = Apollo.QueryResult<GetFolderDetailQuery, GetFolderDetailQueryVariables>;
+export function refetchGetFolderDetailQuery(variables: GetFolderDetailQueryVariables) {
+      return { query: GetFolderDetailDocument, variables: variables }
+    }
 export const GetMeDocument = gql`
     query getMe {
   getMe {
@@ -1802,7 +1921,10 @@ export const GetMeDocument = gql`
     currentPackage {
       ID
       maxStorage
+      name
+      detail
     }
+    stripeCustomerID
   }
 }
     `;
@@ -2601,6 +2723,13 @@ export type UnstarFolderMutationVariables = Exact<{
 
 export type UnstarFolderMutation = { unstarFolder: string };
 
+export type UpdateUserMutationVariables = Exact<{
+  input: UpdateUserPayload;
+}>;
+
+
+export type UpdateUserMutation = { updateUser: { ID: string } };
+
 export type UploadFileMutationVariables = Exact<{
   file: Scalars['Upload'];
   folderID: Scalars['String'];
@@ -2642,14 +2771,14 @@ export type GetFileByIdWithAccessQueryVariables = Exact<{
 }>;
 
 
-export type GetFileByIdWithAccessQuery = { getFileByIDWithAccess: { ID: string, name: string, fileType: string } };
+export type GetFileByIdWithAccessQuery = { getFileByIDWithAccess: { ID: string, name: string, fileType: string, url: string } };
 
 export type GetFileDetailQueryVariables = Exact<{
   fileID: Scalars['String'];
 }>;
 
 
-export type GetFileDetailQuery = { getFileDetail: { ID: string, name: string, fileType: string, ownerID: string, isPublic: boolean, fileSize: number, sharedUsers?: Array<{ ID: string, name: string, email: string, avatar?: string | null }> | null, owner: { ID: string, name: string, avatar?: string | null, email: string } } };
+export type GetFileDetailQuery = { getFileDetail: { ID: string, name: string, fileType: string, ownerID: string, isPublic: boolean, fileSize: number, createdDate?: any | null, modifiedDate?: any | null, sharedUsers?: Array<{ ID: string, name: string, email: string, avatar?: string | null }> | null, owner: { ID: string, name: string, avatar?: string | null, email: string }, folder?: { ID: string, name: string } | null } };
 
 export type GetFilesByFolderQueryVariables = Exact<{
   folderID: Scalars['String'];
@@ -2658,10 +2787,17 @@ export type GetFilesByFolderQueryVariables = Exact<{
 
 export type GetFilesByFolderQuery = { getFilesByFolder: Array<{ ID: string, name: string, url: string, fileType: string, isTrash: boolean }> };
 
+export type GetFolderDetailQueryVariables = Exact<{
+  folderID: Scalars['String'];
+}>;
+
+
+export type GetFolderDetailQuery = { getFolderDetail: { ID: string, name: string, createdDate?: any | null, modifiedDate?: any | null, rootFolder?: { ID: string, name: string } | null, owner?: { ID: string, name: string, email: string, avatar?: string | null } | null, sharedUsers?: Array<{ ID: string, name: string, email: string, avatar?: string | null }> | null } };
+
 export type GetMeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMeQuery = { getMe: { ID: string, name: string, email: string, avatar?: string | null, storageUsed: number, rootFolder?: { ID: string } | null, currentPackage: { ID: number, maxStorage: number } } };
+export type GetMeQuery = { getMe: { ID: string, name: string, email: string, avatar?: string | null, storageUsed: number, stripeCustomerID: string, rootFolder?: { ID: string } | null, currentPackage: { ID: number, maxStorage: number, name: string, detail: string } } };
 
 export type GetPeopleWithAccessToFileQueryVariables = Exact<{
   fileID: Scalars['String'];
@@ -2728,4 +2864,4 @@ export type SearchFilesAndFoldersQueryVariables = Exact<{
 }>;
 
 
-export type SearchFilesAndFoldersQuery = { searchFilesAndFolders: { folders: Array<{ ID: string, name: string }>, files: Array<{ ID: string, name: string }> } };
+export type SearchFilesAndFoldersQuery = { searchFilesAndFolders: { folders?: Array<{ ID: string, name: string }> | null, files?: Array<{ ID: string, name: string }> | null } };

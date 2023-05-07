@@ -43,6 +43,7 @@ import FileDragDrop from "@components/FileDragDrop";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCloudArrowUp } from "@fortawesome/free-solid-svg-icons";
 import { FileDetail } from "@components/FileDetail";
+import { FolderDetail } from "@components/FolderDetail";
 
 type SelectedItemType =
   | ((Folder | FileSchema) & { type: "file" | "folder" })
@@ -373,7 +374,7 @@ export const FolderPage = () => {
 
           return (
             <Row gutter={[16, 16]}>
-              <Col span={18}>
+              <Col span={selectedItem ? 18 : undefined}>
                 {!!foldersData?.getFoldersOfFolder.length &&
                   !foldersData?.getFoldersOfFolder.every(
                     (folder) => folder.isTrash
@@ -408,10 +409,17 @@ export const FolderPage = () => {
                   refetch={refetchFiles}
                 />
               </Col>
+              {selectedItem && selectedItem.type === "file" && (
+                <Col span={6}>
+                  <FileDetail fileID={selectedItem?.ID} />
+                </Col>
+              )}
 
-              <Col span={6}>
-                <FileDetail fileID={selectedItem?.ID} />
-              </Col>
+              {selectedItem && selectedItem.type === "folder" && (
+                <Col span={6}>
+                  <FolderDetail folderID={selectedItem?.ID} />
+                </Col>
+              )}
             </Row>
           );
         })()}

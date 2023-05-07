@@ -3,10 +3,16 @@ import PdfViewer from "@components/PDFViewer";
 import TextFileReader from "@components/TextFileReader";
 import { useGetFileByIdWithAccessQuery } from "@generated/schemas";
 import useRouter from "@hooks/useRouter";
-import { downloadURI, getFileURL, hasVideoExtension } from "@utils/tools";
-import { Modal, Typography, Image } from "antd";
+import {
+  downloadURI,
+  getFileURL,
+  hasVideoExtension,
+  isAudioExtension,
+} from "@utils/tools";
+import { Modal, Typography, Image, Button } from "antd";
 import { Header } from "antd/es/layout/layout";
 import { useState } from "react";
+import ReactAudioPlayer from "react-audio-player";
 import ReactPlayer from "react-player";
 
 export const FilePage = () => {
@@ -56,7 +62,30 @@ export const FilePage = () => {
       return <TextFileReader url={url} />;
     }
 
-    return null;
+    if (file?.fileType && isAudioExtension(file?.fileType)) {
+      return <ReactAudioPlayer src={url} controls />;
+    }
+
+    return (
+      <div
+        className="w-[300px] rounded-lg p-8 text-center shadow-2xl flex flex-col"
+        style={{
+          backgroundColor: "rgb(76, 73, 76)",
+        }}
+      >
+        <Typography.Text className="text-white mb-2">
+          Preview not available
+        </Typography.Text>
+        <Button
+          icon={<DownloadOutlined />}
+          onClick={handleDownload}
+          type="primary"
+          className="shadow-none"
+        >
+          Download
+        </Button>
+      </div>
+    );
   };
 
   const handleDownload = () => {

@@ -1,13 +1,22 @@
-import { LogoutOutlined } from "@ant-design/icons";
+import { LogoutOutlined, ProfileOutlined } from "@ant-design/icons";
 import useAuth from "@hooks/useAuth";
 import useCurrentUser from "@hooks/useCurrentUser";
+import useRouter from "@hooks/useRouter";
 import { getBase64StringOfImage, getGeneratedAvatar } from "@utils/tools";
 import { Avatar, Dropdown, MenuProps } from "antd";
 
 export const HeaderProfileIcon = () => {
   const { logout } = useAuth();
   const { ID, avatar } = useCurrentUser();
+  const { navigate } = useRouter();
+
   const items: MenuProps["items"] = [
+    {
+      label: "Profile",
+      key: "0",
+      icon: <ProfileOutlined />,
+      onClick: () => navigate("/profile"),
+    },
     {
       label: "Logout",
       key: "1",

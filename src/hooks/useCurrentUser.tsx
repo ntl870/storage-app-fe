@@ -15,6 +15,8 @@ const useCurrentUser = () => {
     maxStorage: data?.getMe.currentPackage.maxStorage,
     storageUsed: data?.getMe.storageUsed,
     currentPackageID: data?.getMe.currentPackage.ID,
+    stripeCustomerID: data?.getMe.stripeCustomerID,
+    currentPackage: data?.getMe.currentPackage,
   };
 };
 
