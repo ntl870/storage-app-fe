@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build --max-old-space-size=512",
+    "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "codegen": "graphql-codegen -r dotenv/config --config codegen.yml",
     "start:prod": "yarn build && yarn preview"
