@@ -39,11 +39,11 @@ export const Trash = () => {
   const handleEmptyTrash = async () => {
     try {
       const { data } = await emptyTrash();
-      await refetchFolders();
-      await refetchFiles();
       if (data?.emptyUserTrash) {
         showSuccessNotification(data?.emptyUserTrash);
         setIsShowEmptyTrashConfirmModal(false);
+        await refetchFolders();
+        await refetchFiles();
       }
     } catch (err) {
       showErrorNotification((err as Error).message);
