@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "codegen": "graphql-codegen -r dotenv/config --config codegen.yml",
-    "start:prod": "yarn build && yarn preview"
+    "start:prod": "yarn build && yarn preview",
+    "deploy": "scp -r ./build/* root@139.162.10.190:/var/www/html"
   },
   "dependencies": {
     "@ant-design/compatible": "^5.1.1",
@@ -20,6 +21,7 @@
     "@loadable/component": "^5.15.3",
     "antd": "^5.2.2",
     "apollo-upload-client": "^17.0.0",
+    "axios": "^1.4.0",
     "graphql": "^16.6.0",
     "graphql-tag": "^2.12.6",
     "less": "^4.1.3",

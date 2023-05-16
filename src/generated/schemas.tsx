@@ -17,6 +17,16 @@ export type Scalars = {
   Upload: any;
 };
 
+export type Computer = {
+  ID: Scalars['String'];
+  createdDate?: Maybe<Scalars['DateTime']>;
+  hostname: Scalars['String'];
+  macAddress: Scalars['String'];
+  modifiedDate?: Maybe<Scalars['DateTime']>;
+  storagePath: Scalars['String'];
+  user: User;
+};
+
 export type File = {
   ID: Scalars['String'];
   createdDate?: Maybe<Scalars['DateTime']>;
@@ -434,6 +444,7 @@ export type UploadFolderInput = {
 export type User = {
   ID: Scalars['String'];
   avatar?: Maybe<Scalars['String']>;
+  computers?: Maybe<Array<Computer>>;
   currentPackage: Package;
   email: Scalars['String'];
   name: Scalars['String'];

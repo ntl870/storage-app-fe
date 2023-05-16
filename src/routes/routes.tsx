@@ -69,6 +69,14 @@ const ProfilePage = loadable(() =>
   }))
 );
 
+const TransactionSuccessPage = loadable(() =>
+  import("@pages/TransactionSuccessPage/TransactionSuccessPage").then(
+    (module) => ({
+      default: module.TransactionSuccessPage,
+    })
+  )
+);
+
 const routes: Route[] = [
   {
     path: "/",
@@ -126,6 +134,12 @@ const routes: Route[] = [
     path: "/profile",
     key: "/profile",
     element: <ProfilePage />,
+    hidden: true,
+  },
+  {
+    path: "/transaction-success",
+    key: "/transaction-success",
+    element: <TransactionSuccessPage />,
     hidden: true,
   },
 ];

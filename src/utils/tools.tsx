@@ -5,7 +5,7 @@ import {
   FileOutlined,
   AudioOutlined,
 } from "@ant-design/icons";
-import { File as FileSchema } from "@generated/schemas";
+import { File as FileSchema, Folder } from "@generated/schemas";
 import { Image } from "antd";
 
 export const useLocalStorage = () => {
@@ -205,4 +205,14 @@ export const formatFileSize = (bytes: number) => {
 export const isAudioExtension = (extension: string): boolean => {
   const audioExtensions: string[] = ["mp3", "wav", "ogg", "flac", "aac"];
   return audioExtensions.includes(extension.toLowerCase());
+};
+
+export const getFolderEntries = async (folder: any) => {
+  const entries = await folder.createReader?.().readEntries?.();
+  return entries;
+};
+
+export const getFile = async (fileEntry: any) => {
+  const file = await fileEntry.getFile();
+  return file;
 };

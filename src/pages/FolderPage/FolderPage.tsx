@@ -33,6 +33,8 @@ import {
 } from "@ant-design/icons";
 import {
   convertGibToBytes,
+  getFile,
+  getFolderEntries,
   getTotalSizeOfFolder,
   groupFilesByFolder,
   isEnoughSpaceLeft,
@@ -44,6 +46,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCloudArrowUp } from "@fortawesome/free-solid-svg-icons";
 import { FileDetail } from "@components/FileDetail";
 import { FolderDetail } from "@components/FolderDetail";
+import { uploadFileRestful } from "src/api/rest/filesApi";
+import { uploadFolderRestful } from "src/api/rest/folderApi";
 
 type SelectedItemType =
   | ((Folder | FileSchema) & { type: "file" | "folder" })
@@ -166,11 +170,14 @@ export const FolderPage = () => {
       setIsProcessingFiles(false);
       return;
     }
+    const formData = new FormData();
+    formData.append("file", file as Blob);
 
     try {
-      await uploadFile({
-        variables: { file: file, folderID: currentFolderID },
-      });
+      // await uploadFile({
+      //   variables: { file: file, folderID: currentFolderID },
+      // });
+      await uploadFileRestful(formData, currentFolderID);
       refetchFolders();
       refetchFiles();
       showSuccessNotification("File uploaded successfully");
@@ -199,14 +206,25 @@ export const FolderPage = () => {
     }
 
     try {
-      await uploadFolder({
-        variables: {
-          input: {
-            rootFolderID: currentFolderID,
-            folder: groupFilesByFolder(files as unknown as File[])[0],
-          },
-        },
-      });
+      console.log(files);
+      // const folderEntries = await getFolderEntries(files);
+      // console.log(folderEntries);
+      const formData = new FormData();
+
+      for (const file of files as FileList) {
+        console.log(file);
+        formData.append("files", file);
+      }
+      console.log(files);
+      // await uploadFolder({
+      //   variables: {
+      //     input: {
+      //       rootFolderID: currentFolderID,
+      //       folder: groupFilesByFolder(files as unknown as File[])[0],
+      //     },
+      //   },
+      // });
+      await uploadFolderRestful(formData, currentFolderID);
       refetchFolders();
       showSuccessNotification("Folder uploaded successfully");
     } catch (err) {
