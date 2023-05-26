@@ -25,7 +25,7 @@ import { MoveToFolderModal } from "./MoveToFolderModal";
 import { RenameFolderModal } from "./RenameFolderModal";
 import { ShareFolderModal } from "./ShareFolderModal";
 
-const StyledItem = styled.div`
+export const StyledItem = styled.div`
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
 `;

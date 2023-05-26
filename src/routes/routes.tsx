@@ -2,6 +2,7 @@ import loadable from "@loadable/component";
 import {
   DashboardFilled,
   DeleteFilled,
+  LaptopOutlined,
   ShareAltOutlined,
   StarOutlined,
 } from "@ant-design/icons";
@@ -77,6 +78,12 @@ const TransactionSuccessPage = loadable(() =>
   )
 );
 
+const ComputerPage = loadable(() =>
+  import("@pages/ComputerPage/ComputerPage").then((module) => ({
+    default: module.ComputerPage,
+  }))
+);
+
 const routes: Route[] = [
   {
     path: "/",
@@ -141,6 +148,13 @@ const routes: Route[] = [
     key: "/transaction-success",
     element: <TransactionSuccessPage />,
     hidden: true,
+  },
+  {
+    path: "/computers",
+    key: "/computers",
+    label: "Computers",
+    icon: <LaptopOutlined />,
+    element: <ComputerPage />,
   },
 ];
 export default routes;

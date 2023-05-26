@@ -1,13 +1,32 @@
-import useRouter from "@hooks/useRouter";
 import {
-  useGetFoldersOfFolderQuery,
-  Folder,
-  useGetFilesByFolderQuery,
+  FolderAddFilled,
+  FolderOpenFilled,
+  PlusOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
+import { FileDetail } from "@components/FileDetail";
+import FileDragDrop from "@components/FileDragDrop";
+import { FolderDetail } from "@components/FolderDetail";
+import NavigateBreadCrumb from "@components/NavigateBreadCrumb";
+import { faCloudArrowUp } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
   File as FileSchema,
+  Folder,
   useCreateFolderMutation,
+  useGetFilesByFolderQuery,
+  useGetFoldersOfFolderQuery,
   useUploadFileMutation,
   useUploadFolderMutation,
 } from "@generated/schemas";
+import { useAlert } from "@hooks/useAlert";
+import useCurrentUser from "@hooks/useCurrentUser";
+import useRouter from "@hooks/useRouter";
+import {
+  convertGibToBytes,
+  getTotalSizeOfFolder,
+  isEnoughSpaceLeft,
+} from "@utils/tools";
 import {
   Button,
   Col,
@@ -22,32 +41,10 @@ import {
   message,
 } from "antd";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FileSection } from "./components/FileSection";
-import useCurrentUser from "@hooks/useCurrentUser";
-import { FolderSection } from "./components/FolderSection";
-import {
-  FolderAddFilled,
-  UploadOutlined,
-  FolderOpenFilled,
-  PlusOutlined,
-} from "@ant-design/icons";
-import {
-  convertGibToBytes,
-  getFile,
-  getFolderEntries,
-  getTotalSizeOfFolder,
-  groupFilesByFolder,
-  isEnoughSpaceLeft,
-} from "@utils/tools";
-import NavigateBreadCrumb from "@components/NavigateBreadCrumb";
-import { useAlert } from "@hooks/useAlert";
-import FileDragDrop from "@components/FileDragDrop";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCloudArrowUp } from "@fortawesome/free-solid-svg-icons";
-import { FileDetail } from "@components/FileDetail";
-import { FolderDetail } from "@components/FolderDetail";
 import { uploadFileRestful } from "src/api/rest/filesApi";
 import { uploadFolderRestful } from "src/api/rest/folderApi";
+import { FileSection } from "./components/FileSection";
+import { FolderSection } from "./components/FolderSection";
 
 type SelectedItemType =
   | ((Folder | FileSchema) & { type: "file" | "folder" })
@@ -206,7 +203,6 @@ export const FolderPage = () => {
     }
 
     try {
-      console.log(files);
       // const folderEntries = await getFolderEntries(files);
       // console.log(folderEntries);
       const formData = new FormData();
@@ -215,7 +211,6 @@ export const FolderPage = () => {
         console.log(file);
         formData.append("files", file);
       }
-      console.log(files);
       // await uploadFolder({
       //   variables: {
       //     input: {
@@ -239,9 +234,9 @@ export const FolderPage = () => {
   ) => {
     try {
       const file = event?.dataTransfer?.files?.[0];
-      await uploadFile({
-        variables: { file: file, folderID: currentFolderID },
-      });
+      const formData = new FormData();
+      formData.append("file", file as Blob);
+      await uploadFileRestful(formData, currentFolderID);
       refetchFolders();
       refetchFiles();
       showSuccessNotification("File uploaded successfully");

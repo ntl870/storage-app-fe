@@ -23,8 +23,16 @@ export type Computer = {
   hostname: Scalars['String'];
   macAddress: Scalars['String'];
   modifiedDate?: Maybe<Scalars['DateTime']>;
+  name: Scalars['String'];
   storagePath: Scalars['String'];
   user: User;
+};
+
+export type ConnectComputerInput = {
+  hostname: Scalars['String'];
+  macAddress: Scalars['String'];
+  name: Scalars['String'];
+  storagePath: Scalars['String'];
 };
 
 export type File = {
@@ -76,6 +84,7 @@ export type Mutation = {
   bulkCreatePackages: Scalars['String'];
   changeUserRoleInFile: Scalars['String'];
   changeUserRoleInFolder: Scalars['String'];
+  connectComputer: Computer;
   createCheckoutSession: Scalars['String'];
   createFolder: Folder;
   deleteFile: Scalars['String'];
@@ -89,6 +98,7 @@ export type Mutation = {
   moveFolder: Scalars['String'];
   moveFolderOutOfTrash: Scalars['String'];
   moveFolderToTrash: Scalars['String'];
+  removeComputer: Scalars['String'];
   removeUserFromFile: Scalars['String'];
   removeUserFromFolder: Scalars['String'];
   renameFile: Scalars['String'];
@@ -153,6 +163,11 @@ export type MutationChangeUserRoleInFolderArgs = {
 };
 
 
+export type MutationConnectComputerArgs = {
+  input: ConnectComputerInput;
+};
+
+
 export type MutationCreateCheckoutSessionArgs = {
   packageId: Scalars['Float'];
 };
@@ -213,6 +228,11 @@ export type MutationMoveFolderOutOfTrashArgs = {
 
 export type MutationMoveFolderToTrashArgs = {
   folderID: Scalars['String'];
+};
+
+
+export type MutationRemoveComputerArgs = {
+  macAddress: Scalars['String'];
 };
 
 
@@ -326,10 +346,12 @@ export type PeopleWithAccessResponse = {
 };
 
 export type Query = {
+  getAllFilesAndFoldersOfUser: SearchFilesAndFoldersResponse;
   getAllPackages: Array<Package>;
   getAllUserFoldersPagination: GetFoldersByOwnerIdPaginationResponse;
   getAllUsers: Array<User>;
   getArrayOfRootFoldersName: Array<Folder>;
+  getComputerByMacAddress: Computer;
   getFileByID: File;
   getFileByIDWithAccess: File;
   getFileDetail: File;
@@ -342,6 +364,7 @@ export type Query = {
   getStarredFiles: Array<File>;
   getStarredFolders: Array<Folder>;
   getUserByID: User;
+  getUserComputers: Array<Computer>;
   getUserFiles: Array<File>;
   getUserSharedFiles: Array<File>;
   getUserSharedFolders: Array<Folder>;
@@ -361,6 +384,11 @@ export type QueryGetAllUserFoldersPaginationArgs = {
 
 export type QueryGetArrayOfRootFoldersNameArgs = {
   folderID: Scalars['String'];
+};
+
+
+export type QueryGetComputerByMacAddressArgs = {
+  macAddress: Scalars['String'];
 };
 
 
@@ -1101,6 +1129,37 @@ export function useMoveFolderToTrashMutation(baseOptions?: Apollo.MutationHookOp
 export type MoveFolderToTrashMutationHookResult = ReturnType<typeof useMoveFolderToTrashMutation>;
 export type MoveFolderToTrashMutationResult = Apollo.MutationResult<MoveFolderToTrashMutation>;
 export type MoveFolderToTrashMutationOptions = Apollo.BaseMutationOptions<MoveFolderToTrashMutation, MoveFolderToTrashMutationVariables>;
+export const RemoveComputerDocument = gql`
+    mutation removeComputer($macAddress: String!) {
+  removeComputer(macAddress: $macAddress)
+}
+    `;
+export type RemoveComputerMutationFn = Apollo.MutationFunction<RemoveComputerMutation, RemoveComputerMutationVariables>;
+
+/**
+ * __useRemoveComputerMutation__
+ *
+ * To run a mutation, you first call `useRemoveComputerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveComputerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeComputerMutation, { data, loading, error }] = useRemoveComputerMutation({
+ *   variables: {
+ *      macAddress: // value for 'macAddress'
+ *   },
+ * });
+ */
+export function useRemoveComputerMutation(baseOptions?: Apollo.MutationHookOptions<RemoveComputerMutation, RemoveComputerMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveComputerMutation, RemoveComputerMutationVariables>(RemoveComputerDocument, options);
+      }
+export type RemoveComputerMutationHookResult = ReturnType<typeof useRemoveComputerMutation>;
+export type RemoveComputerMutationResult = Apollo.MutationResult<RemoveComputerMutation>;
+export type RemoveComputerMutationOptions = Apollo.BaseMutationOptions<RemoveComputerMutation, RemoveComputerMutationVariables>;
 export const RemoveUserFromFileDocument = gql`
     mutation removeUserFromFile($fileID: String!, $targetUserID: String!) {
   removeUserFromFile(fileID: $fileID, targetUserID: $targetUserID)
@@ -2160,6 +2219,47 @@ export type GetStarredFoldersQueryResult = Apollo.QueryResult<GetStarredFoldersQ
 export function refetchGetStarredFoldersQuery(variables?: GetStarredFoldersQueryVariables) {
       return { query: GetStarredFoldersDocument, variables: variables }
     }
+export const GetUserComputersDocument = gql`
+    query getUserComputers {
+  getUserComputers {
+    ID
+    macAddress
+    hostname
+    storagePath
+    name
+  }
+}
+    `;
+
+/**
+ * __useGetUserComputersQuery__
+ *
+ * To run a query within a React component, call `useGetUserComputersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserComputersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserComputersQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetUserComputersQuery(baseOptions?: Apollo.QueryHookOptions<GetUserComputersQuery, GetUserComputersQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetUserComputersQuery, GetUserComputersQueryVariables>(GetUserComputersDocument, options);
+      }
+export function useGetUserComputersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserComputersQuery, GetUserComputersQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetUserComputersQuery, GetUserComputersQueryVariables>(GetUserComputersDocument, options);
+        }
+export type GetUserComputersQueryHookResult = ReturnType<typeof useGetUserComputersQuery>;
+export type GetUserComputersLazyQueryHookResult = ReturnType<typeof useGetUserComputersLazyQuery>;
+export type GetUserComputersQueryResult = Apollo.QueryResult<GetUserComputersQuery, GetUserComputersQueryVariables>;
+export function refetchGetUserComputersQuery(variables?: GetUserComputersQueryVariables) {
+      return { query: GetUserComputersDocument, variables: variables }
+    }
 export const GetFoldersOfFolderDocument = gql`
     query getFoldersOfFolder($folderID: String!) {
   getFoldersOfFolder(folderID: $folderID) {
@@ -2642,6 +2742,13 @@ export type MoveFolderToTrashMutationVariables = Exact<{
 
 export type MoveFolderToTrashMutation = { moveFolderToTrash: string };
 
+export type RemoveComputerMutationVariables = Exact<{
+  macAddress: Scalars['String'];
+}>;
+
+
+export type RemoveComputerMutation = { removeComputer: string };
+
 export type RemoveUserFromFileMutationVariables = Exact<{
   fileID: Scalars['String'];
   targetUserID: Scalars['String'];
@@ -2833,6 +2940,11 @@ export type GetStarredFoldersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetStarredFoldersQuery = { getStarredFolders: Array<{ ID: string, name: string, path: string }> };
+
+export type GetUserComputersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetUserComputersQuery = { getUserComputers: Array<{ ID: string, macAddress: string, hostname: string, storagePath: string, name: string }> };
 
 export type GetFoldersOfFolderQueryVariables = Exact<{
   folderID: Scalars['String'];

@@ -1,0 +1,9 @@
+query getUserComputers {
+  getUserComputers {
+    ID
+    macAddress
+    hostname
+    storagePath
+    name
+  }
+}

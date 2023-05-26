@@ -32,23 +32,20 @@ export const downloadURI = (
   name: string
 ) => {
   const storage = useLocalStorage();
-  const link = document.createElement("a");
-  document.body.appendChild(link);
   const headers = new Headers();
   const token = storage.getLocalStorage("token");
   headers.append("Authorization", `Bearer ${token}`);
 
-  fetch(`${import.meta.env.VITE_BASE_API}/${type}/${fileID}`, { headers })
-    .then((response) => response.blob())
-    .then((blobby) => {
-      const objectUrl = window.URL.createObjectURL(blobby);
+  const downloadUrl = `${import.meta.env.VITE_BASE_API}/${type}/${fileID}`;
 
-      link.href = objectUrl;
-      link.download = name;
-      link.click();
+  // Append headers to the URL as query parameters
+  const urlWithHeaders = new URL(downloadUrl);
+  headers.forEach((value, name) => {
+    urlWithHeaders.searchParams.append(name, value);
+  });
 
-      window.URL.revokeObjectURL(objectUrl);
-    });
+  // Set the URL as the location.href to trigger the download
+  window.location.href = urlWithHeaders.toString();
 };
 
 export const groupFilesByFolder = (files: File[]) => {

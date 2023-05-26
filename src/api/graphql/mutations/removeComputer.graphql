@@ -1,0 +1,3 @@
+mutation removeComputer($macAddress: String!) {
+  removeComputer(macAddress: $macAddress)
+}
