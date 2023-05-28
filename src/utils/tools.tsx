@@ -43,7 +43,6 @@ export const downloadURI = (
   headers.forEach((value, name) => {
     urlWithHeaders.searchParams.append(name, value);
   });
-
   // Set the URL as the location.href to trigger the download
   window.location.href = urlWithHeaders.toString();
 };
