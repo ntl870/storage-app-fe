@@ -11,8 +11,16 @@ import { faArrowTurnRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAlert } from "@hooks/useAlert";
 import { downloadURI } from "@utils/tools";
-import { Col, Dropdown, MenuProps, Row, Tooltip, Typography } from "antd";
-import { useMemo, useState } from "react";
+import {
+  Col,
+  Dropdown,
+  MenuProps,
+  Row,
+  Tooltip,
+  Typography,
+  message,
+} from "antd";
+import { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import {
   Folder,
@@ -57,6 +65,7 @@ export const FolderSection = ({
   const [currentMoveToFolder, setCurrentMoveToFolder] = useState<Folder | null>(
     null
   );
+  const [isZippingFolder, setIsZippingFolder] = useState(false);
   const [starFolder] = useStarFolderMutation();
   const [unstarFolder] = useUnstarFolderMutation();
 
@@ -66,6 +75,7 @@ export const FolderSection = ({
       key: "1",
       icon: <CloudDownloadOutlined />,
       onClick: () => {
+        setIsZippingFolder(true);
         downloadURI(String(item.ID), "folders", item.name);
       },
     },
@@ -185,6 +195,16 @@ export const FolderSection = ({
     () => folders.filter((folder) => !folder.isTrash),
     [folders]
   );
+
+  useEffect(() => {
+    if (isZippingFolder)
+      message.loading({
+        content: "Zipping folder...",
+        key: "zipping-folder",
+        duration: 0,
+      });
+    else message.destroy();
+  }, [isZippingFolder]);
 
   return (
     <>

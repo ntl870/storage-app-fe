@@ -38,7 +38,12 @@ export const ProtectedLayout = ({ children, routes }: ProtectedLayoutProps) => {
         }}
       >
         <div className="flex items-center p-4">
-          <img id="logo" src={logo} className="w-10 h-10 mr-1" />
+          <img
+            id="logo"
+            alt="CloudStorage logo"
+            src={logo}
+            className="w-10 h-10 mr-1"
+          />
           <Typography.Title level={4} className="mb-0">
             CloudStorage
           </Typography.Title>

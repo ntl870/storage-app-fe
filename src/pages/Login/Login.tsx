@@ -3,6 +3,7 @@ import { MutationLoginArgs, useLoginMutation } from "../../generated/schemas";
 import { useAlert } from "../../hooks/useAlert";
 import { useLocalStorage } from "../../utils/tools";
 import useRouter from "../../hooks/useRouter";
+import landingImg from "../../assets/landing.jpg";
 
 const Login = () => {
   const [login, { loading }] = useLoginMutation();
@@ -30,10 +31,9 @@ const Login = () => {
     <Row className="h-full">
       <Col
         span={12}
-        className="flex flex-col justify-center items-center bg-gray-100"
+        className="flex flex-col justify-center items-center bg-[#1e2683]"
       >
-        <h1 className="text-4xl font-bold">Welcome back!</h1>
-        <p className="text-gray-600">Please login to your account</p>
+        <img src={landingImg} className="w-96" alt="CloudStorage logo" />
       </Col>
       <Col span={12} className="flex flex-col justify-center items-center">
         <h1 className="text-4xl font-bold mb-4">Login</h1>

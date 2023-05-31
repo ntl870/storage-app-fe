@@ -34,6 +34,7 @@ export const HeaderProfileIcon = () => {
     >
       <Avatar
         size="large"
+        alt="Profile picture"
         src={
           !avatar
             ? getGeneratedAvatar(String(ID))

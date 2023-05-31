@@ -62,8 +62,6 @@ export const FolderPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const folderInputRef = useRef<HTMLInputElement>(null);
 
-  const [uploadFolder] = useUploadFolderMutation();
-
   const [createFolder, { loading: createFolderLoading }] =
     useCreateFolderMutation({
       onCompleted: () => {
@@ -71,8 +69,6 @@ export const FolderPage = () => {
         refetchFolders();
       },
     });
-
-  const [uploadFile] = useUploadFileMutation();
 
   const currentFolderID = useMemo(
     () => params.folderID || rootFolderID || "",
