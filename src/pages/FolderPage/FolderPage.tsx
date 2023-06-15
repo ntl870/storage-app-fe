@@ -163,6 +163,8 @@ export const FolderPage = () => {
       setIsProcessingFiles(false);
       return;
     }
+    console.log(file);
+
     const formData = new FormData();
     formData.append("file", file as Blob);
 
@@ -202,7 +204,6 @@ export const FolderPage = () => {
       // const folderEntries = await getFolderEntries(files);
       // console.log(folderEntries);
       const formData = new FormData();
-
       for (const file of files as FileList) {
         console.log(file);
         formData.append("files", file);
