@@ -132,26 +132,6 @@ export const FolderSection = ({
             },
           },
           {
-            label: "Make a copy",
-            key: "6",
-            icon: <CopyOutlined />,
-            onClick: async () => {
-              try {
-                const { data } = await makeCopyOfFolder({
-                  variables: {
-                    folderID: item.ID,
-                  },
-                });
-                if (data?.makeCopyOfFolder) {
-                  await refetch();
-                  showSuccessNotification(data?.makeCopyOfFolder);
-                }
-              } catch (err) {
-                showErrorNotification((err as Error).message);
-              }
-            },
-          },
-          {
             label: "Move to",
             key: "7",
             icon: <FontAwesomeIcon icon={faArrowTurnRight} />,
