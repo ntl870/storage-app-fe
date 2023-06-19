@@ -103,7 +103,7 @@ const PdfViewer = ({ url }: Props) => {
           className="bg-black opacity-50 text-white disabled:invisible"
         />
       </div>
-      <div className="fixed bottom-12 left-1/2 right-1/2 w-10">
+      <div className="fixed bottom-12 left-1/2 right-1/2 w-16">
         <span>
           {pageNum} / {pdfDoc ? pdfDoc.numPages : "-"}
         </span>

@@ -65,7 +65,6 @@ export const FolderSection = ({
   const [currentMoveToFolder, setCurrentMoveToFolder] = useState<Folder | null>(
     null
   );
-  const [isZippingFolder, setIsZippingFolder] = useState(false);
   const [starFolder] = useStarFolderMutation();
   const [unstarFolder] = useUnstarFolderMutation();
 
@@ -75,7 +74,6 @@ export const FolderSection = ({
       key: "1",
       icon: <CloudDownloadOutlined />,
       onClick: () => {
-        setIsZippingFolder(true);
         downloadURI(String(item.ID), "folders", item.name);
       },
     },
@@ -195,16 +193,6 @@ export const FolderSection = ({
     () => folders.filter((folder) => !folder.isTrash),
     [folders]
   );
-
-  useEffect(() => {
-    if (isZippingFolder)
-      message.loading({
-        content: "Zipping folder...",
-        key: "zipping-folder",
-        duration: 0,
-      });
-    else message.destroy();
-  }, [isZippingFolder]);
 
   return (
     <>
