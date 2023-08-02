@@ -34,7 +34,8 @@ const authLink = setContext((_, { headers }) => {
 const client = new ApolloClient({
   cache: new InMemoryCache(),
   link: authLink.concat(ApolloLink.from([uploadLink, httpLink])),
-});
+});\
+
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>

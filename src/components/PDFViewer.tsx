@@ -3,7 +3,7 @@ import { useState, useEffect, useRef, useLayoutEffect } from "react";
 // @ts-ignore
 import * as pdfjs from "pdfjs-dist/build/pdf";
 import pdfjsWorker from "pdfjs-dist/build/pdf.worker?worker";
-import { Button } from "antd";
+import { Button, Spin } from "antd";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 
 const init = () => {
@@ -27,6 +27,7 @@ interface Props {
 const PdfViewer = ({ url }: Props) => {
   const [pdfDoc, setPdfDoc] = useState<pdfjs.PDFDocumentProxy | null>(null);
   const [pageNum, setPageNum] = useState<number>(1);
+  const [isLoading, setIsLoading] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const handlePreviousPage = () => {
@@ -44,8 +45,10 @@ const PdfViewer = ({ url }: Props) => {
   }, []);
 
   useEffect(() => {
+    setIsLoading(true);
     pdfjs?.getDocument(url).promise.then((pdfDoc: pdfjs.PDFDocumentProxy) => {
       setPdfDoc(pdfDoc);
+      setIsLoading(false);
     });
   }, [url]);
 
@@ -82,32 +85,40 @@ const PdfViewer = ({ url }: Props) => {
 
   return (
     <div className="text-center w-full">
-      <div className="flex flex-row justify-evenly items-center w-full">
-        <Button
-          shape="circle"
-          icon={<LeftOutlined />}
-          size="large"
-          disabled={pageNum <= 1}
-          onClick={handlePreviousPage}
-          type="text"
-          className="bg-black opacity-50 text-white disabled:invisible"
-        />
-        <canvas ref={canvasRef} />
-        <Button
-          disabled={pageNum >= Number(pdfDoc?.numPages)}
-          onClick={handleNextPage}
-          shape="circle"
-          icon={<RightOutlined />}
-          size="large"
-          type="text"
-          className="bg-black opacity-50 text-white disabled:invisible"
-        />
-      </div>
-      <div className="fixed bottom-12 left-1/2 right-1/2 w-16">
-        <span>
-          {pageNum} / {pdfDoc ? pdfDoc.numPages : "-"}
-        </span>
-      </div>
+      {isLoading ? (
+        <div>
+          <Spin size="large" />
+        </div>
+      ) : (
+        <>
+          <div className="flex flex-row justify-evenly items-center w-full">
+            <Button
+              shape="circle"
+              icon={<LeftOutlined />}
+              size="large"
+              disabled={pageNum <= 1}
+              onClick={handlePreviousPage}
+              type="text"
+              className="bg-black opacity-50 text-white disabled:invisible"
+            />
+            <canvas ref={canvasRef} />
+            <Button
+              disabled={pageNum >= Number(pdfDoc?.numPages)}
+              onClick={handleNextPage}
+              shape="circle"
+              icon={<RightOutlined />}
+              size="large"
+              type="text"
+              className="bg-black opacity-50 text-white disabled:invisible"
+            />
+          </div>
+          <div className="fixed bottom-12 left-1/2 right-1/2 w-16">
+            <span>
+              {pageNum} / {pdfDoc ? pdfDoc.numPages : "-"}
+            </span>
+          </div>
+        </>
+      )}
     </div>
   );
 };
